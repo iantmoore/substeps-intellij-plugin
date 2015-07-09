@@ -44,7 +44,8 @@
 
 
 
-      <completion.contributor language="SubstepStepDefinition" implementationClass="uk.co.itmoore.intellisubsteps.psi.stepdefinition.SubstepDefinitionCompletionContributor"/>
+      <completion.contributor language="SubstepStepDefinition"
+              implementationClass="uk.co.itmoore.intellisubsteps.psi.stepdefinition.SubstepDefinitionCompletionContributor"/>
 
       <lang.parserDefinition language="SubstepStepDefinition" implementationClass="uk.co.itmoore.intellisubsteps.psi.stepdefinition.SubstepDefinitionParserDefinition"/>
 

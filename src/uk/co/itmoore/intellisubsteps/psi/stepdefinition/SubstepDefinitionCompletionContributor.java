@@ -26,13 +26,20 @@ public class SubstepDefinitionCompletionContributor extends CompletionContributo
  * you want to suggest from its {@link PsiReference#getVariants()} method as {@link String}s,
  * {@link com.intellij.psi.PsiElement}s, or better {@link LookupElement}s.<p>
  *
+ *
  * Q: OK, but what to do with CompletionContributor?<br>
- * A: There are two ways. The easier and preferred one is to provide constructor in your contributor and register completion providers there:
+ * A: There are two ways. The easier and preferred one is to provide constructor in your contributor
+ * and register completion providers there:
  * {@link #extend(CompletionType, ElementPattern, CompletionProvider)}.<br>
- * A more generic way is to override default {@link #fillCompletionVariants(CompletionParameters, CompletionResultSet)} implementation
- * and provide your own. It's easier to debug, but harder to write. Remember, that completion variant collection is done in a dedicated thread
- * WITHOUT read action, so you'll have to manually invoke {@link com.intellij.openapi.application.Application#runReadAction(Runnable)} each time
- * you access PSI. Don't spend long time inside read action, since this will prevent user from selecting lookup element or cancelling completion.<p>
+ *
+ * A more generic way is to override default
+ * {@link #fillCompletionVariants(CompletionParameters, CompletionResultSet)} implementation
+ * and provide your own. It's easier to debug, but harder to write. Remember, that completion variant
+ * collection is done in a dedicated thread
+ * WITHOUT read action, so you'll have to manually invoke
+ * {@link com.intellij.openapi.application.Application#runReadAction(Runnable)} each time
+ * you access PSI. Don't spend long time inside read action, since this will prevent user from
+ * selecting lookup element or cancelling completion.<p>
  *
  * Q: What does the {@link CompletionParameters#getPosition()} return?<br>
  * A: When completion is invoked, the file being edited is first copied (the original file can be accessed from {@link com.intellij.psi.PsiFile#getOriginalFile()}
@@ -113,7 +120,7 @@ public class SubstepDefinitionCompletionContributor extends CompletionContributo
         logger.debug("SubstepDefinitionCompletionContributor ctor");
 
         extend(CompletionType.BASIC,
-                PlatformPatterns.psiElement(SubstepDefinitionElementTypes.SUBSTEP_DEFINITION_ELEMENT_TYPE).withLanguage(SubstepsStepDefinitionLanguage.INSTANCE),
+                PlatformPatterns.psiElement(SubstepDefinitionElementTypes.SUBSTEP_DEFINITION_STEP_ELEMENT_TYPE).withLanguage(SubstepsStepDefinitionLanguage.INSTANCE),
                 new CompletionProvider<CompletionParameters>() {
                     public void addCompletions(@NotNull CompletionParameters parameters,
                                                ProcessingContext context,
@@ -123,8 +130,14 @@ public class SubstepDefinitionCompletionContributor extends CompletionContributo
 
 
                         resultSet.addElement(LookupElementBuilder.create("Hello"));
+                        resultSet.addElement(LookupElementBuilder.create("Bob"));
+
                     }
                 }
         );
+    }
+
+    public void fillCompletionVariants(CompletionParameters params, CompletionResultSet result){
+        super.fillCompletionVariants(params, result);
     }
 }

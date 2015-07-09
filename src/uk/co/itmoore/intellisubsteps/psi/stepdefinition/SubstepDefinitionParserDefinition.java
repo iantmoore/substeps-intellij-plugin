@@ -16,6 +16,7 @@ import com.intellij.psi.util.PsiUtilCore;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
+import uk.co.itmoore.intellisubsteps.psi.stepdefinition.impl.SubstepDefinitionDefineBlockImpl;
 import uk.co.itmoore.intellisubsteps.psi.stepdefinition.impl.SubstepDefinitionImpl;
 import uk.co.itmoore.intellisubsteps.psi.stepdefinition.impl.SubstepDefinitionStepImpl;
 import uk.co.itmoore.intellisubsteps.psi.stepdefinition.impl.SubstepDefinitionsFileImpl;
@@ -72,6 +73,8 @@ public class SubstepDefinitionParserDefinition implements ParserDefinition {
 
         if (astNode.getElementType() == SubstepDefinitionElementTypes.SUBSTEP_DEFINITION_ELEMENT_TYPE) return new SubstepDefinitionImpl(astNode);
         if (astNode.getElementType() == SubstepDefinitionElementTypes.SUBSTEP_DEFINITION_STEP_ELEMENT_TYPE) return new SubstepDefinitionStepImpl(astNode);
+        if (astNode.getElementType() == SubstepDefinitionElementTypes.SUBSTEP_DEFINITION_DEFINE_BLOCK_ELEMENT_TYPE) return new SubstepDefinitionDefineBlockImpl(astNode);
+        // TODO need to sort out the model here - this is why it's barfing
 
 //        if (node.getElementType() == GherkinElementTypes.FEATURE) return new GherkinFeatureImpl(node);
 //        if (node.getElementType() == GherkinElementTypes.FEATURE_HEADER) return new GherkinFeatureHeaderImpl(node);

@@ -20,7 +20,7 @@ public class SubstepDefinitionParser implements PsiParser {
     @Override
     public ASTNode parse(IElementType root, PsiBuilder psiBuilder) {
 
-        log.debug("parse");
+//        log.debug("parse");
 
         psiBuilder.setDebugMode(true);
 
@@ -28,7 +28,7 @@ public class SubstepDefinitionParser implements PsiParser {
         parseFileTopLevel(psiBuilder);
         marker.done(SubstepDefinitionElementTypes.SUBSTEP_DEFINITION_FILE);
 
-        log.debug("parse done");
+     //   log.debug("parse done");
 
         return psiBuilder.getTreeBuilt();
     }
@@ -37,12 +37,12 @@ public class SubstepDefinitionParser implements PsiParser {
 
     private static void parseFileTopLevel(PsiBuilder builder) {
 
-        log.debug("parse file top level");
+       // log.debug("parse file top level");
 
         while(!builder.eof()) {
             final IElementType tokenType = builder.getTokenType();
 
-            log.debug("tokenType: " + tokenType.toString());
+  //          log.debug("tokenType: " + tokenType.toString());
 
             if (tokenType == SubstepDefinitionTokenTypes.DEFINE_KEYWORD_TOKEN) {
                 parseSubstepDefinition(builder);
@@ -51,17 +51,17 @@ public class SubstepDefinitionParser implements PsiParser {
 //                parseTags(builder);
 //            }
             else {
-                log.debug("advancing");
+    //            log.debug("advancing");
                 builder.advanceLexer();
             }
         }
-        log.debug("parse file top level - done");
+      //  log.debug("parse file top level - done");
 
     }
 
     private static void parseSubstepDefinition(PsiBuilder builder) {
 
-        log.debug("parseSubstepDefinition");
+      //  log.debug("parseSubstepDefinition");
 
         final PsiBuilder.Marker substepDefineMarker = builder.mark();
 
@@ -86,7 +86,7 @@ public class SubstepDefinitionParser implements PsiParser {
 
             if (tokenType == SubstepDefinitionTokenTypes.COLON_TOKEN){
                 // nop
-                log.debug("parsed colon");
+        //        log.debug("parsed colon");
                 builder.advanceLexer();
             }
             else if (tokenType == SubstepDefinitionTokenTypes.SUBSTEP_DEFINITION_TOKEN){
@@ -122,13 +122,13 @@ public class SubstepDefinitionParser implements PsiParser {
 
 
                     // TODO end this marker and bail
-                    log.debug("got another DEFINE keyword with LineBreaksBefore");
+          //          log.debug("got another DEFINE keyword with LineBreaksBefore");
                     break;
 //                    descMarker = builder.mark();
                 }
-                else {
-                    log.debug("define keyword no line break before");
-                }
+//                else {
+//                    log.debug("define keyword no line break before");
+//                }
 
             }
             else {
@@ -162,15 +162,15 @@ public class SubstepDefinitionParser implements PsiParser {
 //        if (descMarker != null) {
 //            descMarker.done(GherkinElementTypes.FEATURE_HEADER);
 //        }
-        log.debug("parseSubstepDefinition - done");
+//        log.debug("parseSubstepDefinition - done");
 
     }
 
     private static boolean hadLineBreakBefore(PsiBuilder builder, int prevTokenEnd) {
         if (prevTokenEnd < 0) return false;
 
-        log.debug("hadLineBreakBefore - prevTokenEnd: " + prevTokenEnd +
-                " builder.getCurrentOffset(): " + builder.getCurrentOffset());
+//        log.debug("hadLineBreakBefore - prevTokenEnd: " + prevTokenEnd +
+//                " builder.getCurrentOffset(): " + builder.getCurrentOffset());
 
         final String precedingText = builder.getOriginalText().subSequence(prevTokenEnd,
                 builder.getCurrentOffset()).toString();

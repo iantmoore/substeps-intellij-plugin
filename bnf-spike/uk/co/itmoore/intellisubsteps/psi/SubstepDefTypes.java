@@ -4,7 +4,6 @@ package uk.co.itmoore.intellisubsteps.psi;
 import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.PsiElement;
 import com.intellij.lang.ASTNode;
-import uk.co.itmoore.intellisubsteps.psi.impl.*;
 
 public interface SubstepDefTypes {
 

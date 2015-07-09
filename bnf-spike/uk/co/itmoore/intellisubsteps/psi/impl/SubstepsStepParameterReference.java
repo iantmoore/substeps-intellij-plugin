@@ -1,8 +1,8 @@
-package uk.co.itmoore.intellisubsteps.psi.impl;
+package uk.co.itmoore.intellisubsteps.psi.feature.impl;
 
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.util.PsiTreeUtil;
-import uk.co.itmoore.intellisubsteps.psi.*;
+
 /**
  * User: Andrey.Vokin
  * Date: 4/13/11

@@ -1,4 +1,4 @@
-package uk.co.itmoore.intellisubsteps.psi.impl;
+package uk.co.itmoore.intellisubsteps.psi.feature.impl;
 
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiElement;
@@ -7,7 +7,6 @@ import com.intellij.psi.PsiReference;
 import com.intellij.util.ArrayUtil;
 import com.intellij.util.IncorrectOperationException;
 import org.jetbrains.annotations.NotNull;
-import uk.co.itmoore.intellisubsteps.psi.*;
 
 /**
  * User: Andrey.Vokin

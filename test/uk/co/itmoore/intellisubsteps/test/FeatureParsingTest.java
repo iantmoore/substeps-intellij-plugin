@@ -7,9 +7,9 @@ package uk.co.itmoore.intellisubsteps.test;
 import com.intellij.testFramework.ParsingTestCase;
 import uk.co.itmoore.intellisubsteps.psi.stepdefinition.SubstepDefinitionParserDefinition;
 
-public class SubstepDefinitionParsingTest extends ParsingTestCase {
-    public SubstepDefinitionParsingTest() {
-        super("", "substeps", new SubstepDefinitionParserDefinition());
+public class FeatureParsingTest extends ParsingTestCase {
+    public FeatureParsingTest() {
+        super("", "feature", new SubstepDefinitionParserDefinition());
     }
 
     public void testParsingTestData() {
@@ -18,7 +18,8 @@ public class SubstepDefinitionParsingTest extends ParsingTestCase {
 
     @Override
     protected String getTestDataPath() {
-        return "/home/ian/projects/intelliSubsteps/test/testData/substeps/psi";
+
+        return "/home/ian/projects/intelliSubsteps/test/testData/features";
     }
 
     @Override

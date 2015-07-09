@@ -1,7 +1,6 @@
 package uk.co.itmoore.intellisubsteps.psi;
 
 import com.intellij.psi.PsiElementVisitor;
-import uk.co.itmoore.intellisubsteps.psi.impl.*;
 
 public abstract class SubstepsElementVisitor extends PsiElementVisitor {
   public void visitFeature(SubstepsFeature feature) {

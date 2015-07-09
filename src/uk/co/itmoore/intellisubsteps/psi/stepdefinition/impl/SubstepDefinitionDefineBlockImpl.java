@@ -7,19 +7,17 @@ import uk.co.itmoore.intellisubsteps.psi.stepdefinition.SubstepsDefinitionElemen
 /**
  * Created by ian on 05/07/15.
  */
-public class SubstepDefinitionStepImpl extends SubstepsPsiElementBase {
-    public SubstepDefinitionStepImpl(@NotNull ASTNode node) {
+
+// represents a define: block with steps
+
+public class SubstepDefinitionDefineBlockImpl extends SubstepsPsiElementBase {
+
+    public SubstepDefinitionDefineBlockImpl(@NotNull ASTNode node) {
         super(node);
     }
 
     @Override
-    protected void acceptGherkin(SubstepsDefinitionElementVisitor substepDefinitionElementVisitor) {
+    protected void acceptGherkin(SubstepsDefinitionElementVisitor gherkinElementVisitor) {
 
     }
-
-//    @Override
-//    public void getVariants(){
-//
-//    }
-
 }

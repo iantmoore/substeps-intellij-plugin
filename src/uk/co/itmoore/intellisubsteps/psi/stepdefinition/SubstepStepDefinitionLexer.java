@@ -112,7 +112,7 @@ public class SubstepStepDefinitionLexer extends LexerBase {
         }
         else {
             if (myState == STATE_DEFAULT) {
-                log.debug("current state = default");
+                //log.debug("current state = default");
 
                 String keyword = "Define";
                     int length = keyword.length();

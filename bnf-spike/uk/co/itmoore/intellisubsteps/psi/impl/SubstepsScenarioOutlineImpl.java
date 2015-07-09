@@ -1,9 +1,8 @@
-package uk.co.itmoore.intellisubsteps.psi.impl;
+package uk.co.itmoore.intellisubsteps.psi.feature.impl;
 
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.tree.TokenSet;
 import org.jetbrains.annotations.NotNull;
-import uk.co.itmoore.intellisubsteps.psi.*;
 
 import java.util.ArrayList;
 import java.util.List;

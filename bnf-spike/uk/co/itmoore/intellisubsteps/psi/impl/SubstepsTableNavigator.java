@@ -1,8 +1,8 @@
-package uk.co.itmoore.intellisubsteps.psi.impl;
+package uk.co.itmoore.intellisubsteps.psi.feature.impl;
 
 import com.intellij.psi.PsiElement;
 import org.jetbrains.annotations.Nullable;
-import uk.co.itmoore.intellisubsteps.psi.*;
+
 /**
  * @author Roman.Chernyatchik
  * @date Sep 10, 2009

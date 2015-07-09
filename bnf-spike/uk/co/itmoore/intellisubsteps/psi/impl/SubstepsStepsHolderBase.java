@@ -1,4 +1,4 @@
-package uk.co.itmoore.intellisubsteps.psi.impl;
+package uk.co.itmoore.intellisubsteps.psi.feature.impl;
 
 import com.intellij.lang.ASTNode;
 import com.intellij.openapi.util.text.StringUtil;
@@ -6,7 +6,6 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.util.PsiTreeUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import uk.co.itmoore.intellisubsteps.psi.*;
 
 public abstract class SubstepsStepsHolderBase extends SubstepsPsiElementBase implements SubstepsStepsHolder {
   protected SubstepsStepsHolderBase(@NotNull ASTNode node) {

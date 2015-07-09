@@ -1,4 +1,4 @@
-package uk.co.itmoore.intellisubsteps.psi.impl;
+package uk.co.itmoore.intellisubsteps.psi.feature.impl;
 
 import com.intellij.lang.ASTNode;
 import com.intellij.openapi.util.text.StringUtil;
@@ -8,7 +8,6 @@ import com.intellij.psi.PsiReference;
 import com.intellij.psi.TokenType;
 import com.intellij.psi.impl.source.resolve.reference.ReferenceProvidersRegistry;
 import com.intellij.psi.tree.TokenSet;
-import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.util.Function;
 import com.intellij.util.IncorrectOperationException;
 import com.intellij.util.containers.HashSet;
@@ -18,7 +17,6 @@ import org.jetbrains.annotations.Nullable;
 
 import uk.co.itmoore.intellisubsteps.AbstractStepDefinition;
 import uk.co.itmoore.intellisubsteps.SubstepsChangeUtil;
-import uk.co.itmoore.intellisubsteps.psi.*;
 
 import uk.co.itmoore.intellisubsteps.psi.SubstepsElementTypes;
 import uk.co.itmoore.intellisubsteps.psi.SubstepsTokenTypes;

@@ -14,7 +14,6 @@ import com.intellij.psi.tree.IFileElementType;
 import com.intellij.psi.tree.TokenSet;
 import com.intellij.psi.util.PsiUtilCore;
 import org.jetbrains.annotations.NotNull;
-import uk.co.itmoore.intellisubsteps.psi.impl.*;
 
 public class SubstepsParserDefinition implements ParserDefinition {
   private static final TokenSet WHITESPACE = TokenSet.create(TokenType.WHITE_SPACE);
