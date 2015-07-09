@@ -1,0 +1,37 @@
+Define: A substep defintion
+    The first substep
+    And the second
+
+# A comment
+
+Define: Another substep definition
+    Yet another substep
+    And some more
+-----
+SubstepsDefinitionFile:simple.substeps(0,159)
+    SubstepDefinition:A substep defintion(0,68)
+    PsiElement(DEFINE_KEYWORD_TOKEN)('Define')(0,6)
+    PsiElement(COLON_TOKEN)(':')(6,7)
+    PsiWhiteSpace(' ')(7,8)
+    PsiElement(SUBSTEP_DEFINITION_ELEMENT_TYPE)('A substep defintion')(8,27)
+    PsiWhiteSpace('\n    ')(27,32)
+        SubstepDefinitionStep:The first substep(32,49)
+            PsiElement(TEXT)('The first substep')(32,49)
+            PsiWhiteSpace('\n    ')(49,54)
+        SubstepDefinitionStep:The first substep(54,68)
+            PsiElement(TEXT)('And the second')(54,68)
+            PsiWhiteSpace('\n\n\n')(68,70)
+  PsiComment(COMMENT)('# a comment')(70,81)
+    PsiWhiteSpace('\n\n')(81,83)
+    SubstepDefinition:Another substep definition(83,159)
+    PsiElement(DEFINE_KEYWORD_TOKEN)('Define')(83,89)
+    PsiElement(COLON_TOKEN)(':')(89,90)
+    PsiWhiteSpace(' ')(90,91)
+    PsiElement(SUBSTEP_DEFINITION_ELEMENT_TYPE)('A substep defintion')(91,117)
+    PsiWhiteSpace('\n    ')(117,122)
+        SubstepDefinitionStep:Yet another substep(122,141)
+            PsiElement(TEXT)('Yet another substep')(122,141)
+            PsiWhiteSpace('\n    ')(141,146)
+        SubstepDefinitionStep:And some more(146,159)
+            PsiElement(TEXT)('And some more')(146,159)
+

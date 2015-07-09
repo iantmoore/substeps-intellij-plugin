@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+
+<idea-plugin version="2">
+  <id>uk.co.itmoore.intellisubsteps</id>
+  <name>Substeps IntelliJ Plugin</name>
+  <version>1.0</version>
+  <vendor email="support@yourcompany.com" url="http://www.yourcompany.com">YourCompany</vendor>
+
+  <description><![CDATA[
+      Enter short description for your plugin here.<br>
+      <em>most HTML tags may be used</em>
+    ]]></description>
+
+  <change-notes><![CDATA[
+      Add change notes here.<br>
+      <em>most HTML tags may be used</em>
+    ]]>
+  </change-notes>
+
+  <!-- please see http://confluence.jetbrains.com/display/IDEADEV/Build+Number+Ranges for description -->
+  <idea-version since-build="136.0"/>
+
+  <!-- please see http://confluence.jetbrains.com/display/IDEADEV/Plugin+Compatibility+with+IntelliJ+Platform+Products
+       on how to target different products -->
+  <!-- uncomment to enable plugin in all products
+  <depends>com.intellij.modules.lang</depends>
+  -->
+
+  <extensions defaultExtensionNs="com.intellij">
+    <!-- Add your extensions here -->
+
+    <errorHandler implementation="com.intellij.diagnostic.ITNReporter"/>
+
+    <fileTypeFactory implementation="uk.co.itmoore.intellisubsteps.psi.feature.SubstepsFeatureFileTypeFactory"/>
+      <fileTypeFactory implementation="uk.co.itmoore.intellisubsteps.psi.stepdefinition.SubstepsStepDefinitionFileTypeFactory"/>
+
+      <lang.syntaxHighlighterFactory key="SubstepStepDefinition"
+         implementationClass="uk.co.itmoore.intellisubsteps.psi.stepdefinition.SubstepStepDefinitionSyntaxHighlighterFactory"/>
+
+      <lang.syntaxHighlighterFactory key="SubstepsFeature"
+                                     implementationClass="uk.co.itmoore.intellisubsteps.psi.feature.SubstepFeatureSyntaxHighlighterFactory"/>
+
+      <colorSettingsPage implementation="uk.co.itmoore.intellisubsteps.SubstepsColourSettingsPage"/>
+
+
+
+      <completion.contributor language="SubstepStepDefinition" implementationClass="uk.co.itmoore.intellisubsteps.psi.stepdefinition.SubstepDefinitionCompletionContributor"/>
+
+      <lang.parserDefinition language="SubstepStepDefinition" implementationClass="uk.co.itmoore.intellisubsteps.psi.stepdefinition.SubstepDefinitionParserDefinition"/>
+
+      <!--
+        SubstepsFeature and SubstepStepDefinition
+
+
+
+      -->
+
+
+      <!--
+
+    <lang.commenter language="Gherkin" implementationClass="org.jetbrains.plugins.cucumber.psi.GherkinCommenter"/>
+    <lang.psiStructureViewFactory language="Gherkin"
+                                  implementationClass="org.jetbrains.plugins.cucumber.psi.structure.GherkinStructureViewFactory"/>
+    <lang.formatter language="Gherkin"
+                    implementationClass="org.jetbrains.plugins.cucumber.psi.formatter.GherkinFormattingModelBuilder"/>
+
+    <annotator language="Gherkin" implementationClass="org.jetbrains.plugins.cucumber.psi.annotator.GherkinAnnotator"/>
+    <lang.foldingBuilder language="Gherkin" implementationClass="org.jetbrains.plugins.cucumber.psi.GherkinFoldingBuilder"/>
+    <langCodeStyleSettingsProvider
+        implementation="org.jetbrains.plugins.cucumber.psi.formatter.GherkinLanguageCodeStyleSettingsProvider"/>
+    <codeStyleSettingsProvider implementation="org.jetbrains.plugins.cucumber.psi.formatter.GherkinCodeStyleSettingsProvider"/>
+
+    <projectService serviceInterface="org.jetbrains.plugins.cucumber.psi.CucumberLanguageService"
+                    serviceImplementation="org.jetbrains.plugins.cucumber.psi.CucumberLanguageService"/>
+
+    <lang.findUsagesProvider language="Gherkin" implementationClass="org.jetbrains.plugins.cucumber.psi.GherkinFindUsagesProvider"/>
+    <colorSettingsPage implementation="org.jetbrains.plugins.cucumber.psi.GherkinColorsPage"/>
+
+    <projectService serviceInterface="org.jetbrains.plugins.cucumber.steps.CucumberStepsIndex"
+                    serviceImplementation="org.jetbrains.plugins.cucumber.steps.CucumberStepsIndex"/>
+    <psi.referenceContributor  language="Gherkin"
+                               implementation="org.jetbrains.plugins.cucumber.steps.reference.CucumberReferenceContributor"/>
+
+    <localInspection language="Gherkin" shortName="CucumberUndefinedStep" bundle="org.jetbrains.plugins.cucumber.CucumberBundle"
+                     key="cucumber.inspection.undefined.step.name" groupKey="cucumber.inspection.group.name" enabledByDefault="true" level="WARNING"
+                     implementationClass="org.jetbrains.plugins.cucumber.inspections.CucumberStepInspection" unfair="true"/>
+
+    <localInspection language="Gherkin" shortName="CucumberExamplesColon" bundle="org.jetbrains.plugins.cucumber.CucumberBundle"
+                     key="inspection.missed.colon.example.name" groupKey="cucumber.inspection.group.name" enabledByDefault="true"
+                     level="ERROR" implementationClass="org.jetbrains.plugins.cucumber.inspections.CucumberExamplesColonInspection"/>
+
+    <localInspection language="Gherkin" shortName="CucumberMissedExamples" bundle="org.jetbrains.plugins.cucumber.CucumberBundle"
+                     key="inspection.missed.example.name" groupKey="cucumber.inspection.group.name" enabledByDefault="true" level="ERROR"
+                     implementationClass="org.jetbrains.plugins.cucumber.inspections.CucumberMissedExamplesInspection"/>
+
+    <localInspection language="Gherkin" shortName="CucumberTableInspection" displayName="Unused or missing columns in Cucumber tables"
+                     groupBundle="org.jetbrains.plugins.cucumber.CucumberBundle" groupKey="cucumber.inspection.group.name" enabledByDefault="true"
+                     level="WARNING" implementationClass="org.jetbrains.plugins.cucumber.inspections.CucumberTableInspection"/>
+
+    <localInspection  language="Gherkin" shortName="GherkinBrokenTableInspection" bundle="org.jetbrains.plugins.cucumber.CucumberBundle"
+                      key="inspection.gherkin.table.is.broken.name" groupKey="cucumber.inspection.group.name" enabledByDefault="true"
+                      level="ERROR" implementationClass="org.jetbrains.plugins.cucumber.inspections.GherkinBrokenTableInspection"/>
+
+    <localInspection language="Gherkin" shortName="GherkinMisplacedBackground" bundle="org.jetbrains.plugins.cucumber.CucumberBundle"
+                     key="inspection.gherkin.background.after.scenario.name" groupKey="cucumber.inspection.group.name" enabledByDefault="true"
+                     level="ERROR" implementationClass="org.jetbrains.plugins.cucumber.inspections.GherkinMisplacedBackgroundInspection"/>
+
+    <completion.contributor language="Gherkin"
+                            implementationClass="org.jetbrains.plugins.cucumber.completion.CucumberCompletionContributor"/>
+
+    <enterHandlerDelegate implementation="org.jetbrains.plugins.cucumber.codeinsight.CucumberEnterHandler"/>
+    <typedHandler implementation="org.jetbrains.plugins.cucumber.codeinsight.GherkinTypedHandler"/>
+
+    <spellchecker.support language="Gherkin" implementationClass="org.jetbrains.plugins.cucumber.spellchecker.GherkinSpellcheckerStrategy"/>
+    <lang.inspectionSuppressor language="Gherkin" implementationClass="org.jetbrains.plugins.cucumber.inspections.model.GherkinInspectionSuppressor"/>
+
+    <liveTemplateContext implementation="org.jetbrains.plugins.cucumber.GherkinLiveTemplateContextType"/>
+
+    <extendWordSelectionHandler implementation="org.jetbrains.plugins.cucumber.actions.GherkinStepParameterSelectioner"/>
+
+    <gotoRelatedProvider implementation="org.jetbrains.plugins.cucumber.navigation.CucumberGoToRelatedProvider"/>
+
+    <renameHandler implementation="org.jetbrains.plugins.cucumber.psi.refactoring.rename.GherkinInplaceRenameHandler"/>
+    <renameHandler implementation="org.jetbrains.plugins.cucumber.psi.refactoring.rename.GherkinStepRenameHandler"/>
+
+
+    <renamePsiElementProcessor implementation="org.jetbrains.plugins.cucumber.psi.refactoring.rename.CucumberStepRenameProcessor" order="first"/>
+
+    <additionalTextAttributes scheme="Default" file="colorSchemes/GherkinDefault.xml"/>
+    <additionalTextAttributes scheme="Darcula" file="colorSchemes/GherkinDarcula.xml"/>
+
+
+
+
+      -->
+
+
+
+      <!--
+        <extensionPoints>
+    <extensionPoint qualifiedName="org.jetbrains.plugins.cucumber.steps.cucumberJvmExtensionPoint"
+                    interface="org.jetbrains.plugins.cucumber.CucumberJvmExtensionPoint"/>
+  </extensionPoints>
+
+      -->
+
+
+
+  </extensions>
+
+  <application-components>
+    <!-- Add your application components here -->
+  </application-components>
+
+  <project-components>
+    <!-- Add your project components here -->
+  </project-components>
+
+
+  <actions>
+    <group id="MyPlugin.SampleMenu" text="_Sample Menu" description="Sample menu">
+      <add-to-group group-id="MainMenu" anchor="last"  />
+      <action id="uk.co.itmoore.intellisubsteps.testactionid" class="uk.co.itmoore.intellisubsteps.TestAction" text="Text _Boxes" description="A test menu item" />
+<!--
+      <action id="Myplugin.Dialogs" class="Mypackage.MyShowDialog" text="Show _Dialog" description="A test menu item" />
+-->
+    </group>
+
+  </actions>
+
+</idea-plugin>
