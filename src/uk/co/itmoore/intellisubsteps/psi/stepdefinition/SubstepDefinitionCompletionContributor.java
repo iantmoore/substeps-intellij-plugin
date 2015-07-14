@@ -2,11 +2,22 @@ package uk.co.itmoore.intellisubsteps.psi.stepdefinition;
 
 import com.intellij.codeInsight.completion.*;
 import com.intellij.codeInsight.lookup.LookupElementBuilder;
+import com.intellij.openapi.module.Module;
+import com.intellij.openapi.module.ModuleManager;
+import com.intellij.openapi.module.ModuleUtil;
+import com.intellij.openapi.project.Project;
+import com.intellij.openapi.roots.ModuleRootManager;
+import com.intellij.openapi.roots.libraries.Library;
+import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.patterns.PlatformPatterns;
 import com.intellij.util.ProcessingContext;
+import com.intellij.util.Processor;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by ian on 04/07/15.
@@ -115,7 +126,6 @@ public class SubstepDefinitionCompletionContributor extends CompletionContributo
 
     public SubstepDefinitionCompletionContributor() {
 
-        // TODO - this isn't working at the mo..
 
         logger.debug("SubstepDefinitionCompletionContributor ctor");
 
@@ -125,6 +135,29 @@ public class SubstepDefinitionCompletionContributor extends CompletionContributo
                     public void addCompletions(@NotNull CompletionParameters parameters,
                                                ProcessingContext context,
                                                @NotNull CompletionResultSet resultSet) {
+
+                        Project thisProject = parameters.getEditor().getProject();
+                        VirtualFile vFile = parameters.getOriginalFile().getVirtualFile();
+
+                        Module module = ModuleUtil.findModuleForFile(vFile, thisProject);
+                        String moduleName = module == null ? "Module not found" : module.getName();
+
+                        logger.debug("got module name: " + moduleName);
+
+
+                        final List<String> libraryNames = new ArrayList<String>();
+                        ModuleRootManager.getInstance(module).orderEntries().forEachLibrary(new Processor<Library>() {
+                            @Override
+                            public boolean process(Library library) {
+                                libraryNames.add(library.getName());
+                                return true;
+                            }
+                        });
+
+
+                        for (String lib : libraryNames){
+                            logger.debug("got library name " + lib);
+                        }
 
                         logger.debug("completion processing ctx to string:\n" + context.toString());
 
