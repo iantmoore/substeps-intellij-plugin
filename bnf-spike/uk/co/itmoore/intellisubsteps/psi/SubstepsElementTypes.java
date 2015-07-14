@@ -3,13 +3,13 @@ package uk.co.itmoore.intellisubsteps.psi;
 import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.tree.IFileElementType;
 import com.intellij.psi.tree.TokenSet;
-import uk.co.itmoore.intellisubsteps.psi.feature.SubstepsFeatureLanguage;
+import uk.co.itmoore.intellisubsteps.psi.feature.FeatureLanguage;
 
 /**
  * @author yole
  */
 public interface SubstepsElementTypes {
-  IFileElementType SUBSTEPS_FILE = new IFileElementType(SubstepsFeatureLanguage.INSTANCE);
+  IFileElementType SUBSTEPS_FILE = new IFileElementType(FeatureLanguage.INSTANCE);
 
   IElementType FEATURE = new SubstepsElementType("feature");
   IElementType FEATURE_HEADER = new SubstepsElementType("feature header");

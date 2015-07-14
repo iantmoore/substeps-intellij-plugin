@@ -31,23 +31,32 @@
 
     <errorHandler implementation="com.intellij.diagnostic.ITNReporter"/>
 
-    <fileTypeFactory implementation="uk.co.itmoore.intellisubsteps.psi.feature.SubstepsFeatureFileTypeFactory"/>
-      <fileTypeFactory implementation="uk.co.itmoore.intellisubsteps.psi.stepdefinition.SubstepsStepDefinitionFileTypeFactory"/>
+    <fileTypeFactory implementation="uk.co.itmoore.intellisubsteps.psi.feature.FeatureFileTypeFactory"/>
 
-      <lang.syntaxHighlighterFactory key="SubstepStepDefinition"
+    <fileTypeFactory implementation="uk.co.itmoore.intellisubsteps.psi.stepdefinition.SubstepsStepDefinitionFileTypeFactory"/>
+
+    <lang.syntaxHighlighterFactory key="SubstepStepDefinition"
          implementationClass="uk.co.itmoore.intellisubsteps.psi.stepdefinition.SubstepStepDefinitionSyntaxHighlighterFactory"/>
 
-      <lang.syntaxHighlighterFactory key="SubstepsFeature"
-                                     implementationClass="uk.co.itmoore.intellisubsteps.psi.feature.SubstepFeatureSyntaxHighlighterFactory"/>
+    <lang.syntaxHighlighterFactory key="SubstepsFeature"
+         implementationClass="uk.co.itmoore.intellisubsteps.psi.feature.FeatureSyntaxHighlighterFactory"/>
 
       <colorSettingsPage implementation="uk.co.itmoore.intellisubsteps.SubstepsColourSettingsPage"/>
+
 
 
 
       <completion.contributor language="SubstepStepDefinition"
               implementationClass="uk.co.itmoore.intellisubsteps.psi.stepdefinition.SubstepDefinitionCompletionContributor"/>
 
-      <lang.parserDefinition language="SubstepStepDefinition" implementationClass="uk.co.itmoore.intellisubsteps.psi.stepdefinition.SubstepDefinitionParserDefinition"/>
+
+
+
+      <lang.parserDefinition language="SubstepStepDefinition"
+             implementationClass="uk.co.itmoore.intellisubsteps.psi.stepdefinition.SubstepDefinitionParserDefinition"/>
+
+      <lang.parserDefinition language="SubstepsFeature"
+             implementationClass="uk.co.itmoore.intellisubsteps.psi.feature.FeatureParserDefinition"/>
 
       <!--
         SubstepsFeature and SubstepStepDefinition

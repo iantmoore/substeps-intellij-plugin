@@ -1,8 +1,13 @@
+# parsing test not currently working - ide seems to work ok though
+
+# scenario outline not coming through correctly in the psi viewer
+
+# doesn't look like it's detecting that it's a feature file
+
+
 
 try and create the psi test upfront manually
 as per https://confluence.jetbrains.com/display/IntelliJIDEA/Parsing+Test.
-
-intellij is going into a spin starting up...
 
 https://confluence.jetbrains.com/display/IntelliJIDEA/Custom+Language+Support
 

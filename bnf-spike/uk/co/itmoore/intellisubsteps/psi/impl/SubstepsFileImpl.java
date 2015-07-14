@@ -11,20 +11,20 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 
-import uk.co.itmoore.intellisubsteps.psi.feature.SubstepsFeatureFileType;
-import uk.co.itmoore.intellisubsteps.psi.feature.SubstepsFeatureLanguage;
+import uk.co.itmoore.intellisubsteps.psi.feature.FeatureFileType;
+import uk.co.itmoore.intellisubsteps.psi.feature.FeatureLanguage;
 
 /**
  * @author yole
  */
 public class SubstepsFileImpl extends PsiFileBase implements SubstepsFile {
   public SubstepsFileImpl(FileViewProvider viewProvider) {
-    super(viewProvider, SubstepsFeatureLanguage.INSTANCE);
+    super(viewProvider, FeatureLanguage.INSTANCE);
   }
 
   @NotNull
   public FileType getFileType() {
-    return SubstepsFeatureFileType.INSTANCE;
+    return FeatureFileType.INSTANCE;
   }
 
   @Override

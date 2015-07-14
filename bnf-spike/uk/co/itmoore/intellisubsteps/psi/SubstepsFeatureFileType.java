@@ -3,7 +3,7 @@ package uk.co.itmoore.intellisubsteps.psi;
 import com.intellij.openapi.fileTypes.LanguageFileType;
 import org.jetbrains.annotations.NotNull;
 import uk.co.itmoore.intellisubsteps.SubstepsIcons;
-import uk.co.itmoore.intellisubsteps.psi.feature.SubstepsFeatureLanguage;
+import uk.co.itmoore.intellisubsteps.psi.feature.FeatureLanguage;
 
 import javax.swing.*;
 
@@ -11,7 +11,7 @@ public class SubstepsFeatureFileType extends LanguageFileType {
   public static final SubstepsFeatureFileType INSTANCE = new SubstepsFeatureFileType();
 
   protected SubstepsFeatureFileType() {
-    super(SubstepsFeatureLanguage.INSTANCE);
+    super(FeatureLanguage.INSTANCE);
   }
 
   @NotNull

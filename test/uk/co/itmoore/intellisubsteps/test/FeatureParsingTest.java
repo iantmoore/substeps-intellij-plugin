@@ -5,11 +5,12 @@ package uk.co.itmoore.intellisubsteps.test;
  */
 
 import com.intellij.testFramework.ParsingTestCase;
+import uk.co.itmoore.intellisubsteps.psi.feature.FeatureParserDefinition;
 import uk.co.itmoore.intellisubsteps.psi.stepdefinition.SubstepDefinitionParserDefinition;
 
 public class FeatureParsingTest extends ParsingTestCase {
     public FeatureParsingTest() {
-        super("", "feature", new SubstepDefinitionParserDefinition());
+        super("", "feature", new FeatureParserDefinition());
     }
 
     public void testParsingTestData() {
@@ -19,7 +20,7 @@ public class FeatureParsingTest extends ParsingTestCase {
     @Override
     protected String getTestDataPath() {
 
-        return "/home/ian/projects/intelliSubsteps/test/testData/features";
+        return "/home/ian/projects/intelliSubsteps/test/testData/features/psi";
     }
 
     @Override

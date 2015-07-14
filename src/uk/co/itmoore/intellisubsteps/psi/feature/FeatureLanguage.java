@@ -3,10 +3,10 @@ package uk.co.itmoore.intellisubsteps.psi.feature;
 import com.intellij.lang.Language;
 import org.jetbrains.annotations.NotNull;
 
-public class SubstepsFeatureLanguage extends Language {
-  public static SubstepsFeatureLanguage INSTANCE = new SubstepsFeatureLanguage();
+public class FeatureLanguage extends Language {
+  public static FeatureLanguage INSTANCE = new FeatureLanguage();
 
-  protected SubstepsFeatureLanguage() {
+  protected FeatureLanguage() {
     super("SubstepsFeature");
   }
 

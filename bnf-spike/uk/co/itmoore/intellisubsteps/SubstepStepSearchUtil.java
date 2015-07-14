@@ -4,7 +4,7 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.util.Computable;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.search.SearchScope;
-import uk.co.itmoore.intellisubsteps.psi.feature.SubstepsFeatureFileType;
+import uk.co.itmoore.intellisubsteps.psi.feature.FeatureFileType;
 
 /**
  * User: Andrey.Vokin
@@ -17,7 +17,7 @@ public class SubstepStepSearchUtil {
         final SearchScope originalScope = originalScopeComputation.compute();
         if (originalScope instanceof GlobalSearchScope) {
           return GlobalSearchScope.getScopeRestrictedByFileTypes((GlobalSearchScope)originalScope,
-                  SubstepsFeatureFileType.INSTANCE); // TODO expand to include substep defs
+                  FeatureFileType.INSTANCE); // TODO expand to include substep defs
         }
         return originalScope;
       }

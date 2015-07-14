@@ -10,7 +10,7 @@ Feature: A feature to self test the webdriver substeps implementations
 
   Scenario: a scenario
     Given I go to the self test page
-    Then I can see 'Hello Self Test page'
+    Then I can see "Hello Self Test page"
 
   Tags: other
 

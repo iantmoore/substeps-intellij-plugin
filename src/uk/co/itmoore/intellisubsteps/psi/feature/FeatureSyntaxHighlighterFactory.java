@@ -9,13 +9,13 @@ import org.jetbrains.annotations.NotNull;
 /**
  * Created by ian on 02/07/15.
  */
-public class SubstepFeatureSyntaxHighlighterFactory extends SyntaxHighlighterFactory {
+public class FeatureSyntaxHighlighterFactory extends SyntaxHighlighterFactory {
     @NotNull
     @Override
     public SyntaxHighlighter getSyntaxHighlighter(Project project, VirtualFile virtualFile) {
 
-        System.out.println("SubstepFeatureSyntaxHighlighterFactory vfile type: " + virtualFile.getFileType().getDescription());
+        System.out.println("FeatureSyntaxHighlighterFactory vfile type: " + virtualFile.getFileType().getDescription());
 
-        return new SubstepFeatureSyntaxHighlighter();
+        return new FeatureSyntaxHighlighter();
     }
 }

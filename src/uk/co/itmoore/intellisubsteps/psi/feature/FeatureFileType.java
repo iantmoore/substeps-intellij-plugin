@@ -6,11 +6,11 @@ import uk.co.itmoore.intellisubsteps.SubstepsIcons;
 
 import javax.swing.*;
 
-public class SubstepsFeatureFileType extends LanguageFileType {
-  public static final SubstepsFeatureFileType INSTANCE = new SubstepsFeatureFileType();
+public class FeatureFileType extends LanguageFileType {
+  public static final FeatureFileType INSTANCE = new FeatureFileType();
 
-  protected SubstepsFeatureFileType() {
-    super(SubstepsFeatureLanguage.INSTANCE);
+  protected FeatureFileType() {
+    super(FeatureLanguage.INSTANCE);
   }
 
   @NotNull

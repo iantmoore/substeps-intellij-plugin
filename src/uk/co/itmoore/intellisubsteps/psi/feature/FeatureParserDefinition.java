@@ -1,4 +1,4 @@
-package uk.co.itmoore.intellisubsteps.psi.stepdefinition;
+package uk.co.itmoore.intellisubsteps.psi.feature;
 
 import com.intellij.lang.ASTNode;
 import com.intellij.lang.ParserDefinition;
@@ -9,44 +9,41 @@ import com.intellij.psi.FileViewProvider;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.TokenType;
-import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.tree.IFileElementType;
 import com.intellij.psi.tree.TokenSet;
 import com.intellij.psi.util.PsiUtilCore;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
-import uk.co.itmoore.intellisubsteps.psi.stepdefinition.impl.SubstepDefinitionDefineBlockImpl;
-import uk.co.itmoore.intellisubsteps.psi.stepdefinition.impl.SubstepDefinitionImpl;
-import uk.co.itmoore.intellisubsteps.psi.stepdefinition.impl.SubstepDefinitionStepImpl;
-import uk.co.itmoore.intellisubsteps.psi.stepdefinition.impl.SubstepDefinitionsFileImpl;
+import uk.co.itmoore.intellisubsteps.psi.feature.impl.*;
 
 /**
- * Created by ian on 05/07/15.
+ * Created by ian on 09/07/15.
  */
-public class SubstepDefinitionParserDefinition implements ParserDefinition {
+public class FeatureParserDefinition implements ParserDefinition {
 
-    private static final Logger logger = LogManager.getLogger(SubstepDefinitionParserDefinition.class);
-
+    private static final Logger logger = LogManager.getLogger(FeatureParserDefinition.class);
 
     private static final TokenSet WHITESPACE = TokenSet.create(TokenType.WHITE_SPACE);
-    private static final TokenSet COMMENTS = TokenSet.create(SubstepDefinitionTokenTypes.COMMENT_TOKEN);
+    private static final TokenSet COMMENTS = TokenSet.create(FeatureTokenTypes.COMMENT_TOKEN);
 
 
     @NotNull
     @Override
     public Lexer createLexer(Project project) {
-        return new SubstepStepDefinitionLexer();
+        return new FeatureLexer();
     }
 
     @Override
     public PsiParser createParser(Project project) {
-        return new SubstepDefinitionParser();
+        return new FeatureParser();
     }
 
     @Override
     public IFileElementType getFileNodeType() {
-        return SubstepDefinitionElementTypes.SUBSTEP_DEFINITION_FILE;
+
+        return FeatureElementTypes.FEATURE_FILE;
+
     }
 
     @NotNull
@@ -71,9 +68,23 @@ public class SubstepDefinitionParserDefinition implements ParserDefinition {
     @Override
     public PsiElement createElement(ASTNode astNode) {
 
-        if (astNode.getElementType() == SubstepDefinitionElementTypes.SUBSTEP_DEFINITION_ELEMENT_TYPE) return new SubstepDefinitionImpl(astNode);
-        if (astNode.getElementType() == SubstepDefinitionElementTypes.SUBSTEP_DEFINITION_STEP_ELEMENT_TYPE) return new SubstepDefinitionStepImpl(astNode);
-        if (astNode.getElementType() == SubstepDefinitionElementTypes.SUBSTEP_DEFINITION_DEFINE_BLOCK_ELEMENT_TYPE) return new SubstepDefinitionDefineBlockImpl(astNode);
+
+        if (astNode.getElementType() == FeatureElementTypes.FEATURE_ELEMENT_TYPE) return new FeatureImpl(astNode);
+        if (astNode.getElementType() == FeatureElementTypes.TAG_ELEMENT_TYPE) return new  TagNameImpl(astNode);
+        if (astNode.getElementType() == FeatureElementTypes.FEATURE_NAME_ELEMENT_TYPE) return new  FeatureNameImpl(astNode);
+        if (astNode.getElementType() == FeatureElementTypes.FEATURE_DESCRIPTION_ELEMENT_TYPE) return new  FeatureDescriptionImpl(astNode);
+        if (astNode.getElementType() == FeatureElementTypes.BACKGROUND_BLOCK_ELEMENT_TYPE) return new  BackgroundImpl(astNode);
+        if (astNode.getElementType() == FeatureElementTypes.BACKGROUND_STEP_ELEMENT_TYPE) return new  BackgroundStepImpl(astNode);
+        if (astNode.getElementType() == FeatureElementTypes.SCENARIO_BLOCK_ELEMENT_TYPE) return new  ScenarioImpl(astNode);
+        if (astNode.getElementType() == FeatureElementTypes.SCENARIO_NAME_ELEMENT_TYPE) return new  ScenarioNameImpl(astNode);
+        if (astNode.getElementType() == FeatureElementTypes.STEP_ELEMENT_TYPE) return new  ScenarioStepImpl(astNode);
+        if (astNode.getElementType() == FeatureElementTypes.SCENARIO_OUTLINE_BLOCK_ELEMENT_TYPE) return new  ScenarioOutlineImpl(astNode);
+        if (astNode.getElementType() == FeatureElementTypes.EXAMPLES_BLOCK_ELEMENT_TYPE) return new  ExamplesBlockImpl(astNode);
+        if (astNode.getElementType() == FeatureElementTypes.TABLE_BLOCK_ELEMENT_TYPE) return new  TableBlockImpl(astNode);
+
+//        if (astNode.getElementType() == SubstepDefinitionElementTypes.SUBSTEP_DEFINITION_ELEMENT_TYPE) return new SubstepDefinitionImpl(astNode);
+//        if (astNode.getElementType() == SubstepDefinitionElementTypes.SUBSTEP_DEFINITION_STEP_ELEMENT_TYPE) return new SubstepDefinitionStepImpl(astNode);
+//        if (astNode.getElementType() == SubstepDefinitionElementTypes.SUBSTEP_DEFINITION_DEFINE_BLOCK_ELEMENT_TYPE) return new SubstepDefinitionDefineBlockImpl(astNode);
 
 //        if (node.getElementType() == GherkinElementTypes.FEATURE) return new GherkinFeatureImpl(node);
 //        if (node.getElementType() == GherkinElementTypes.FEATURE_HEADER) return new GherkinFeatureHeaderImpl(node);
@@ -89,17 +100,17 @@ public class SubstepDefinitionParserDefinition implements ParserDefinition {
 //        if (node.getElementType() == GherkinElementTypes.STEP_PARAMETER) return new GherkinStepParameterImpl(node);
 //        if (node.getElementType() == GherkinElementTypes.PYSTRING) return new GherkinPystringImpl(node);
         return PsiUtilCore.NULL_PSI_ELEMENT;
+
     }
 
     @Override
     public PsiFile createFile(FileViewProvider fileViewProvider) {
 
-        return new SubstepDefinitionsFileImpl(fileViewProvider);
+        return new FeatureFileImpl(fileViewProvider);
     }
 
     @Override
-    public SpaceRequirements spaceExistanceTypeBetweenTokens(ASTNode left, ASTNode right) {
-
+    public SpaceRequirements spaceExistanceTypeBetweenTokens(ASTNode astNode, ASTNode astNode1) {
         // line break between step defs ?
 
 //        final IElementType leftElementType = left.getElementType();
@@ -111,6 +122,5 @@ public class SubstepDefinitionParserDefinition implements ParserDefinition {
 //        }
 
         return SpaceRequirements.MAY;
-
     }
 }

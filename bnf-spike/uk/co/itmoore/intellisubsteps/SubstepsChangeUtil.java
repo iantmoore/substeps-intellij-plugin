@@ -32,7 +32,7 @@ public class SubstepsChangeUtil {
   public static SubstepsFile createDummyFile(Project project, String text) {
 
     return null;
-//    final String fileName = "dummy." + SubstepsFeatureFileType.INSTANCE.getDefaultExtension();
+//    final String fileName = "dummy." + FeatureFileType.INSTANCE.getDefaultExtension();
 //    return (SubstepsFile)PsiFileFactory.getInstance(project).createFileFromText(fileName, SubstepsLanguage.INSTANCE, text);
   }
 }
