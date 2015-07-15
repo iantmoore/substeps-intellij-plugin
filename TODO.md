@@ -3,6 +3,8 @@
 
 arch overview
 https://confluence.jetbrains.com/display/IDEADEV/PluginDevelopment
+https://confluence.jetbrains.com/display/IDEADEV/IntelliJ+IDEA+Architectural+Overview#IntelliJIDEAArchitecturalOverview-PsiElements
+
 
 
 persisting state of components:
