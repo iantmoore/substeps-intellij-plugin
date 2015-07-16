@@ -7,8 +7,13 @@ import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.module.ModuleUtil;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.ModuleRootManager;
+import com.intellij.openapi.roots.OrderRootType;
+import com.intellij.openapi.roots.libraries.LibrariesHelper;
 import com.intellij.openapi.roots.libraries.Library;
+import com.intellij.openapi.roots.ui.configuration.libraryEditor.LibraryRootsComponent;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.openapi.vfs.VirtualFileAdapter;
+import com.intellij.openapi.vfs.VirtualFileManager;
 import com.intellij.patterns.PlatformPatterns;
 import com.intellij.util.ProcessingContext;
 import com.intellij.util.Processor;
@@ -144,19 +149,26 @@ public class SubstepDefinitionCompletionContributor extends CompletionContributo
 
                         logger.debug("got module name: " + moduleName);
 
-
-                        final List<String> libraryNames = new ArrayList<String>();
+                        final List<Library> libraries = new ArrayList<Library>();
                         ModuleRootManager.getInstance(module).orderEntries().forEachLibrary(new Processor<Library>() {
                             @Override
                             public boolean process(Library library) {
-                                libraryNames.add(library.getName());
+
+                                libraries.add(library);
                                 return true;
                             }
                         });
 
 
-                        for (String lib : libraryNames){
-                            logger.debug("got library name " + lib);
+                        for (Library lib : libraries){
+                            logger.debug("got library name " + lib.getName());
+
+                            // TODO - no idea what's going on here!
+
+                            VirtualFile[] vLibFiles = lib.getFiles(OrderRootType.CLASSES);
+//                            VirtualFileAdapter vfa = new VirtualFileAdapter(vLibFiles[0]).
+                            //LibrariesHelper.getInstance().
+
                         }
 
                         logger.debug("completion processing ctx to string:\n" + context.toString());

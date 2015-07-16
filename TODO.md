@@ -1,5 +1,5 @@
 
-# scenario outline not coming through correctly in the psi viewer
+# how to actually get hold of the jar files from the library
 
 arch overview
 https://confluence.jetbrains.com/display/IDEADEV/PluginDevelopment
@@ -42,10 +42,6 @@ https://confluence.jetbrains.com/display/IDEADEV/Developing+Custom+Language+Plug
 
 https://confluence.jetbrains.com/display/IntelliJIDEA/Parsing+Test
 
-# current issues around the lexing and parsing
-SubstepDefinitionImpl - seems to encompass the whole file
-
-# think the lexer is now correct - work on the parser
 
 * highlighting
     tables

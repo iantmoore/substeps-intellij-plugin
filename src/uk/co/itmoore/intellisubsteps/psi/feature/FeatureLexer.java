@@ -48,7 +48,8 @@ public class FeatureLexer extends LexerBase {
         STATE_AFTER_SCENARIO_OUTLINE_KEYWORD(true),
 
         STATE_AFTER_EXAMPLES_KEYWORD(false),
-        STATE_IN_EXAMPLES_TABLE(true);
+        STATE_IN_TABLE_HEADER_ROW(true),
+        STATE_IN_TABLE_VALUE_ROWS(true);
 
         private FeatureLexerState(boolean resetStateOnNewLine){
             this.resetStateOnNewLine = resetStateOnNewLine;
@@ -66,7 +67,9 @@ public class FeatureLexer extends LexerBase {
     private IElementType myCurrentToken;
     private int myCurrentTokenStart;
 
-    private String[] myKeywords = {"Tags", "Feature", "Background", "Scenario", "Scenario Outline", "Examples"};
+    private String[] myKeywords = {"Tags", "Feature", "Background", "Scenario Outline", "Scenario", "Examples"};
+    // NB. outline has to come before scenario..
+
     private FeatureLexerState myState;
 
 
@@ -153,12 +156,20 @@ public class FeatureLexer extends LexerBase {
             myCurrentToken = FeatureTokenTypes.COMMENT_TOKEN;
             advanceToEOL();
         }
-        else if ((myState == FeatureLexerState.STATE_AFTER_EXAMPLES_KEYWORD
-                || myState == FeatureLexerState.STATE_IN_EXAMPLES_TABLE)
-                && c == '|') {
+        else if (c == '|' && (myState == FeatureLexerState.STATE_AFTER_EXAMPLES_KEYWORD
+                            || myState == FeatureLexerState.STATE_IN_TABLE_HEADER_ROW
+                            || myState == FeatureLexerState.STATE_IN_TABLE_VALUE_ROWS)
+                ) {
             myCurrentToken = FeatureTokenTypes.TABLE_SEPARATOR_TOKEN;
             advanceOverWhitespace();
-            myState = FeatureLexerState.STATE_IN_EXAMPLES_TABLE;
+
+            //Todo - state here depends on the incoming state - could be row or value
+            if (myState == FeatureLexerState.STATE_AFTER_EXAMPLES_KEYWORD ) {
+                myState = FeatureLexerState.STATE_IN_TABLE_HEADER_ROW;
+            }
+//            else {
+//                myState = FeatureLexerState.STATE_IN_TABLE_VALUE_ROWS;
+//            }
         }
         else if (c == ':') {
             myCurrentToken = FeatureTokenTypes.COLON_TOKEN;
@@ -267,9 +278,16 @@ public class FeatureLexer extends LexerBase {
                 return;
             }
 
-            if (myState == FeatureLexerState.STATE_IN_EXAMPLES_TABLE){
+            if (myState == FeatureLexerState.STATE_IN_TABLE_HEADER_ROW){
                 myCurrentToken = FeatureElementTypes.TABLE_HEADER_VALUE;
                 advanceToTableCellBoundary();
+                return;
+            }
+
+            if (myState == FeatureLexerState.STATE_IN_TABLE_VALUE_ROWS){
+                myCurrentToken = FeatureElementTypes.TABLE_ROW_VALUE;
+                advanceToTableCellBoundary();
+                return;
             }
 
 //            if(myState == STATE_AFTER_FEATURE_KEYWORD){
@@ -343,8 +361,11 @@ public class FeatureLexer extends LexerBase {
     private void advanceToTableCellBoundary(){
         myPosition++;
         int mark = myPosition;
-        while (myPosition < myEndOffset && (myBuffer.charAt(myPosition) != '|' || myBuffer.charAt(myPosition) != '\n')) {
+        char c = myBuffer.charAt(myPosition);
+
+        while (myPosition < myEndOffset && (c != '|' && c != '\n')) {
             myPosition++;
+            c = myBuffer.charAt(myPosition);
         }
         returnWhitespace(mark);
     }
@@ -380,24 +401,28 @@ public class FeatureLexer extends LexerBase {
     private void advanceOverWhitespace() {
         if (myBuffer.charAt(myPosition) == '\n') {
 
+            if (myState == FeatureLexerState.STATE_IN_TABLE_HEADER_ROW){
+
+                myState = FeatureLexerState.STATE_IN_TABLE_VALUE_ROWS;
+            }
+            else {
 
 //            if (myState.resetStateOnNewLine){
 
                 // TODO, might not want to reset state - peek ahead, if the line ahead is blank
-                int nextLineEnd = bufString.indexOf('\n', myPosition+1);
+                int nextLineEnd = bufString.indexOf('\n', myPosition + 1);
                 if (nextLineEnd != -1) {
 
                     String nextLine = bufString.substring(myPosition + 1, nextLineEnd);
                     // if the nextLine is empty, then reset
-                    if (nextLine.trim().isEmpty()){
+                    if (nextLine.trim().isEmpty()) {
                         log.debug("next line is empty, resetting state");
                         myState = FeatureLexerState.STATE_DEFAULT;
-                    }
-                    else {
+                    } else {
                         log.debug("next line not empty, not resetting state");
                     }
                 }
-
+            }
 //                myState = FeatureLexerState.STATE_DEFAULT;
 //            }
 //            else {

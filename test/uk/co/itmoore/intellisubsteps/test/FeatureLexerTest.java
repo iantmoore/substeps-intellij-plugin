@@ -21,7 +21,7 @@ public class FeatureLexerTest {
     @Test
     public void testFeatureLexer() throws IOException {
 
-        String txt = Files.toString(new File("/home/ian/projects/intelliSubsteps/test/testData/features/ParsingTestData.feature"), Charset.forName("UTF-8"));
+        String txt = Files.toString(new File("/home/ian/projects/intelliSubsteps/test/testData/features/psi/ParsingTestData.feature"), Charset.forName("UTF-8"));
 
         FeatureLexer lexer = new FeatureLexer();
 
@@ -49,7 +49,6 @@ public class FeatureLexerTest {
         // TODO - put some assertions in here...
 
 
-        // TODO - state isn't shifting off the background step impls - state not being reset by the new lines..
     }
 
 

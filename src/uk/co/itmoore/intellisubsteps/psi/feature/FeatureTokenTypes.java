@@ -24,6 +24,7 @@ public interface FeatureTokenTypes extends SubstepTokenTypes {
     FeatureElementType SCENARIO_NAME_TOKEN = new FeatureElementType("SCENARIO_NAME_TOKEN");
     FeatureElementType TABLE_SEPARATOR_TOKEN = new FeatureElementType("TABLE_SEPARATOR_TOKEN");
 
+
     FeatureElementType EXAMPLES_KEYWORD_TOKEN = new FeatureElementType("EXAMPLES_KEYWORD_TOKEN");
 
 

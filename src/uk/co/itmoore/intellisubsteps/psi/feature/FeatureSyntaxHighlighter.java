@@ -29,6 +29,15 @@ public class FeatureSyntaxHighlighter extends SyntaxHighlighterBase {
         ATTRIBUTES.put(FeatureTokenTypes.EXAMPLES_KEYWORD_TOKEN,SubstepsHighlighter.KEYWORD);
 
 
+
+        ATTRIBUTES.put(FeatureTokenTypes.TABLE_SEPARATOR_TOKEN ,SubstepsHighlighter.TABLE_SEPERATOR);
+        ATTRIBUTES.put(FeatureElementTypes.TABLE_HEADER_VALUE ,SubstepsHighlighter.TABLE_HEADER);
+        ATTRIBUTES.put(FeatureElementTypes.TABLE_ROW_VALUE ,SubstepsHighlighter.TABLE_VALUE);
+
+
+
+
+
         ATTRIBUTES.put(FeatureTokenTypes.COLON_TOKEN ,SubstepsHighlighter.KEYWORD);
     }
 
