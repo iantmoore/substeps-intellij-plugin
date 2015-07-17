@@ -1,6 +1,11 @@
 package uk.co.itmoore.intellisubsteps.psi.stepdefinition;
 
+import com.google.common.io.CharStreams;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.reflect.TypeToken;
 import com.intellij.codeInsight.completion.*;
+import com.intellij.codeInsight.lookup.LookupElement;
 import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleManager;
@@ -11,18 +16,31 @@ import com.intellij.openapi.roots.OrderRootType;
 import com.intellij.openapi.roots.libraries.LibrariesHelper;
 import com.intellij.openapi.roots.libraries.Library;
 import com.intellij.openapi.roots.ui.configuration.libraryEditor.LibraryRootsComponent;
+
+
 import com.intellij.openapi.vfs.VirtualFile;
-import com.intellij.openapi.vfs.VirtualFileAdapter;
-import com.intellij.openapi.vfs.VirtualFileManager;
 import com.intellij.patterns.PlatformPatterns;
 import com.intellij.util.ProcessingContext;
 import com.intellij.util.Processor;
+import com.technophobia.substeps.glossary.StepDescriptor;
+import com.technophobia.substeps.glossary.StepImplementationsDescriptor;
+import com.technophobia.substeps.glossary.XMLSubstepsGlossarySerializer;
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
+import java.util.jar.JarFile;
+import java.util.zip.ZipEntry;
 
 /**
  * Created by ian on 04/07/15.
@@ -128,11 +146,18 @@ public class SubstepDefinitionCompletionContributor extends CompletionContributo
 
 
     private static final Logger logger = LogManager.getLogger(SubstepDefinitionCompletionContributor.class);
+    public static final String STEPIMPLEMENTATIONS_JSON_FILENAME = "stepimplementations.json";
+
+    private List<StepImplementationsDescriptor> stepImplsInScope = new ArrayList<StepImplementationsDescriptor>();
+
+//    private XMLSubstepsGlossarySerializer serializer = new XMLSubstepsGlossarySerializer();
 
     public SubstepDefinitionCompletionContributor() {
 
 
         logger.debug("SubstepDefinitionCompletionContributor ctor");
+
+
 
         extend(CompletionType.BASIC,
                 PlatformPatterns.psiElement(SubstepDefinitionElementTypes.SUBSTEP_DEFINITION_STEP_ELEMENT_TYPE).withLanguage(SubstepsStepDefinitionLanguage.INSTANCE),
@@ -140,6 +165,8 @@ public class SubstepDefinitionCompletionContributor extends CompletionContributo
                     public void addCompletions(@NotNull CompletionParameters parameters,
                                                ProcessingContext context,
                                                @NotNull CompletionResultSet resultSet) {
+
+                        logger.debug("calling into extend");
 
                         Project thisProject = parameters.getEditor().getProject();
                         VirtualFile vFile = parameters.getOriginalFile().getVirtualFile();
@@ -161,26 +188,106 @@ public class SubstepDefinitionCompletionContributor extends CompletionContributo
 
 
                         for (Library lib : libraries){
-                            logger.debug("got library name " + lib.getName());
-
-                            // TODO - no idea what's going on here!
+                            logger.debug("looking for stepImplementations in " + lib.getName());
 
                             VirtualFile[] vLibFiles = lib.getFiles(OrderRootType.CLASSES);
-//                            VirtualFileAdapter vfa = new VirtualFileAdapter(vLibFiles[0]).
-                            //LibrariesHelper.getInstance().
 
+                            for (VirtualFile vf  : vLibFiles){
+                                logger.debug("virtual file canonical path: " + vf.getCanonicalPath() + " path: " + vf.getPath());
+                            }
+                            String libraryPath = StringUtils.substringBefore(vLibFiles[0].getPath(), "!/");
+                            stepImplsInScope.addAll(findStepImplementationDescriptorsForDependency(libraryPath));
                         }
 
                         logger.debug("completion processing ctx to string:\n" + context.toString());
 
 
+
                         resultSet.addElement(LookupElementBuilder.create("Hello"));
                         resultSet.addElement(LookupElementBuilder.create("Bob"));
+
+                        for (StepImplementationsDescriptor descriptor : stepImplsInScope){
+
+                            for (StepDescriptor stepDescriptor: descriptor.getExpressions()){
+
+                                LookupElementBuilder builder = LookupElementBuilder.create(stepDescriptor.getExpression());
+
+                                if (stepDescriptor.getExample() != null && stepDescriptor.getExample().isEmpty()){
+
+                                    builder.withPresentableText(stepDescriptor.getExample());
+                                }
+
+                                builder.withTailText("tail text");
+                                builder.withTypeText("type text");
+
+                                resultSet.addElement(builder);
+
+//                                .withTailText("tail text"));
+                            }
+
+                        }
 
                     }
                 }
         );
     }
+
+
+    private List<StepImplementationsDescriptor> findStepImplementationDescriptorsForDependency(final String path) {
+        JarFile jarFile = null;
+        try {
+            jarFile = new JarFile(new File(path));
+
+
+            final List<StepImplementationsDescriptor> stepImplementationDescriptors = loadJsonStepImplementationsDescriptorFromJar(jarFile);
+
+            return stepImplementationDescriptors != null ? stepImplementationDescriptors : Collections.<StepImplementationsDescriptor>emptyList();
+        }
+        catch (final IOException ex) {
+
+            logger.warn("Could not open jar file " + path, ex);
+        }
+        finally {
+            try {
+                if (jarFile != null) {
+                    jarFile.close();
+                }
+            } catch (final IOException e) {
+                logger.warn("Could not close jar file " + path);
+            }
+        }
+
+        return Collections.<StepImplementationsDescriptor> emptyList();
+    }
+
+    private List<StepImplementationsDescriptor> loadJsonStepImplementationsDescriptorFromJar(JarFile jarFile){
+        Gson gson = new GsonBuilder().create();
+
+        List<StepImplementationsDescriptor> classStepTagList = null;
+
+        final ZipEntry entry = jarFile.getEntry(STEPIMPLEMENTATIONS_JSON_FILENAME);
+
+        if (entry != null) {
+
+            try {
+                final InputStream is = jarFile.getInputStream(entry);
+
+                Type datasetListType = new TypeToken<Collection<StepImplementationsDescriptor>>() {}.getType();
+
+                classStepTagList = gson.fromJson(new InputStreamReader(is), datasetListType);
+
+
+            } catch (final IOException e) {
+                logger.error("Error loading from jarfile: ", e);
+            }
+        } else {
+            logger.error("couldn't locate file in jar: " + STEPIMPLEMENTATIONS_JSON_FILENAME);
+        }
+
+        return classStepTagList;
+
+    }
+
 
     public void fillCompletionVariants(CompletionParameters params, CompletionResultSet result){
         super.fillCompletionVariants(params, result);

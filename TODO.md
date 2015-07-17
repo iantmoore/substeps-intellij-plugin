@@ -1,5 +1,6 @@
 
-# how to actually get hold of the jar files from the library
+# implement an alternative to the xml serializer - use json - breaks the dependency
+
 
 arch overview
 https://confluence.jetbrains.com/display/IDEADEV/PluginDevelopment
