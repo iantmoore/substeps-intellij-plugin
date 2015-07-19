@@ -78,13 +78,13 @@ public abstract class SubstepsPsiElementBase extends ASTWrapperPsiElement {
     @Override
     public void accept(@NotNull PsiElementVisitor visitor) {
         if (visitor instanceof SubstepsDefinitionElementVisitor) {
-            acceptGherkin((SubstepsDefinitionElementVisitor) visitor);
+            acceptSubstepDefinition((SubstepsDefinitionElementVisitor) visitor);
         }
         else {
             super.accept(visitor);
         }
     }
 
-    protected abstract void acceptGherkin(SubstepsDefinitionElementVisitor substepDefinitionElementVisitor);
+    protected abstract void acceptSubstepDefinition(SubstepsDefinitionElementVisitor substepDefinitionElementVisitor);
 }
 

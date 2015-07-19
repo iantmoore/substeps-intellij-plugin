@@ -17,7 +17,8 @@ public class SubstepDefinitionDefineBlockImpl extends SubstepsPsiElementBase {
     }
 
     @Override
-    protected void acceptGherkin(SubstepsDefinitionElementVisitor gherkinElementVisitor) {
-
+    protected void acceptSubstepDefinition(SubstepsDefinitionElementVisitor substepDefinitionElementVisitor) {
+        substepDefinitionElementVisitor.visitSubstepDefinitionDefineBlock(this);
     }
+
 }

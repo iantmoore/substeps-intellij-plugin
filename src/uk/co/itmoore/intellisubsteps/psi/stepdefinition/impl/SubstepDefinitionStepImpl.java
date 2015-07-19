@@ -13,8 +13,8 @@ public class SubstepDefinitionStepImpl extends SubstepsPsiElementBase {
     }
 
     @Override
-    protected void acceptGherkin(SubstepsDefinitionElementVisitor substepDefinitionElementVisitor) {
-
+    protected void acceptSubstepDefinition(SubstepsDefinitionElementVisitor substepDefinitionElementVisitor) {
+        substepDefinitionElementVisitor.visitSubstepDefinitionStep(this);
     }
 
 //    @Override

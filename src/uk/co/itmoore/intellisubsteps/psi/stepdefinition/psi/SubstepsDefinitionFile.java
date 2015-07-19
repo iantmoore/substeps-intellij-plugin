@@ -7,4 +7,5 @@ import com.intellij.psi.PsiFile;
  */
 public interface SubstepsDefinitionFile extends PsiFile {
 
+    SubstepDefinition[] getSubstepDefinitions();
 }

@@ -142,7 +142,7 @@ public class FeatureLexer extends LexerBase {
         myCurrentTokenStart = myPosition;
         char c = myBuffer.charAt(myPosition);
 
-        log.debug("char: [" + c + "] @ " + myPosition);
+        log.trace("char: [" + c + "] @ " + myPosition);
 
         if (Character.isWhitespace(c)) {
 //            log.debug("whitespace");
@@ -176,7 +176,7 @@ public class FeatureLexer extends LexerBase {
             myPosition++;
         }
         else {
-            log.debug("current state = " + myState);
+            log.trace("current state = " + myState);
 
             if (myState == FeatureLexerState.STATE_DEFAULT) {
 
@@ -416,10 +416,10 @@ public class FeatureLexer extends LexerBase {
                     String nextLine = bufString.substring(myPosition + 1, nextLineEnd);
                     // if the nextLine is empty, then reset
                     if (nextLine.trim().isEmpty()) {
-                        log.debug("next line is empty, resetting state");
+                        log.trace("next line is empty, resetting state");
                         myState = FeatureLexerState.STATE_DEFAULT;
                     } else {
-                        log.debug("next line not empty, not resetting state");
+                        log.trace("next line not empty, not resetting state");
                     }
                 }
             }

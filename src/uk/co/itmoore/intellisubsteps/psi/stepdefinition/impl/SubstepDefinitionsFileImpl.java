@@ -7,11 +7,13 @@ import com.intellij.psi.FileViewProvider;
 import org.jetbrains.annotations.NotNull;
 import uk.co.itmoore.intellisubsteps.psi.stepdefinition.SubstepsStepDefinitionFileType;
 import uk.co.itmoore.intellisubsteps.psi.stepdefinition.SubstepsStepDefinitionLanguage;
+import uk.co.itmoore.intellisubsteps.psi.stepdefinition.psi.SubstepDefinition;
+import uk.co.itmoore.intellisubsteps.psi.stepdefinition.psi.SubstepsDefinitionFile;
 
 /**
  * Created by ian on 05/07/15.
  */
-public class SubstepDefinitionsFileImpl extends PsiFileBase {
+public class SubstepDefinitionsFileImpl extends PsiFileBase implements SubstepsDefinitionFile{
 
     public SubstepDefinitionsFileImpl(@NotNull FileViewProvider fileViewProvider) {
         super(fileViewProvider, SubstepsStepDefinitionLanguage.INSTANCE);
@@ -21,5 +23,13 @@ public class SubstepDefinitionsFileImpl extends PsiFileBase {
     @Override
     public FileType getFileType() {
         return SubstepsStepDefinitionFileType.INSTANCE;
+    }
+
+
+
+    @Override
+    public SubstepDefinition[] getSubstepDefinitions() {
+
+        return findChildrenByClass(SubstepDefinition.class);
     }
 }
