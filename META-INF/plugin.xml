@@ -3,18 +3,24 @@
 <idea-plugin version="2">
   <id>uk.co.itmoore.intellisubsteps</id>
   <name>Substeps IntelliJ Plugin</name>
-  <version>1.0</version>
-  <vendor email="support@yourcompany.com" url="http://www.yourcompany.com">YourCompany</vendor>
+  <version>0.0.1</version>
+  <vendor email="ian@itmoore.co.uk" url="http://www.yourcompany.com">Substeps</vendor>
 
   <description><![CDATA[
-      Enter short description for your plugin here.<br>
-      <em>most HTML tags may be used</em>
+      A plugin to help compose Substep features and substeps
     ]]></description>
 
+    <!--      Enter short description for your plugin here.<br>
+      <em>most HTML tags may be used</em> -->
+
+
   <change-notes><![CDATA[
-      Add change notes here.<br>
-      <em>most HTML tags may be used</em>
-    ]]>
+
+  <h3>0.0.1</h3>
+  <ul>
+    <li>Initial release for testing - code completion in substeps files, syntax highlighting.
+  </ul>
+      ]]>
   </change-notes>
 
   <!-- please see http://confluence.jetbrains.com/display/IDEADEV/Build+Number+Ranges for description -->
