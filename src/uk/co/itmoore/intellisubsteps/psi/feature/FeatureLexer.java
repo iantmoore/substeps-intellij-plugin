@@ -90,7 +90,7 @@ public class FeatureLexer extends LexerBase {
         // initially called with 0, end and 0
         bufString = buffer.toString();
 
-        String sample = buffer.toString().substring(0, buffer.length() > 20 ? 20 : buffer.length());
+//        String sample = buffer.toString().substring(0, buffer.length() > 20 ? 20 : buffer.length());
 //        log.debug("start buffer: " +
 //                sample + " ....startOffset: " +
 //                startOffset + " endOffset: " + endOffset + " initialState: " + initialState);
@@ -260,6 +260,7 @@ public class FeatureLexer extends LexerBase {
             if (myState == FeatureLexerState.STATE_AFTER_TAGS_KEYWORD){
                 myCurrentToken = FeatureElementTypes.TAG_ELEMENT_TYPE;
                 advanceToEOL();
+                myState = FeatureLexerState.STATE_DEFAULT;
                 return;
             }
             if (myState == FeatureLexerState.STATE_AFTER_SCENARIO_OUTLINE_KEYWORD){
@@ -381,7 +382,7 @@ public class FeatureLexer extends LexerBase {
             myPosition++;
         }
         returnWhitespace(mark);
-        myState = FeatureLexerState.STATE_DEFAULT;
+        //myState = FeatureLexerState.STATE_DEFAULT;
     }
 
     private void returnWhitespace(int mark) {
@@ -401,7 +402,11 @@ public class FeatureLexer extends LexerBase {
     private void advanceOverWhitespace() {
         if (myBuffer.charAt(myPosition) == '\n') {
 
-            if (myState == FeatureLexerState.STATE_IN_TABLE_HEADER_ROW){
+            if (myState ==  FeatureLexerState.STATE_AFTER_FEATURE_NAME){
+
+                // feature descriptions can be multi line, with gaps!
+            }
+            else if (myState == FeatureLexerState.STATE_IN_TABLE_HEADER_ROW){
 
                 myState = FeatureLexerState.STATE_IN_TABLE_VALUE_ROWS;
             }

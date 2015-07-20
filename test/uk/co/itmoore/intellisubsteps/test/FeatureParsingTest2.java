@@ -5,14 +5,23 @@ package uk.co.itmoore.intellisubsteps.test;
  */
 
 import com.intellij.testFramework.ParsingTestCase;
+import org.jetbrains.annotations.NonNls;
+import org.junit.Ignore;
 import uk.co.itmoore.intellisubsteps.psi.feature.FeatureParserDefinition;
-import uk.co.itmoore.intellisubsteps.psi.stepdefinition.SubstepDefinitionParserDefinition;
 
-public class FeatureParsingTest extends ParsingTestCase {
-    public FeatureParsingTest() {
+import java.io.IOException;
+
+@Ignore
+public class FeatureParsingTest2 extends ParsingTestCase {
+    public FeatureParsingTest2() {
 
         super("", "feature", new FeatureParserDefinition());
     }
+
+    public String getTestName(boolean var1) {
+        return "sample";
+    }
+
 
 
     public void testParsingTestData() {
@@ -22,7 +31,7 @@ public class FeatureParsingTest extends ParsingTestCase {
     @Override
     protected String getTestDataPath() {
 
-        return "/home/ian/projects/intelliSubsteps/test/testData/features/psi";
+        return "/home/ian/projects/intelliSubsteps/test/testData/features/account";
     }
 
     @Override

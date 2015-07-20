@@ -14,7 +14,7 @@ public class SubstepStepDefinitionSyntaxHighlighterFactory extends SyntaxHighlig
     @Override
     public SyntaxHighlighter getSyntaxHighlighter(Project project, VirtualFile virtualFile) {
 
-        System.out.println("SubstepStepDefinitionSyntaxHighlighterFactory vfile type: " + virtualFile.getFileType().getDescription());
+//        System.out.println("SubstepStepDefinitionSyntaxHighlighterFactory vfile type: " + virtualFile.getFileType().getDescription());
 
         return new SubstepStepDefinitionSyntaxHighlighter();
     }

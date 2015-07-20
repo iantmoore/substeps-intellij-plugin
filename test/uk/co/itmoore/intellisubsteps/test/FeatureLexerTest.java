@@ -18,10 +18,29 @@ public class FeatureLexerTest {
 
     private static final Logger log = LogManager.getLogger(FeatureLexerTest.class);
 
+    String accountFeature = "/home/ian/skybet/projects/test-automation/international-testing-parent/test-automation/src/test/resources/com/skybet/international/testing/journey/account/account.feature";
+
+    @Test
+    public void testAccountFeatureLexer() throws IOException {
+
+        lexFeatureFile(accountFeature);
+
+    }
+
     @Test
     public void testFeatureLexer() throws IOException {
 
-        String txt = Files.toString(new File("/home/ian/projects/intelliSubsteps/test/testData/features/psi/ParsingTestData.feature"), Charset.forName("UTF-8"));
+        String file = "/home/ian/projects/intelliSubsteps/test/testData/features/psi/ParsingTestData.feature";
+        lexFeatureFile(file);
+
+
+        // TODO - put some assertions in here... ? not sure how ?
+
+
+    }
+
+    private void lexFeatureFile(String file) throws IOException {
+        String txt = Files.toString(new File(file), Charset.forName("UTF-8"));
 
         FeatureLexer lexer = new FeatureLexer();
 
@@ -45,10 +64,6 @@ public class FeatureLexerTest {
 
             previousTokenEnd = tokenEnd;
         }
-
-        // TODO - put some assertions in here...
-
-
     }
 
 

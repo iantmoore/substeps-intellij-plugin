@@ -14,7 +14,7 @@ public class FeatureSyntaxHighlighterFactory extends SyntaxHighlighterFactory {
     @Override
     public SyntaxHighlighter getSyntaxHighlighter(Project project, VirtualFile virtualFile) {
 
-        System.out.println("FeatureSyntaxHighlighterFactory vfile type: " + virtualFile.getFileType().getDescription());
+//        System.out.println("FeatureSyntaxHighlighterFactory vfile type: " + virtualFile.getFileType().getDescription());
 
         return new FeatureSyntaxHighlighter();
     }

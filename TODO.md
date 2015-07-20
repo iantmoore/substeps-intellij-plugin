@@ -1,10 +1,8 @@
 
-# load up step impls from code
-# PsiJavaFile ?
-
 # completion handler for feature files
 
 # caching of lookups derived from libraries - invalidate when libraries change - currently contributor gets called with each ctrl space - should cache and rebuild at appropriate time (how?)
+
 
 arch overview
 https://confluence.jetbrains.com/display/IDEADEV/PluginDevelopment
