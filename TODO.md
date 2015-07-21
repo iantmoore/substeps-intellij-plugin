@@ -1,3 +1,4 @@
+# feature parsing - syntax not being coloured correctly..?
 
 # completion handler for feature files
 

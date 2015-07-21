@@ -54,7 +54,7 @@ public class FeatureParser implements PsiParser {
                     featureMarker.done(FeatureElementTypes.FEATURE_ELEMENT_TYPE);
                 break;
             }
-
+            log.debug("parseFeature advancing lexer");
             builder.advanceLexer();
         }
     }
@@ -67,7 +67,7 @@ public class FeatureParser implements PsiParser {
 
     private void parseFeatureFile(PsiBuilder builder) {
 
-        // log.debug("parse feature file");
+        log.debug("parse feature file");
 
         while(!builder.eof()) {
             final IElementType tokenType = builder.getTokenType();
@@ -79,6 +79,8 @@ public class FeatureParser implements PsiParser {
                 parseTags(builder);
             }
 //            else {
+            log.debug("parseFeatureFile advancing lexer");
+
                 builder.advanceLexer();
 //            }
         }
