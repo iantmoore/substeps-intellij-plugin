@@ -1,9 +1,10 @@
-# feature parsing - & lexing gettimg stuck on FEATURE_DESCRIPTION_ELEMENT_TYPE ?
+# feature parsing - incomplete
 
-# completion handler for feature files
+# completion handler for feature files - does this require a full implementation of the feature parser ?
 
 # caching of lookups derived from libraries - invalidate when libraries change - currently contributor gets called with each ctrl space - should cache and rebuild at appropriate time (how?)
 
+# highlight and id of params and tokens
 
 arch overview
 https://confluence.jetbrains.com/display/IDEADEV/PluginDevelopment

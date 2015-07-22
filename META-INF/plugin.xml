@@ -56,6 +56,9 @@
               implementationClass="uk.co.itmoore.intellisubsteps.psi.stepdefinition.SubstepDefinitionCompletionContributor"/>
 
 
+      <completion.contributor language="SubstepsFeature"
+                              implementationClass="uk.co.itmoore.intellisubsteps.psi.feature.FeatureCompletionContributor"/>
+
 
 
       <lang.parserDefinition language="SubstepStepDefinition"
