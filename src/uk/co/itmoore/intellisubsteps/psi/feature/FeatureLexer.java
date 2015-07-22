@@ -74,13 +74,6 @@ public class FeatureLexer extends LexerBase {
 
 
 
-//    private final static int STATE_AFTER_STEP_DEFINITION = 3;
-//    private final static int STATE_AFTER_STEP_KEYWORD = 4;
-//    private final static int STATE_INSIDE_PYSTRING = 5;
-//
-//    private final static int STATE_PARAMETER_INSIDE_PYSTRING = 6;
-//    private final static int STATE_PARAMETER_INSIDE_STEP = 7;
-
 
 
 
@@ -178,7 +171,7 @@ public class FeatureLexer extends LexerBase {
         else {
             log.debug("current state = " + myState);
 
-            if (myState == FeatureLexerState.STATE_DEFAULT) {
+            if (myState == FeatureLexerState.STATE_DEFAULT || myState == FeatureLexerState.STATE_AFTER_FEATURE_NAME) {
 
                 for (String keyword : myKeywords) {
                     int length = keyword.length();

@@ -22,6 +22,10 @@ public class FeatureSyntaxHighlighter extends SyntaxHighlighterBase {
         ATTRIBUTES.put(FeatureTokenTypes.COMMENT_TOKEN, SubstepsHighlighter.COMMENT);
 
         ATTRIBUTES.put(FeatureTokenTypes.TAGS_KEYWORD_TOKEN ,SubstepsHighlighter.KEYWORD);
+        ATTRIBUTES.put(FeatureElementTypes.TAG_ELEMENT_TYPE ,SubstepsHighlighter.TAGS);
+
+
+
         ATTRIBUTES.put(FeatureTokenTypes.BACKGROUND_KEYWORD_TOKEN ,SubstepsHighlighter.KEYWORD);
         ATTRIBUTES.put(FeatureTokenTypes.FEATURE_KEYWORD_TOKEN ,SubstepsHighlighter.KEYWORD);
         ATTRIBUTES.put(FeatureTokenTypes.SCENARIO_KEYWORD_TOKEN ,SubstepsHighlighter.KEYWORD);

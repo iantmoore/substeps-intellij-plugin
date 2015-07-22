@@ -16,7 +16,6 @@ import java.io.IOException;
 
 public class FeatureParsingScenario{
 
-//@Ignore
 public static class FeatureParsingTest2 extends ParsingTestCase {
 
     private final String name;

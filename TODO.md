@@ -1,4 +1,4 @@
-# feature parsing - syntax not being coloured correctly..?
+# feature parsing - & lexing gettimg stuck on FEATURE_DESCRIPTION_ELEMENT_TYPE ?
 
 # completion handler for feature files
 

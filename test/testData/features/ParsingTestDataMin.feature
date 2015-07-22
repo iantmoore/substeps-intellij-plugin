@@ -5,9 +5,18 @@ Feature: A feature to self test the webdriver substeps implementations
 
 # a comment
 
-  Background:
-    Given stuff that happens first
+ Background:
+   Given stuff that happens first
 
   Scenario: a scenario
     Given I go to the self test page
     Then I can see "Hello Self Test page"
+
+ Tags: another
+  Scenario Outline: a scenario
+    Given I go to the self test page
+    Then I can see "Hello Self Test page"
+
+    Examples:
+      |col1 | col2 |
+      | v1  |  v2  |
