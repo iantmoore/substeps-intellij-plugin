@@ -16,6 +16,7 @@ import com.intellij.openapi.roots.OrderRootType;
 import com.intellij.openapi.roots.libraries.Library;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.*;
+import com.intellij.util.PlatformIcons;
 import com.intellij.util.ProcessingContext;
 import com.intellij.util.Processor;
 import com.technophobia.substeps.glossary.StepDescriptor;
@@ -24,6 +25,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
+import uk.co.itmoore.intellisubsteps.SubstepsIcons;
 import uk.co.itmoore.intellisubsteps.psi.stepdefinition.psi.SubstepsDefinitionFile;
 
 import java.io.File;
@@ -92,7 +94,8 @@ public abstract class SubstepsCompletionContributor extends CompletionContributo
 
                 String def = StringUtils.stripStart(line.trim(), "Define:").trim();
 
-                LookupElementBuilder builder = LookupElementBuilder.create(def);
+                LookupElementBuilder builder = LookupElementBuilder.create(def).withIcon(SubstepsIcons.Substep);
+
                 resultSet.addElement(builder);
 
             }
@@ -203,7 +206,7 @@ public abstract class SubstepsCompletionContributor extends CompletionContributo
 
             for (StepDescriptor stepDescriptor: descriptor.getExpressions()){
 
-                LookupElementBuilder builder = LookupElementBuilder.create(stepDescriptor.getExpression());
+                LookupElementBuilder builder = LookupElementBuilder.create(stepDescriptor.getExpression()).withIcon(PlatformIcons.CLASS_ICON);
 
                 if (stepDescriptor.getExample() != null && stepDescriptor.getExample().isEmpty()){
 
