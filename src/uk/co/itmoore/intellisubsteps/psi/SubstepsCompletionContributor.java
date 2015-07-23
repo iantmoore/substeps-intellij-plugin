@@ -47,7 +47,9 @@ public abstract class SubstepsCompletionContributor extends CompletionContributo
 
     private static final Logger logger = LogManager.getLogger(SubstepsCompletionContributor.class);
 
-    protected void buildSuggestionsFromStepImplementationsInProjectSource(Module module, final List<StepImplementationsDescriptor> stepImplsInScope, final CompletionResultSet resultSet) {
+    protected void buildSuggestionsFromStepImplementationsInProjectSource(Module module,
+                final List<StepImplementationsDescriptor> stepImplsInScope, final CompletionResultSet resultSet) {
+
         long start = System.currentTimeMillis();
         AnalysisScope moduleScope = new AnalysisScope(module);
         moduleScope.accept(new PsiRecursiveElementVisitor() {

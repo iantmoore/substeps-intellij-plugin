@@ -3,8 +3,8 @@
 <idea-plugin version="2">
   <id>uk.co.itmoore.intellisubsteps</id>
   <name>Substeps IntelliJ Plugin</name>
-  <version>0.0.1</version>
-  <vendor email="ian@itmoore.co.uk" url="http://www.yourcompany.com">Substeps</vendor>
+  <version>0.0.2</version>
+  <vendor email="ian@itmoore.co.uk" url="n/a">Substeps</vendor>
 
   <description><![CDATA[
       A plugin to help compose Substep features and substeps
@@ -16,9 +16,9 @@
 
   <change-notes><![CDATA[
 
-  <h3>0.0.1</h3>
+  <h3>0.0.2</h3>
   <ul>
-    <li>Initial release for testing - code completion in substeps files, syntax highlighting.
+    <li>Initial release for testing - code completion in substeps files (both feature ands and substeps), basic syntax highlighting.
   </ul>
       ]]>
   </change-notes>
@@ -124,8 +124,6 @@
                      key="inspection.gherkin.background.after.scenario.name" groupKey="cucumber.inspection.group.name" enabledByDefault="true"
                      level="ERROR" implementationClass="org.jetbrains.plugins.cucumber.inspections.GherkinMisplacedBackgroundInspection"/>
 
-    <completion.contributor language="Gherkin"
-                            implementationClass="org.jetbrains.plugins.cucumber.completion.CucumberCompletionContributor"/>
 
     <enterHandlerDelegate implementation="org.jetbrains.plugins.cucumber.codeinsight.CucumberEnterHandler"/>
     <typedHandler implementation="org.jetbrains.plugins.cucumber.codeinsight.GherkinTypedHandler"/>
