@@ -3,7 +3,7 @@
 <idea-plugin version="2">
   <id>uk.co.itmoore.intellisubsteps</id>
   <name>Substeps IntelliJ Plugin</name>
-  <version>0.0.2</version>
+  <version>0.0.3</version>
   <vendor email="ian@itmoore.co.uk" url="n/a">Substeps</vendor>
 
   <description><![CDATA[
@@ -18,7 +18,9 @@
 
   <h3>0.0.2</h3>
   <ul>
-    <li>Initial release for testing - code completion in substeps files (both feature ands and substeps), basic syntax highlighting.
+    <li>code completion in substeps files (both feature ands and substeps).</li>
+    <li>basic syntax highlighting</li>
+    <li>Multi line commenting through selection and (Ctrl or Command) & / </li>
   </ul>
       ]]>
   </change-notes>
@@ -67,6 +69,10 @@
       <lang.parserDefinition language="SubstepsFeature"
              implementationClass="uk.co.itmoore.intellisubsteps.psi.feature.FeatureParserDefinition"/>
 
+
+      <lang.commenter language="SubstepStepDefinition" implementationClass="uk.co.itmoore.intellisubsteps.psi.SubstepsCommenter"/>
+
+      <lang.commenter language="SubstepsFeature" implementationClass="uk.co.itmoore.intellisubsteps.psi.SubstepsCommenter"/>
       <!--
         SubstepsFeature and SubstepStepDefinition
 
