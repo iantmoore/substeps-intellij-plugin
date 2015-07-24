@@ -1,3 +1,9 @@
+# finish off feature parsing
+
+# feature lexing - content after Example keyword - causes a hissy - make more robust
+
+# bug with suggestions from in project step impls where it's a single word - seems to be chopping off the last letter
+
 # jump to def
 
 # caching of lookups derived from libraries - invalidate when libraries change - currently contributor gets called with each ctrl space - should cache and rebuild at appropriate time (how?)

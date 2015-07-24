@@ -1,5 +1,8 @@
 package uk.co.itmoore.intellisubsteps.test;
 
+import com.google.common.base.Predicate;
+import com.google.common.collect.FluentIterable;
+import com.google.common.collect.TreeTraverser;
 import com.google.common.io.Files;
 import com.intellij.psi.TokenType;
 import com.intellij.psi.tree.IElementType;
@@ -37,7 +40,7 @@ public class FeatureLexerTest {
     @Test
     public void testAccountFeatureLexer() throws IOException {
 
-        lexFeatureFile(accountFeature);
+        lexFeatureFile(new File(accountFeature));
 
     }
 
@@ -45,7 +48,7 @@ public class FeatureLexerTest {
     public void testFeatureLexer() throws IOException {
 
         String file = "/home/ian/projects/intelliSubsteps/test/testData/features/psi/ParsingTestData.feature";
-        lexFeatureFile(file);
+        lexFeatureFile(new File(file));
 
 
         // TODO - put some assertions in here... ? not sure how ?
@@ -139,7 +142,7 @@ public class FeatureLexerTest {
         expected.states.add(STATE_IN_TABLE_VALUE_ROWS);
         expected.states.add(STATE_IN_TABLE_VALUE_ROWS);
 
-        LexingResults results = lexFeatureFile(file);
+        LexingResults results = lexFeatureFile(new File(file));
 
 
         List<IElementType>  skipTokens = new ArrayList<>();
@@ -154,6 +157,43 @@ public class FeatureLexerTest {
 
 
 
+    }
+
+    @Test
+    public void testLexFeatureSet() throws IOException {
+        String base = "/home/ian/skybet/plugin-testing/test-automation/international-testing-parent/test-automation/src/test/resources/com/skybet/international/testing/";
+
+        TreeTraverser<File> fileTreeTraverser = Files.fileTreeTraverser();
+
+        File root = new File(base);
+
+        FluentIterable<File> fileIterator = fileTreeTraverser.postOrderTraversal(root);
+
+        List<File> featureFiles =
+                fileIterator.filter(new Predicate<File>(){
+
+                    @Override
+                    public boolean apply(File file) {
+                        return file.getName().endsWith(".feature");
+                    }
+                }).toList();
+
+        for (File feature : featureFiles){
+            System.out.println("feature file: " + feature.getAbsolutePath() + "\n name: " + feature.getName());
+
+            String featureName = feature.getName().replaceAll("\\.feature", "");
+
+            System.out.println("featureName: " + featureName);
+
+            lexFeatureFile(feature);
+
+//
+//            FeatureParsingTest2 fp2 = new FeatureParsingTest2(featureName, feature.getParent());
+////
+//            System.out.println("running tests for feature: " + featureName);
+//            fp2.runTest();
+
+        }
     }
 
     public static class LexingResults{
@@ -193,8 +233,8 @@ public class FeatureLexerTest {
     }
 
 
-    private LexingResults lexFeatureFile(String file) throws IOException {
-        String txt = Files.toString(new File(file), Charset.forName("UTF-8"));
+    private LexingResults lexFeatureFile(File file) throws IOException {
+        String txt = Files.toString(file, Charset.forName("UTF-8"));
 
         FeatureLexer lexer = new FeatureLexer();
 
@@ -218,7 +258,7 @@ public class FeatureLexerTest {
             startOffset = lexer.getTokenEnd();
             if (tokenEnd == previousTokenEnd){
 
-                log.error(" ** lexer not progressing...");
+                Assert.fail(" ** lexer not progressing...");
                 break;
             }
 

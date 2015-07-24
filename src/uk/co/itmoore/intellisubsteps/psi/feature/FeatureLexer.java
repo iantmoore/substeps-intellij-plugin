@@ -213,6 +213,11 @@ public class FeatureLexer extends LexerBase {
 //                }
 //                return;
 //            }
+            if(myState == FeatureLexerState.STATE_AFTER_EXAMPLES_KEYWORD){
+                advanceToEOL();
+                return;
+            }
+
             if(myState == FeatureLexerState.STATE_AFTER_FEATURE_KEYWORD){
                 myCurrentToken = FeatureElementTypes.FEATURE_NAME_ELEMENT_TYPE;
                 advanceToEOL();
@@ -408,16 +413,33 @@ public class FeatureLexer extends LexerBase {
 //            if (myState.resetStateOnNewLine){
 
                 // TODO, might not want to reset state - peek ahead, if the line ahead is blank
-                int nextLineEnd = bufString.indexOf('\n', myPosition + 1);
+//                int nextLineEnd = bufString.indexOf('\n', myPosition + 1);
+
+                // reset state if it's blank up to the next keyword, otherwise, we're still in the thing we were in
+
+                String nextContent = bufString.substring(myPosition + 1).trim();
+                int nextLineEnd = nextContent.indexOf('\n');
+
+
+//                if (lines != null) {
+//
+//
+//                }
                 if (nextLineEnd != -1) {
 
-                    String nextLine = bufString.substring(myPosition + 1, nextLineEnd);
+                    String nextLine = nextContent.substring(0, nextLineEnd);
+
+                    if (nextLine.startsWith("Scenario:") || nextLine.startsWith("Tags:") ||
+                            nextLine.startsWith("Scenario Outline:") ||
+                            nextLine.startsWith("Background:") || nextLine.startsWith("Examples:")){
+
+//                    String nextLine = bufString.substring(myPosition + 1, nextLineEnd);
                     // if the nextLine is empty, then reset
-                    if (nextLine.trim().isEmpty()) {
-                        log.debug("next line is empty, resetting state");
+//                    if (nextLine.trim().isEmpty()) {
+                        log.debug("next content line contains a keyword, resetting state");
                         myState = FeatureLexerState.STATE_DEFAULT;
                     } else {
-                        log.debug("next line not empty, not resetting state");
+                        log.debug("next line not empty, doesn't start with a keyword, not resetting state");
                     }
                 }
             }
