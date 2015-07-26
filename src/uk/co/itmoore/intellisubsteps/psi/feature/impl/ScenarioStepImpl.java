@@ -8,13 +8,14 @@ import org.jetbrains.annotations.NotNull;
 import uk.co.itmoore.intellisubsteps.psi.feature.FeatureElementVisitor;
 import uk.co.itmoore.intellisubsteps.psi.feature.FeatureFileType;
 import uk.co.itmoore.intellisubsteps.psi.feature.FeatureLanguage;
+import uk.co.itmoore.intellisubsteps.psi.feature.Step;
 import uk.co.itmoore.intellisubsteps.psi.stepdefinition.SubstepsStepDefinitionFileType;
 import uk.co.itmoore.intellisubsteps.psi.stepdefinition.SubstepsStepDefinitionLanguage;
 
 /**
  * Created by ian on 05/07/15.
  */
-public class ScenarioStepImpl extends FeaturePsiElementBase {
+public class ScenarioStepImpl extends FeaturePsiElementBase implements Step {
 
     public ScenarioStepImpl(@NotNull ASTNode node) {
         super(node);

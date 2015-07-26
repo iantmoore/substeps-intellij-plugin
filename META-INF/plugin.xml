@@ -73,6 +73,11 @@
       <lang.commenter language="SubstepStepDefinition" implementationClass="uk.co.itmoore.intellisubsteps.psi.SubstepsCommenter"/>
 
       <lang.commenter language="SubstepsFeature" implementationClass="uk.co.itmoore.intellisubsteps.psi.SubstepsCommenter"/>
+
+
+      <!--  not sure that this does anything..
+
+      <psi.referenceContributor implementation="uk.co.itmoore.intellisubsteps.psi.feature.FeatureReferenceContributor"/>-->
       <!--
         SubstepsFeature and SubstepStepDefinition
 
@@ -181,13 +186,42 @@
 
 
   <actions>
-    <group id="MyPlugin.SampleMenu" text="_Sample Menu" description="Sample menu">
-      <add-to-group group-id="MainMenu" anchor="last"  />
-      <action id="uk.co.itmoore.intellisubsteps.testactionid" class="uk.co.itmoore.intellisubsteps.TestAction" text="Text _Boxes" description="A test menu item" />
+
+      <action id="Go to step definition" class="uk.co.itmoore.intellisubsteps.GotoStepDefinitionAction"
+              text="Go to Step definition" description="A test menu item" >
+          <add-to-group anchor="last" group-id="EditorPopupMenu"/>
+              </action>
+
+      <!--
+          <group id="MyPlugin.SampleMenu" text="_Sample Menu" description="Sample menu">
+            <add-to-group group-id="MainMenu" anchor="last"  />
+            <action id="uk.co.itmoore.intellisubsteps.testactionid" class="uk.co.itmoore.intellisubsteps.TestAction" text="Text _Boxes" description="A test menu item" />
+      -->
 <!--
       <action id="Myplugin.Dialogs" class="Mypackage.MyShowDialog" text="Show _Dialog" description="A test menu item" />
 -->
+<!--
     </group>
+-->
+
+
+
+<!--
+      <group id="SubstepsEditor" popup="true" text="Substeps">
+          <reference ref="Go to step definition"/>
+-->
+
+          <!--
+          <reference ref="View event PSI element"/>
+          <reference ref="View event PSI file "/>
+          <reference ref="idea.plugin.psiviewer.controller.actions.PsiDump"/>
+          <reference ref="idea.plugin.psiviewer.controller.actions.PsiTestDump"/>
+-->
+<!--
+          <add-to-group anchor="last" group-id="EditorPopupMenu"/>
+      </group>
+-->
+
 
   </actions>
 

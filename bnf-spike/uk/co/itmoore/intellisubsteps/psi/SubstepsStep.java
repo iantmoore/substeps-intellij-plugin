@@ -67,7 +67,7 @@ public interface SubstepsStep extends SubstepsPsiElement, SubstepsSuppressionHol
    * Show {@link #RENAME_DISABLED_MESSAGE} or {@link #RENAME_BAD_SYMBOLS_MESSAGE}
    *
    * @param newName new name (to check if renaming to it is supported) or null to check if step could be renamed at all.
-   *                Steps with out of defintiions can't be renamed as well.
+   *                StepsHolder with out of defintiions can't be renamed as well.
    * @return true it could be
    * @see #RENAME_BAD_SYMBOLS_MESSAGE
    * @see #RENAME_DISABLED_MESSAGE

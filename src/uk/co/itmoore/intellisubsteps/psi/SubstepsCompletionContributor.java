@@ -140,7 +140,7 @@ public abstract class SubstepsCompletionContributor extends CompletionContributo
                 if (attributes != null) {
                     String src = attributes[0].getValue().getText();
 
-                    String  stepExpression = src.substring(1, src.length() -2);
+                    String  stepExpression = src.substring(1, src.length() -1);
 
                     StepDescriptor sd = new StepDescriptor();
 
@@ -162,7 +162,7 @@ public abstract class SubstepsCompletionContributor extends CompletionContributo
     }
 
 
-    protected boolean isStepImplementationsClass(PsiClass psiClass) {
+    public static boolean isStepImplementationsClass(PsiClass psiClass) {
 
         PsiAnnotation[] classAnnotations = psiClass.getModifierList().getAnnotations();
         for (PsiAnnotation a : classAnnotations){

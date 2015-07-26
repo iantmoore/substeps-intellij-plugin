@@ -29,16 +29,12 @@ public class FeatureParser implements PsiParser {
         psiBuilder.setDebugMode(true);
 
         final PsiBuilder.Marker fileMarker = psiBuilder.mark();
-  //      final PsiBuilder.Marker featureMarker = psiBuilder.mark();
 
         parseFeatureFile(psiBuilder);
-
-//        featureMarker.done(FeatureElementTypes.FEATURE_ELEMENT_TYPE);
 
         fileMarker.done(FeatureElementTypes.FEATURE_FILE);
 
         psiBuilder.setDebugMode(true);
-
 
         log.debug("parsing done!");
 
@@ -86,14 +82,20 @@ public class FeatureParser implements PsiParser {
 
                     parseBackground(builder);
                 } else if (tokenType == FeatureTokenTypes.SCENARIO_KEYWORD_TOKEN) {
+
+                    final PsiBuilder.Marker scenarioBlockMarker = builder.mark();
+
                     parseScenario(builder);
+
+                    scenarioBlockMarker.done(FeatureElementTypes.SCENARIO_BLOCK_ELEMENT_TYPE);
                 }
                 else if (tokenType == FeatureTokenTypes.SCENARIO_OUTLINE_KEYWORD_TOKEN) {
+                    final PsiBuilder.Marker scenarioOutlineBlockMarker = builder.mark();
+
                     parseScenarioOutline(builder);
+
+                    scenarioOutlineBlockMarker.done(FeatureElementTypes.SCENARIO_OUTLINE_BLOCK_ELEMENT_TYPE);
                 }
-//                else if (tokenType == FeatureTokenTypes.EXAMPLES_KEYWORD_TOKEN) {
-//                    parseExamples(builder);
-//                }
                 else if (tokenType == FeatureTokenTypes.TAGS_KEYWORD_TOKEN) {
                     parseTags(builder);
                 }

@@ -14,7 +14,7 @@ import uk.co.itmoore.intellisubsteps.psi.stepdefinition.SubstepsStepDefinitionLa
 /**
  * Created by ian on 05/07/15.
  */
-public class ScenarioOutlineImpl extends FeaturePsiElementBase {
+public class ScenarioOutlineImpl extends ScenarioImpl {
 
     public ScenarioOutlineImpl(@NotNull ASTNode node) {
         super(node);

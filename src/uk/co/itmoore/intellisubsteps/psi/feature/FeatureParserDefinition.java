@@ -70,16 +70,24 @@ public class FeatureParserDefinition implements ParserDefinition {
 
 
         if (astNode.getElementType() == FeatureElementTypes.FEATURE_ELEMENT_TYPE) return new FeatureImpl(astNode);
+
         if (astNode.getElementType() == FeatureElementTypes.TAG_ELEMENT_TYPE) return new  TagNameImpl(astNode);
+
         if (astNode.getElementType() == FeatureElementTypes.FEATURE_NAME_ELEMENT_TYPE) return new  FeatureNameImpl(astNode);
         if (astNode.getElementType() == FeatureElementTypes.FEATURE_DESCRIPTION_ELEMENT_TYPE) return new  FeatureDescriptionImpl(astNode);
+
         if (astNode.getElementType() == FeatureElementTypes.BACKGROUND_BLOCK_ELEMENT_TYPE) return new  BackgroundImpl(astNode);
         if (astNode.getElementType() == FeatureElementTypes.BACKGROUND_STEP_ELEMENT_TYPE) return new  BackgroundStepImpl(astNode);
+
         if (astNode.getElementType() == FeatureElementTypes.SCENARIO_BLOCK_ELEMENT_TYPE) return new  ScenarioImpl(astNode);
         if (astNode.getElementType() == FeatureElementTypes.SCENARIO_NAME_ELEMENT_TYPE) return new  ScenarioNameImpl(astNode);
+
         if (astNode.getElementType() == FeatureElementTypes.STEP_ELEMENT_TYPE) return new  ScenarioStepImpl(astNode);
+
         if (astNode.getElementType() == FeatureElementTypes.SCENARIO_OUTLINE_BLOCK_ELEMENT_TYPE) return new  ScenarioOutlineImpl(astNode);
+
         if (astNode.getElementType() == FeatureElementTypes.EXAMPLES_BLOCK_ELEMENT_TYPE) return new  ExamplesBlockImpl(astNode);
+
         if (astNode.getElementType() == FeatureElementTypes.TABLE_BLOCK_ELEMENT_TYPE) return new  TableBlockImpl(astNode);
 
 //        if (astNode.getElementType() == SubstepDefinitionElementTypes.SUBSTEP_DEFINITION_ELEMENT_TYPE) return new SubstepDefinitionImpl(astNode);

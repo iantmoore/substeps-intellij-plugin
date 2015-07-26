@@ -9,8 +9,11 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.tree.TokenSet;
 import com.intellij.util.Function;
+import com.intellij.util.IncorrectOperationException;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import uk.co.itmoore.intellisubsteps.psi.SubstepsNamedElement;
+import uk.co.itmoore.intellisubsteps.psi.SubstepsNamedElementImpl;
 import uk.co.itmoore.intellisubsteps.psi.feature.FeatureElementVisitor;
 import uk.co.itmoore.intellisubsteps.psi.feature.FeatureTokenTypes;
 import uk.co.itmoore.intellisubsteps.psi.stepdefinition.SubstepDefinitionTokenTypes;
@@ -21,12 +24,13 @@ import javax.swing.*;
 /**
  * Created by ian on 05/07/15.
  */
-public abstract class FeaturePsiElementBase extends ASTWrapperPsiElement {
+public abstract class FeaturePsiElementBase extends SubstepsNamedElementImpl {
     private static final TokenSet TEXT_FILTER = TokenSet.create(FeatureTokenTypes.TEXT_TOKEN);
 
     public FeaturePsiElementBase(@NotNull final ASTNode node) {
         super(node);
     }
+
 
     @NotNull
     protected String getElementText() {
@@ -87,5 +91,19 @@ public abstract class FeaturePsiElementBase extends ASTWrapperPsiElement {
     }
 
     protected abstract void acceptFeature(FeatureElementVisitor featureElementVisitor);
+
+
+
+    @Nullable
+    @Override
+    public PsiElement getNameIdentifier() {
+        return null;
+    }
+
+    @Override
+    public PsiElement setName(@NotNull String s) throws IncorrectOperationException {
+        return null;
+    }
+
 }
 
