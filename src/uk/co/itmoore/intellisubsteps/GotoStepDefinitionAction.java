@@ -243,6 +243,27 @@ public class GotoStepDefinitionAction extends AnAction {
     }
 
 
+    private boolean stepTextMatchesExpression(String text, String expression){
+
+        String parameterRegEx = ".*(<[^>]*>).*";
+        Pattern paramPattern = Pattern.compile(parameterRegEx);
+
+        if(paramPattern.matcher(text).matches()){
+            String text2 = text.replaceAll("<[^>]*>", "");
+
+            String expression2 = expression.replaceAll("\\([^\\)]*\\)", "");
+
+            return text2.equals(expression2);
+        }
+        else {
+            Pattern p = Pattern.compile(expression);
+
+            Matcher matcher = p.matcher(text);
+
+            return matcher.matches();
+
+        }
+    }
 
     private String getMatchingStepExpression(PsiMethod method, final String stepText) {
 
@@ -261,13 +282,22 @@ public class GotoStepDefinitionAction extends AnAction {
                     String stepExpression = src.substring(1, src.length() - 1);
                     log.debug("found step expression: " + stepExpression);
 
-                    Matcher matcher = Pattern.compile(stepExpression).matcher(stepText);
+                    if (stepTextMatchesExpression(stepText, stepExpression)){
 
-                    if (matcher.matches()){
+//                    Pattern p = Pattern.compile(stepExpression);
+//
+//                    Matcher matcher = p.matcher(stepText);
+//
+//
+//
+//                    if (matcher.matches()){
                         log.debug("found a match with stepEpression: " + stepExpression + " and text: " + stepText + " method: " + method.getName());
                         return stepExpression;
                     }
                     else {
+
+                        // TODO - check the capture patterns in the regex, if the pattern is capturing (//d+) then convert the stepText accordingly
+
                         log.debug("no match");
                     }
                 }

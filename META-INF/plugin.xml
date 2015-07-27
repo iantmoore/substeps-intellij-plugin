@@ -3,7 +3,7 @@
 <idea-plugin version="2">
   <id>uk.co.itmoore.intellisubsteps</id>
   <name>Substeps IntelliJ Plugin</name>
-  <version>0.0.3</version>
+  <version>0.0.4</version>
   <vendor email="ian@itmoore.co.uk" url="n/a">Substeps</vendor>
 
   <description><![CDATA[
@@ -16,13 +16,20 @@
 
   <change-notes><![CDATA[
 
-  <h3>0.0.3</h3>
+    <h3>0.0.4</h3>
+    <ul>
+        <li>fixed bug in resolving step definitions in the go to functionality </li>
+    </ul>
+
+  <h4>0.0.3</h4>
   <ul>
     <li>code completion in substeps files (both feature ands and substeps).</li>
     <li>basic syntax highlighting</li>
     <li>Multi line commenting through selection and (Ctrl or Command) & / </li>
     <li>Implemented go to substep definition</li>
   </ul>
+
+
       ]]>
   </change-notes>
 

@@ -1,10 +1,10 @@
 # finish off feature parsing
 
-# feature lexing - content after Example keyword - causes a hissy - make more robust
 
-# bug with suggestions from in project step impls where it's a single word - seems to be chopping off the last letter
+# Check <no_of_bets> bets placed - doesn't resolve to the step impl - step impl using strange reg ex - @Step("Check (\d+) bets placed") ?
 
-# jump to def
+# changing branches causes mayhem!
+
 
 # caching of lookups derived from libraries - invalidate when libraries change - currently contributor gets called with each ctrl space - should cache and rebuild at appropriate time (how?)
 
@@ -13,6 +13,15 @@
 arch overview
 https://confluence.jetbrains.com/display/IDEADEV/PluginDevelopment
 https://confluence.jetbrains.com/display/IDEADEV/IntelliJ+IDEA+Architectural+Overview#IntelliJIDEAArchitecturalOverview-PsiElements
+
+
+
+
+27.7.2015
+latest links
+https://code.google.com/p/ide-examples/wiki/IntelliJIdeaPsiCookbook#Find_a_Class
+https://confluence.jetbrains.com/display/IDEADEV/IntelliJ+IDEA+Architectural+Overview
+https://confluence.jetbrains.com/display/IDEADEV/Run+Configurations
 
 
 
