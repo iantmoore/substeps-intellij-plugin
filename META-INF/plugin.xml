@@ -21,6 +21,7 @@
     <li>code completion in substeps files (both feature ands and substeps).</li>
     <li>basic syntax highlighting</li>
     <li>Multi line commenting through selection and (Ctrl or Command) & / </li>
+    <li>Implemented go to substep definition</li>
   </ul>
       ]]>
   </change-notes>
