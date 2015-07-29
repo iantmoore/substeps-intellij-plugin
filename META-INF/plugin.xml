@@ -83,6 +83,8 @@
       <lang.commenter language="SubstepsFeature" implementationClass="uk.co.itmoore.intellisubsteps.psi.SubstepsCommenter"/>
 
 
+      <configurationType implementation="uk.co.itmoore.intellisubsteps.execution.FeatureRunnerConfigurationType"/>
+
       <!--  not sure that this does anything..
 
       <psi.referenceContributor implementation="uk.co.itmoore.intellisubsteps.psi.feature.FeatureReferenceContributor"/>-->

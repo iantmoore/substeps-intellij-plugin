@@ -43,6 +43,10 @@ eclipse plugin - get suggestions from jars
 
 Run configs:
 https://confluence.jetbrains.com/display/IDEADEV/Run+Configurations
+and
+https://github.com/JetBrains/intellij-community/blob/master/plugins/junit_rt/src/com/intellij/junit4/JUnit4IdeaTestRunner.java
+and 
+https://github.com/JetBrains/intellij-community/tree/master/plugins/junit/src/com/intellij/execution/junit
 
 try and create the psi test upfront manually
 as per https://confluence.jetbrains.com/display/IntelliJIDEA/Parsing+Test.
