@@ -358,15 +358,26 @@ public class FeatureLexer extends LexerBase {
     }
 
     private void advanceToTableCellBoundary(){
-        myPosition++;
-        int mark = myPosition;
-        char c = myBuffer.charAt(myPosition);
 
-        while (myPosition < myEndOffset && (c != '|' && c != '\n')) {
+        if (myPosition < myBuffer.length()-1) {
+
             myPosition++;
-            c = myBuffer.charAt(myPosition);
+            int mark = myPosition;
+            char c = myBuffer.charAt(myPosition);
+
+            while (myPosition < myEndOffset && (c != '|' && c != '\n')) {
+                myPosition++;
+
+                // TODO can get an idx out of bounds here
+
+                if (myPosition < myBuffer.length()) {
+                    c = myBuffer.charAt(myPosition);
+                } else {
+                    log.debug("hopefully bailing out here: myBuffer.length(): " + myBuffer.length() + " myEndOffset: " + myEndOffset);
+                }
+            }
+            returnWhitespace(mark);
         }
-        returnWhitespace(mark);
     }
 
     private void advanceToEOL() {
@@ -425,6 +436,14 @@ public class FeatureLexer extends LexerBase {
 //
 //
 //                }
+
+                log.debug("nextLineEnd: " + nextLineEnd);
+
+//                if (nextLineEnd == -1) {
+//                    myState = FeatureLexerState.STATE_DEFAULT;
+//
+//                }
+//                else
                 if (nextLineEnd != -1) {
 
                     String nextLine = nextContent.substring(0, nextLineEnd);

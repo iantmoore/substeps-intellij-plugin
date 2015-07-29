@@ -345,6 +345,9 @@ public class FeatureParser implements PsiParser {
         while(true){
             final IElementType tokenType = builder.getTokenType();
 
+            if (tokenType == null){
+                break;
+            }
             log.debug("parseTags tokenType == " + tokenType.toString());
 
             if (endOfTagsTokens.contains(tokenType) || builder.eof() ) {

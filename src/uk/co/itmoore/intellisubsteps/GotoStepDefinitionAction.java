@@ -14,6 +14,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import uk.co.itmoore.intellisubsteps.psi.SubstepsCompletionContributor;
+import uk.co.itmoore.intellisubsteps.psi.feature.FeatureFile;
 import uk.co.itmoore.intellisubsteps.psi.stepdefinition.psi.SubstepsDefinitionFile;
 
 import java.util.ArrayList;
@@ -65,66 +66,50 @@ public class GotoStepDefinitionAction extends AnAction {
         }
 
         final PsiFile psiFile = getPsiFile(anActionEvent);
-        if (psiFile == null){
+        if (psiFile == null ){
             log.debug("no psi file");
         }
 
-        // TODO - check that this is a substep or feature file.
+        else if (psiFile instanceof SubstepsDefinitionFile || psiFile instanceof FeatureFile) {
 
-        PsiElement elementAt = psiFile.findElementAt(editor.getCaretModel().getOffset());
-        log.debug("elementAt.getText(): " + elementAt.getText());
+            PsiElement elementAt = psiFile.findElementAt(editor.getCaretModel().getOffset());
+            log.debug("elementAt.getText(): " + elementAt.getText());
 
-        String stepText = elementAt.getText();
+            String stepText = elementAt.getText();
 
-        // TODO from this text, match against substep defs, step impls in this project and step impls from libraries
+            final Project project = getProject(anActionEvent);
 
-        // TODO - same logic as the code completion handler
+//            GlobalSearchScope scope = GlobalSearchScope.allScope(project);
+            //PsiClass psiClass = JavaPsiFacade.getInstance(project).findClass("im.StepImplentations", scope);
 
-        final Project project = getProject(anActionEvent);
-
-        GlobalSearchScope scope = GlobalSearchScope.allScope(project);
-        //PsiClass psiClass = JavaPsiFacade.getInstance(project).findClass("im.StepImplentations", scope);
-
-        // this works loading up a class via the decompiler
+            // this works loading up a class via the decompiler
 //        PsiClass psiClass = JavaPsiFacade.getInstance(project).findClass("com.technophobia.webdriver.substeps.impl.ActionWebDriverSubStepImplementations", scope);
 
-        List<PsiClassAndExpression> matchingProjectFiles = getMatchingProjectFiles(stepText, project);
+            List<PsiClassAndExpression> matchingProjectFiles = getMatchingProjectFiles(stepText, project);
 
-        if (!matchingProjectFiles.isEmpty()){
+            if (!matchingProjectFiles.isEmpty()) {
 
-            if (matchingProjectFiles.size() > 1){
-                log.error("found too many matching step impls");
+                if (matchingProjectFiles.size() > 1) {
+                    log.error("found too many matching step impls");
+                }
+
+                PsiFile referencedPsiFile = matchingProjectFiles.get(0).psiFile;
+
+                VirtualFile virtualFile = referencedPsiFile.getContainingFile().getVirtualFile();
+
+                int offset = referencedPsiFile.getText().indexOf(matchingProjectFiles.get(0).expression);
+
+                new OpenFileDescriptor(project, virtualFile, offset).navigateInEditor(project, true);
+
             }
 
-            PsiFile referencedPsiFile = matchingProjectFiles.get(0).psiFile;
-
-            VirtualFile virtualFile = referencedPsiFile.getContainingFile().getVirtualFile();
-
-            int offset = referencedPsiFile.getText().indexOf(matchingProjectFiles.get(0).expression);
-
-            new OpenFileDescriptor(project, virtualFile, offset).navigateInEditor(project, true);
-
         }
-
-
-//        if ( psiClass != null ) {
-//
-//            log.debug("psiClass != null");
-//
-//            FileEditorManager fileEditorManager = FileEditorManager.getInstance(project);
-//
-//
-//            VirtualFile virtualFile = psiClass.getContainingFile().getVirtualFile();
-//
-//            new OpenFileDescriptor(project, virtualFile, 3, 0).navigateInEditor(project, true);
-//
-////            fileEditorManager.openFile(virtualFile, true, true);
-//
-//        }
         else {
-            log.debug("no psiClass");
+            log.debug("not a substep feature or substep def file");
         }
-            // get a vfile:   https://confluence.jetbrains.com/display/IDEADEV/IntelliJ+IDEA+Architectural+Overview
+    }
+
+    // get a vfile:   https://confluence.jetbrains.com/display/IDEADEV/IntelliJ+IDEA+Architectural+Overview
 
 
         // TODO accessing a substep file...
@@ -150,7 +135,6 @@ public class GotoStepDefinitionAction extends AnAction {
 //            //handle the class not found
 //        }
 
-    }
 
     // if only java had tuples :-)
     public static class PsiClassAndExpression{
@@ -243,7 +227,13 @@ public class GotoStepDefinitionAction extends AnAction {
     }
 
 
-    private boolean stepTextMatchesExpression(String text, String expression){
+    private enum MatchResult {
+        NO_MATCH,
+        EXACT_MATCH,
+        FUZZY_MATCH
+    }
+
+    private MatchResult stepTextMatchesExpression(String text, String expression){
 
         String parameterRegEx = ".*(<[^>]*>).*";
         Pattern paramPattern = Pattern.compile(parameterRegEx);
@@ -253,16 +243,46 @@ public class GotoStepDefinitionAction extends AnAction {
 
             String expression2 = expression.replaceAll("\\([^\\)]*\\)", "");
 
-            return text2.equals(expression2);
+            if(text2.equals(expression2)){
+                return MatchResult.EXACT_MATCH;
+            }
+            else {
+                int idx = StringUtils.indexOfAny(expression2, new String[]{"Given", "When", "Then", "And"});
+                if (idx ==0){
+                    String expression3 = replaceKeywords(expression2);
+                    String text3 = replaceKeywords(text2);
+                    if (text3.equals(expression3)){
+                        return MatchResult.FUZZY_MATCH;
+                    }
+                }
+                return MatchResult.NO_MATCH;
+            }
+
         }
         else {
             Pattern p = Pattern.compile(expression);
-
             Matcher matcher = p.matcher(text);
 
-            return matcher.matches();
+            if (matcher.matches()) {
+                return MatchResult.EXACT_MATCH;
+            }
+            else {
+                String expression2 = replaceKeywords(expression);
+                String text2 = replaceKeywords(text);
 
+                p = Pattern.compile(expression2);
+                matcher = p.matcher(text2);
+
+                if (matcher.matches()) {
+                    return MatchResult.FUZZY_MATCH;
+                }
+            }
+            return MatchResult.NO_MATCH;
         }
+    }
+
+    private String replaceKeywords(String src){
+        return StringUtils.removeStart(StringUtils.removeStart(StringUtils.removeStart(StringUtils.removeStart(src, "Given"), "When"), "Then"), "And").trim();
     }
 
     private String getMatchingStepExpression(PsiMethod method, final String stepText) {
@@ -282,15 +302,8 @@ public class GotoStepDefinitionAction extends AnAction {
                     String stepExpression = src.substring(1, src.length() - 1);
                     log.debug("found step expression: " + stepExpression);
 
-                    if (stepTextMatchesExpression(stepText, stepExpression)){
+                    if (stepTextMatchesExpression(stepText, stepExpression) == MatchResult.EXACT_MATCH){
 
-//                    Pattern p = Pattern.compile(stepExpression);
-//
-//                    Matcher matcher = p.matcher(stepText);
-//
-//
-//
-//                    if (matcher.matches()){
                         log.debug("found a match with stepEpression: " + stepExpression + " and text: " + stepText + " method: " + method.getName());
                         return stepExpression;
                     }

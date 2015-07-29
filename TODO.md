@@ -1,7 +1,8 @@
 # finish off feature parsing
 
+# comments on the end of the line
+# resolving lax definitions - given/when/ then gubbins
 
-# Check <no_of_bets> bets placed - doesn't resolve to the step impl - step impl using strange reg ex - @Step("Check (\d+) bets placed") ?
 
 # changing branches causes mayhem!
 
