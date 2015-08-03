@@ -4,6 +4,10 @@
 # resolving lax definitions - given/when/ then gubbins
 
 
+# highlight missing step impls
+# Alt-enter - create definition
+
+
 # changing branches causes mayhem!
 
 
