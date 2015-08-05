@@ -85,11 +85,15 @@
 
       <configurationType implementation="uk.co.itmoore.intellisubsteps.execution.FeatureRunnerConfigurationType"/>
 
+      <runConfigurationProducer implementation="uk.co.itmoore.intellisubsteps.execution.SubstepsFeatureRunnerConfigProducer"/>
+
+
       <!--  not sure that this does anything..
 
       <psi.referenceContributor implementation="uk.co.itmoore.intellisubsteps.psi.feature.FeatureReferenceContributor"/>-->
       <!--
         SubstepsFeature and SubstepStepDefinition
+
 
 
 

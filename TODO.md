@@ -21,12 +21,31 @@ https://confluence.jetbrains.com/display/IDEADEV/IntelliJ+IDEA+Architectural+Ove
 
 
 
+##Tool windows 
+
+https://confluence.jetbrains.com/display/IDEADEV/Creation+of+Tool+Windows
+
+How to get Intellij Quick documentation to hook into the docs ?
+bingo: http://www.jetbrains.org/intellij/sdk/docs/reference_guide/custom_language_support/documentation.html
+
 
 27.7.2015
 latest links
 https://code.google.com/p/ide-examples/wiki/IntelliJIdeaPsiCookbook#Find_a_Class
 https://confluence.jetbrains.com/display/IDEADEV/IntelliJ+IDEA+Architectural+Overview
 https://confluence.jetbrains.com/display/IDEADEV/Run+Configurations
+
+
+# Run configs
+
+Have a look at the docs and being able to construct a run config from a context - Run Prodcuer....
+
+
+https://confluence.jetbrains.com/display/IDEADEV/Run+Configurations
+and
+https://github.com/JetBrains/intellij-community/blob/master/plugins/junit_rt/src/com/intellij/junit4/JUnit4IdeaTestRunner.java
+and 
+https://github.com/JetBrains/intellij-community/tree/master/plugins/junit/src/com/intellij/execution/junit
 
 
 
@@ -45,12 +64,6 @@ eclipse plugin - get suggestions from jars
 
 
 
-Run configs:
-https://confluence.jetbrains.com/display/IDEADEV/Run+Configurations
-and
-https://github.com/JetBrains/intellij-community/blob/master/plugins/junit_rt/src/com/intellij/junit4/JUnit4IdeaTestRunner.java
-and 
-https://github.com/JetBrains/intellij-community/tree/master/plugins/junit/src/com/intellij/execution/junit
 
 try and create the psi test upfront manually
 as per https://confluence.jetbrains.com/display/IntelliJIDEA/Parsing+Test.
