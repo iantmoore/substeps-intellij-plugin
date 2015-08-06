@@ -20,6 +20,13 @@ https://confluence.jetbrains.com/display/IDEADEV/PluginDevelopment
 https://confluence.jetbrains.com/display/IDEADEV/IntelliJ+IDEA+Architectural+Overview#IntelliJIDEAArchitecturalOverview-PsiElements
 
 
+##Tool windows 
+
+https://confluence.jetbrains.com/display/IDEADEV/Creation+of+Tool+Windows
+
+How to get Intellij Quick documentation to hook into the docs ?
+bingo: http://www.jetbrains.org/intellij/sdk/docs/reference_guide/custom_language_support/documentation.html
+
 
 
 27.7.2015

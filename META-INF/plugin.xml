@@ -3,7 +3,7 @@
 <idea-plugin version="2">
   <id>uk.co.itmoore.intellisubsteps</id>
   <name>Substeps IntelliJ Plugin</name>
-  <version>0.0.5</version>
+  <version>0.0.6-SNAPSHOT</version>
   <vendor email="ian@itmoore.co.uk" url="n/a">Substeps</vendor>
 
   <description><![CDATA[
@@ -38,9 +38,9 @@
 
   <!-- please see http://confluence.jetbrains.com/display/IDEADEV/Plugin+Compatibility+with+IntelliJ+Platform+Products
        on how to target different products -->
-  <!-- uncomment to enable plugin in all products
+  <!-- uncomment to enable plugin in all products -->
   <depends>com.intellij.modules.lang</depends>
-  -->
+
 
   <extensions defaultExtensionNs="com.intellij">
     <!-- Add your extensions here -->
@@ -82,6 +82,7 @@
 
       <lang.commenter language="SubstepsFeature" implementationClass="uk.co.itmoore.intellisubsteps.psi.SubstepsCommenter"/>
 
+      <lang.documentationProvider language="SubstepStepDefinition" implementationClass="uk.co.itmoore.intellisubsteps.SubstepsDocumentationProvider"/>
 
       <!--  not sure that this does anything..
 
