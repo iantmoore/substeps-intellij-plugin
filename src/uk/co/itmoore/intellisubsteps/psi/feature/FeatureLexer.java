@@ -135,7 +135,7 @@ public class FeatureLexer extends LexerBase {
         myCurrentTokenStart = myPosition;
         char c = myBuffer.charAt(myPosition);
 
-        log.debug("char: [" + c + "] @ " + myPosition);
+//        log.debug("char: [" + c + "] @ " + myPosition);
 
         if (Character.isWhitespace(c)) {
 //            log.debug("whitespace");
@@ -437,7 +437,7 @@ public class FeatureLexer extends LexerBase {
 //
 //                }
 
-                log.debug("nextLineEnd: " + nextLineEnd);
+//                log.debug("nextLineEnd: " + nextLineEnd);
 
 //                if (nextLineEnd == -1) {
 //                    myState = FeatureLexerState.STATE_DEFAULT;
@@ -457,9 +457,10 @@ public class FeatureLexer extends LexerBase {
 //                    if (nextLine.trim().isEmpty()) {
                         log.debug("next content line contains a keyword, resetting state");
                         myState = FeatureLexerState.STATE_DEFAULT;
-                    } else {
-                        log.debug("next line not empty, doesn't start with a keyword, not resetting state");
                     }
+//                    else {
+//                        log.debug("next line not empty, doesn't start with a keyword, not resetting state");
+//                    }
                 }
             }
 //                myState = FeatureLexerState.STATE_DEFAULT;
