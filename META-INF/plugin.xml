@@ -16,7 +16,13 @@
 
   <change-notes><![CDATA[
 
-    <h3>0.0.4</h3>
+    <h3>0.0.6</h3>
+    <ul>
+        <li>fixed bug with substep parsing going into a loop if you start a new def in the middle of the file.</li>
+    </ul>
+
+
+    <h3>0.0.4/5</h3>
     <ul>
         <li>fixed bug in resolving step definitions in the go to functionality </li>
     </ul>

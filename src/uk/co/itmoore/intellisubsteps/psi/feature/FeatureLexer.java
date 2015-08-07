@@ -84,7 +84,7 @@ public class FeatureLexer extends LexerBase {
         bufString = buffer.toString();
 
 //        String sample = buffer.toString().substring(0, buffer.length() > 20 ? 20 : buffer.length());
-//        log.trace("start buffer: " +
+//        log.debug("start buffer: " +
 //                sample + " ....startOffset: " +
 //                startOffset + " endOffset: " + endOffset + " initialState: " + initialState);
 
@@ -135,10 +135,10 @@ public class FeatureLexer extends LexerBase {
         myCurrentTokenStart = myPosition;
         char c = myBuffer.charAt(myPosition);
 
-        log.trace("char: [" + c + "] @ " + myPosition);
+//        log.debug("char: [" + c + "] @ " + myPosition);
 
         if (Character.isWhitespace(c)) {
-//            log.trace("whitespace");
+//            log.debug("whitespace");
             advanceOverWhitespace();
             myCurrentToken = TokenType.WHITE_SPACE;
             while (myPosition < myEndOffset && Character.isWhitespace(myBuffer.charAt(myPosition))) {
@@ -373,7 +373,7 @@ public class FeatureLexer extends LexerBase {
                 if (myPosition < myBuffer.length()) {
                     c = myBuffer.charAt(myPosition);
                 } else {
-                    log.trace("hopefully bailing out here: myBuffer.length(): " + myBuffer.length() + " myEndOffset: " + myEndOffset);
+                    log.debug("hopefully bailing out here: myBuffer.length(): " + myBuffer.length() + " myEndOffset: " + myEndOffset);
                 }
             }
             returnWhitespace(mark);
@@ -381,7 +381,7 @@ public class FeatureLexer extends LexerBase {
     }
 
     private void advanceToEOL() {
-        //log.trace("advanceToEOL");
+        //log.debug("advanceToEOL");
         myPosition++;
         int mark = myPosition;
 
@@ -437,7 +437,7 @@ public class FeatureLexer extends LexerBase {
 //
 //                }
 
-                log.trace("nextLineEnd: " + nextLineEnd);
+//                log.debug("nextLineEnd: " + nextLineEnd);
 
 //                if (nextLineEnd == -1) {
 //                    myState = FeatureLexerState.STATE_DEFAULT;
@@ -455,11 +455,12 @@ public class FeatureLexer extends LexerBase {
 //                    String nextLine = bufString.substring(myPosition + 1, nextLineEnd);
                     // if the nextLine is empty, then reset
 //                    if (nextLine.trim().isEmpty()) {
-                        log.trace("next content line contains a keyword, resetting state");
+                        log.debug("next content line contains a keyword, resetting state");
                         myState = FeatureLexerState.STATE_DEFAULT;
-                    } else {
-                        log.trace("next line not empty, doesn't start with a keyword, not resetting state");
                     }
+//                    else {
+//                        log.debug("next line not empty, doesn't start with a keyword, not resetting state");
+//                    }
                 }
             }
 //                myState = FeatureLexerState.STATE_DEFAULT;
