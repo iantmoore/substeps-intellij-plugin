@@ -1,3 +1,19 @@
+## INtelli Substeps PLugin
+
+# Current Bugs
+--------------
+
+* Emsell's missing go to step def - look at logs and compare
+
+
+
+# Current Feature impls
+* Docs
+
+* Runner
+
+
+
 # finish off feature parsing
 
 # comments on the end of the line

@@ -170,6 +170,9 @@ public abstract class SubstepsCompletionContributor extends CompletionContributo
             if (a.getQualifiedName().equals(com.technophobia.substeps.model.SubSteps.StepImplementations.class.getCanonicalName())){
                 return true;
             }
+            else {
+                logger.debug("got other class annotation: " + a.getQualifiedName());
+            }
         }
         return false;
     }
