@@ -11,6 +11,7 @@ import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -46,10 +47,12 @@ public class SubstepsDocumentationProvider extends AbstractDocumentationProvider
     @Override
     public List<String> getUrlFor(PsiElement psiElement, PsiElement psiElement1) {
 
-        log.debug("getUrlFor: " +
-                psiElement.getClass().toString());
+//        log.debug("getUrlFor: " +
+//                psiElement.getClass().toString());
 
-
+//        List<String> results = new ArrayList<>();
+//
+//        results.add("a url");
         return null;
     }
 
@@ -57,9 +60,10 @@ public class SubstepsDocumentationProvider extends AbstractDocumentationProvider
     @Override
     public String generateDoc(PsiElement element, @Nullable PsiElement originalElement) {
 
-        //
+        // TODO - lookup !
 
-        return "generateDoc for element: " + element.getClass().toString();
+
+        return "generateDoc for element: " + element.getText();
     }
 
     @Nullable
@@ -89,7 +93,12 @@ public class SubstepsDocumentationProvider extends AbstractDocumentationProvider
     // TODO - I think this needs to return non null..
     @Nullable
     public PsiElement getCustomDocumentationElement(@NotNull Editor editor, @NotNull PsiFile file, @Nullable PsiElement contextElement) {
-        return null;
+
+//        log.debug("getCustomDocumentationElement: " +
+//                contextElement.getClass().toString());
+
+
+        return contextElement;
     }
 
 }
