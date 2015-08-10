@@ -3,7 +3,7 @@
 <idea-plugin version="2">
   <id>uk.co.itmoore.intellisubsteps</id>
   <name>Substeps IntelliJ Plugin</name>
-  <version>0.0.6-SNAPSHOT</version>
+  <version>0.0.7-SNAPSHOT</version>
   <vendor email="ian@itmoore.co.uk" url="n/a">Substeps</vendor>
 
   <description><![CDATA[

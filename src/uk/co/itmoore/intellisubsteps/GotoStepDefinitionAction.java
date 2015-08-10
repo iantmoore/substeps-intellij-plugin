@@ -57,8 +57,6 @@ public class GotoStepDefinitionAction extends AnAction {
     @Override
     public void actionPerformed(AnActionEvent anActionEvent) {
 
-        log.debug("actionPerformed");
-
 
         Editor editor = getEditor(anActionEvent);
         if (editor == null){
@@ -73,7 +71,7 @@ public class GotoStepDefinitionAction extends AnAction {
         else if (psiFile instanceof SubstepsDefinitionFile || psiFile instanceof FeatureFile) {
 
             PsiElement elementAt = psiFile.findElementAt(editor.getCaretModel().getOffset());
-            log.debug("elementAt.getText(): " + elementAt.getText());
+            log.debug("actionPerformed for a substeps or feature file elementAt.getText(): " + elementAt.getText());
 
             String stepText = elementAt.getText();
 
@@ -101,6 +99,9 @@ public class GotoStepDefinitionAction extends AnAction {
 
                 new OpenFileDescriptor(project, virtualFile, offset).navigateInEditor(project, true);
 
+            }
+            else {
+                log.debug("no match found");
             }
 
         }
@@ -220,6 +221,10 @@ public class GotoStepDefinitionAction extends AnAction {
                             return expression;
                         }
                     }
+                }
+                else {
+
+                    log.debug("not step impls class");
                 }
             }
 
