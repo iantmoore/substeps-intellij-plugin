@@ -10,6 +10,8 @@ import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import uk.co.itmoore.intellisubsteps.psi.feature.FeatureFile;
+import uk.co.itmoore.intellisubsteps.psi.stepdefinition.psi.SubstepsDefinitionFile;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,7 +41,7 @@ public class SubstepsDocumentationProvider extends AbstractDocumentationProvider
 //        }
 //        return null;
 
-        // TODO
+        // TODO - not sure where this is seen..?
         return "getQuickNavigateInfo: " + element.getClass().toString();
     }
 
@@ -61,6 +63,28 @@ public class SubstepsDocumentationProvider extends AbstractDocumentationProvider
     public String generateDoc(PsiElement element, @Nullable PsiElement originalElement) {
 
         // TODO - lookup !
+
+        /**
+         * if this is a java step impl, return the example abd description from the step descriptor
+         *
+         * if this is a substep def, then show the steps that make up this step
+         *
+         */
+
+        String elementText = element.getText();
+
+        // what is this ?
+
+        if (element.getContainingFile() instanceof SubstepsDefinitionFile){
+
+            // look for a def in jars and code
+
+
+        }
+        else if (element.getContainingFile() instanceof FeatureFile){
+
+        }
+
 
 
         return "generateDoc for element: " + element.getText();

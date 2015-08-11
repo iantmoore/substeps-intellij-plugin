@@ -41,6 +41,10 @@ public class SubstepLibraryManager {
 
     private Map<String, List<StepImplementationsDescriptor>> descriptorCache = new HashMap<>();
 
+    public static final SubstepLibraryManager INSTANCE = new SubstepLibraryManager();
+
+    private SubstepLibraryManager(){}
+
     public List<StepImplementationsDescriptor> getDescriptorsForProjectFromLibraries(Module module){
 
         List<StepImplementationsDescriptor> stepImplementationsDescriptors = descriptorCache.get(module.getModuleFilePath());
@@ -50,14 +54,14 @@ public class SubstepLibraryManager {
         }
         else {
             // go off and build
-
-            ModuleRootManager moduleRootManager = ModuleRootManager.getInstance(module);
-
+            stepImplementationsDescriptors = getStepImplementationsFromModuleLibraries(ModuleRootManager.getInstance(module));
+            descriptorCache.put(module.getModuleFilePath(), stepImplementationsDescriptors);
         }
+        return stepImplementationsDescriptors;
     }
 
 
-    protected void addStepImplementationsFromModuleLibraries(ModuleRootManager moduleRootManager) {
+    protected List<StepImplementationsDescriptor> getStepImplementationsFromModuleLibraries(ModuleRootManager moduleRootManager) {
 
         List<StepImplementationsDescriptor> stepImplsInScope = new ArrayList<>();
 
@@ -84,6 +88,8 @@ public class SubstepLibraryManager {
             String libraryPath = StringUtils.substringBefore(vLibFiles[0].getPath(), "!/");
             stepImplsInScope.addAll(findStepImplementationDescriptorsForDependency(libraryPath));
         }
+
+        return stepImplsInScope;
     }
 
 
