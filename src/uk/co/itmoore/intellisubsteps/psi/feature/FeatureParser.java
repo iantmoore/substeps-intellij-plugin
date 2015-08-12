@@ -34,9 +34,7 @@ public class FeatureParser implements PsiParser {
 
         fileMarker.done(FeatureElementTypes.FEATURE_FILE);
 
-        psiBuilder.setDebugMode(true);
-
-        log.trace("parsing done!");
+        log.debug("parsing done!");
 
         return psiBuilder.getTreeBuilt();
     }
@@ -284,14 +282,20 @@ public class FeatureParser implements PsiParser {
         endOfScenarioTokens.add(FeatureTokenTypes.TAGS_KEYWORD_TOKEN);
 
 
-        // TODO - what tokens could end the scenaio ? another scenario / outline / tags ?
-
         while(true) {
                 final IElementType tokenType = builder.getTokenType();
 
 
-            if (tokenType == null || endOfScenarioTokens.contains(tokenType) || builder.eof()) {
-                log.trace("breaking out of parseScenario");
+            if (tokenType == null ) {
+                log.debug("breaking out of parseScenario because token is null");
+                break;
+            }
+            else if (endOfScenarioTokens.contains(tokenType)){
+                log.debug("breaking out of parseScenario because end of scenario token");
+                break;
+            }
+            else if (builder.eof()){
+                log.debug("breaking out of parseScenario");
                 break;
             } else {
                 log.trace("parseScenario tokenType == " + tokenType.toString());
@@ -303,6 +307,8 @@ public class FeatureParser implements PsiParser {
                 }
                 else if (tokenType == FeatureElementTypes.SCENARIO_NAME_ELEMENT_TYPE){
 
+                    log.debug("scenario name element");
+
                     final PsiBuilder.Marker scenarioNameMarker = builder.mark();
 
                     builder.advanceLexer();
@@ -312,11 +318,16 @@ public class FeatureParser implements PsiParser {
                 }
                 else if (tokenType == FeatureElementTypes.STEP_ELEMENT_TYPE){
 
+                    log.debug("scenario step element start");
+
                     final PsiBuilder.Marker step = builder.mark();
 
                     builder.advanceLexer();
 
                     step.done(FeatureElementTypes.STEP_ELEMENT_TYPE);
+
+                    log.debug("scenario step element complete");
+
 
                 }
                 else {
