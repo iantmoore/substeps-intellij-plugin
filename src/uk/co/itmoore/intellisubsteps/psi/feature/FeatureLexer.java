@@ -4,11 +4,13 @@ import com.intellij.lexer.LexerBase;
 import com.intellij.psi.TokenType;
 import com.intellij.psi.tree.IElementType;
 import com.intellij.util.ArrayUtil;
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import uk.co.itmoore.intellisubsteps.psi.stepdefinition.SubstepDefinitionTokenTypes;
 
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -63,6 +65,9 @@ public class FeatureLexer extends LexerBase {
 
     protected int myStartOffset = 0;
     protected int myEndOffset = 0;
+
+//    private ArrayDeque<Integer> positionHistory = new ArrayDeque<Integer>();
+    private int previousPosition = -1;
     private int myPosition;
     private IElementType myCurrentToken;
     private int myCurrentTokenStart;
@@ -84,17 +89,18 @@ public class FeatureLexer extends LexerBase {
         bufString = buffer.toString();
 
 //        String sample = buffer.toString().substring(0, buffer.length() > 20 ? 20 : buffer.length());
-//        log.debug("start buffer: " +
-//                sample + " ....startOffset: " +
-//                startOffset + " endOffset: " + endOffset + " initialState: " + initialState);
+        log.debug("start buffer: " +
+                buffer + " ....startOffset: " +
+                startOffset + " endOffset: " + endOffset + " initialState: " + initialState);
 
         myBuffer = buffer;
         myStartOffset = startOffset;
         myEndOffset = endOffset;
         myPosition = startOffset;
         myState = FeatureLexerState.values()[initialState];
-        advance();
 
+        advance();
+//        previousPosition = myPosition;
     }
 
     public int getState() {
@@ -128,14 +134,39 @@ public class FeatureLexer extends LexerBase {
     @Override
     public void advance() {
 
+        log.debug("advance");
+
+        if (myPosition > 0){
+
+            if (myPosition == previousPosition){
+                log.warn("myPosition same as previousPosition, bailing out to the end..");
+                myPosition = myEndOffset;
+            }
+
+            previousPosition = myPosition;
+        }
+
+//        positionHistory.add(Integer.valueOf(myPosition));
+//
+//        log.debug("positionHistory: " +             StringUtils.join(positionHistory, ",")        );
+
+//        if (myPosition!= -1 && myPosition == previousPosition){
+//
+//            log.warn("myPosition same as previousPosition, bailing out to the end..");
+//            myPosition = myEndOffset;
+//        }
+
+
         if (myPosition >= myEndOffset) {
             myCurrentToken = null;
             return;
         }
+//        previousPosition = myPosition;
+
         myCurrentTokenStart = myPosition;
         char c = myBuffer.charAt(myPosition);
 
-//        log.debug("char: [" + c + "] @ " + myPosition);
+        log.debug("char: [" + c + "] @ " + myPosition);
 
         if (Character.isWhitespace(c)) {
 //            log.debug("whitespace");
@@ -169,13 +200,15 @@ public class FeatureLexer extends LexerBase {
             myPosition++;
         }
         else {
-            log.debug("current state = " + myState);
+            log.debug("current state = " + myState + " myPosition: " + myPosition + " myEndOffset: " +  myEndOffset);
+
+
 
             if (myState == FeatureLexerState.STATE_DEFAULT || myState == FeatureLexerState.STATE_AFTER_FEATURE_NAME) {
 
                 for (String keyword : myKeywords) {
                     int length = keyword.length();
-                    if (isStringAtPosition(keyword)) {
+                    if (isStringAtPosition(keyword, myBuffer, myPosition, myEndOffset)) {
 
                         if (myEndOffset - myPosition > length &&
                                 Character.isLetterOrDigit(myBuffer.charAt(myPosition + length))) {
@@ -189,30 +222,9 @@ public class FeatureLexer extends LexerBase {
                         return;
                     }
                 }
-
+                log.debug("in default state, falling through..");
             }
-//            if (myState == STATE_PARAMETER_INSIDE_STEP) {
-//                if (c == '>') {
-//                    myState = STATE_AFTER_STEP_KEYWORD;
-//                    myPosition++;
-//                    myCurrentToken = GherkinTokenTypes.STEP_PARAMETER_BRACE;
-//                } else {
-//                    advanceToParameterEnd("\n");
-//                    myCurrentToken = GherkinTokenTypes.STEP_PARAMETER_TEXT;
-//                }
-//                return;
-//            }
-//             if (myState == STATE_AFTER_STEP_KEYWORD) {
-//                if (myPosition < myEndOffset && myBuffer.charAt(myPosition) == '<' && isStepParameter("\n")) {
-//                    myState = STATE_PARAMETER_INSIDE_STEP;
-//                    myPosition++;
-//                    myCurrentToken = GherkinTokenTypes.STEP_PARAMETER_BRACE;
-//                } else {
-//                    myCurrentToken = GherkinTokenTypes.TEXT;
-//                    advanceToParameterOrSymbol("\n", STATE_AFTER_STEP_KEYWORD, true);
-//                }
-//                return;
-//            }
+
             if(myState == FeatureLexerState.STATE_AFTER_EXAMPLES_KEYWORD){
                 advanceToEOL();
                 return;
@@ -288,22 +300,6 @@ public class FeatureLexer extends LexerBase {
                 advanceToTableCellBoundary();
                 return;
             }
-
-//            if(myState == STATE_AFTER_FEATURE_KEYWORD){
-//                myCurrentToken = FeatureTokenTypes.FEATURE_NAME_TOKEN;
-//                advanceToEOL();
-//                myState = STATE_AFTER_FEATURE_NAME;
-//                return;
-//            }
-
-//            if(myState == STATE_AFTER_STEP_DEFINITION){
-//                myCurrentToken = SubstepDefinitionElementTypes.SUBSTEP_DEFINITION_STEP_ELEMENT_TYPE;
-//                advanceToEOL();
-//                myState = STATE_AFTER_STEP_DEFINITION;
-//                return;
-//            }
-//            myCurrentToken = SubstepDefinitionElementTypes.SUBSTEP_DEFINITION_STEP_ELEMENT_TYPE;
-//            advanceToEOL();
         }
 
     }
@@ -352,9 +348,9 @@ public class FeatureLexer extends LexerBase {
         return null;
     }
 
-    private boolean isStringAtPosition(String keyword) {
+    public static boolean isStringAtPosition(String keyword, CharSequence buf, int position, int endOffset) {
         int length = keyword.length();
-        return myEndOffset - myPosition >= length && myBuffer.subSequence(myPosition, myPosition + length).toString().equals(keyword);
+        return endOffset - position >= length && buf.subSequence(position, position + length).toString().equals(keyword);
     }
 
     private void advanceToTableCellBoundary(){
