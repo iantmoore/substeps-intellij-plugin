@@ -9,7 +9,13 @@ import com.intellij.openapi.roots.ModuleRootManager;
 import com.intellij.openapi.roots.OrderRootType;
 import com.intellij.openapi.roots.libraries.Library;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.psi.*;
+import com.intellij.psi.javadoc.PsiDocComment;
+import com.intellij.psi.javadoc.PsiDocTag;
+import com.intellij.psi.javadoc.PsiDocTagValue;
+import com.intellij.psi.javadoc.PsiDocToken;
 import com.intellij.util.Processor;
+import com.technophobia.substeps.glossary.StepDescriptor;
 import com.technophobia.substeps.glossary.StepImplementationsDescriptor;
 
 import java.io.File;
@@ -25,6 +31,7 @@ import com.intellij.openapi.project.Project;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
+import uk.co.itmoore.intellisubsteps.psi.SubstepsCompletionContributor;
 
 /**
  * A class to load and cache step impl descriptors from jars.  Will need to invalidate the cache when libraries change
@@ -146,6 +153,182 @@ public class SubstepLibraryManager {
 
         return classStepTagList;
 
+    }
+
+
+    public List<StepImplementationsDescriptor> buildStepImplentationDescriptorsFromJavaSource(PsiJavaFile psiJavaFile) {
+
+
+        List<StepImplementationsDescriptor> stepImpls = new ArrayList<>();
+
+        // logger.debug("psiJavaFile: "  psiJavaFile.getName() + "\n" + psiJavaFile.getText());
+
+        final PsiClass[] psiClasses = psiJavaFile.getClasses();
+
+        //final PsiClass psiClass = JavaPsiFacade.getInstance(thisProject).findClass(fqn, psiJavaFile.getResolveScope());
+
+        for (PsiClass psiClass : psiClasses) {
+
+            if (SubstepsCompletionContributor.isStepImplementationsClass(psiClass)) {
+
+                StepImplementationsDescriptor stepClassDescriptor = new StepImplementationsDescriptor(psiClass.getQualifiedName());
+
+                stepImpls.add(stepClassDescriptor);
+
+                PsiMethod[] methods = psiClass.getAllMethods();
+
+                for (PsiMethod method : methods) {
+                    addStepDescriptorIfApplicable(method, stepClassDescriptor);
+                }
+            }
+        }
+
+        return stepImpls;
+    }
+
+    protected void addStepDescriptorIfApplicable(PsiMethod method, StepImplementationsDescriptor stepClassDescriptor) {
+
+
+        PsiAnnotation[] methodAnnotations = method.getModifierList().getAnnotations();
+        for (PsiAnnotation a : methodAnnotations) {
+            if (a.getQualifiedName().equals(com.technophobia.substeps.model.SubSteps.Step.class.getCanonicalName())){
+
+                PsiAnnotationParameterList parameterList = a.getParameterList();
+
+                PsiNameValuePair[] attributes = parameterList.getAttributes();
+                if (attributes != null) {
+                    String src = attributes[0].getValue().getText();
+
+                    String  stepExpression = src.substring(1, src.length() -1);
+
+                    StepDescriptor sd = new StepDescriptor();
+
+                    PsiParameter[] parameters = method.getParameterList().getParameters();
+                    if (parameters != null){
+                        for (PsiParameter p : parameters){
+                            stepExpression = stepExpression.replaceFirst("\\([^\\)]*\\)", "<" + p.getName() + ">");
+                        }
+                    }
+                    stepExpression = stepExpression.replaceAll("\\?", "");
+                    stepExpression = stepExpression.replaceAll("\\\\", "");
+
+                    sd.setExpression(stepExpression);
+
+                    PsiDocComment docComment = method.getDocComment();
+
+                    String description = "";
+                    String example = "";
+                    String section = "";
+
+                    if (docComment != null){
+                        PsiDocTag[] tags = docComment.getTags();
+
+                        PsiElement[] descriptionElements = docComment.getDescriptionElements();
+
+                        StringBuilder descriptionBuf = new StringBuilder();
+
+                        for (PsiElement e : descriptionElements){
+
+                            logger.debug("descriptionElement: class " + e.getClass() + " text: " + e.getText());
+
+                            if (e instanceof PsiDocToken){
+                                PsiDocToken docs = (PsiDocToken)e;
+
+                                String txt = docs.getText().trim();
+                                if (!txt.isEmpty()) {
+                                    descriptionBuf.append("<p>").append(txt).append("<p>");
+                                }
+                            }
+                        }
+
+                        PsiDocTag[] paramTags = docComment.findTagsByName("param");
+                        if (paramTags != null){
+
+                            descriptionBuf.append("<h3>Parameters:</h3>");
+                            for (PsiDocTag paramTag: paramTags){
+
+                                String txt = getStringFromPsiDocTag(paramTag, true).trim();
+                                if (!txt.isEmpty()) {
+                                    descriptionBuf.append("<p>").append(txt).append("<p>");
+                                }
+                            }
+
+                        }
+
+                        description = descriptionBuf.toString();
+
+
+
+                        PsiDocTag exampleTag = docComment.findTagByName("example");
+                        example = getStringFromPsiDocTag(exampleTag, false);
+
+                        PsiDocTag sectionTag = docComment.findTagByName("section");
+                        if (sectionTag!= null){
+                            section = sectionTag.getValueElement().getText();
+                        }
+
+
+                        // TODO what to do with the parameter tags
+
+                        if (tags != null){
+
+                            for (PsiDocTag tag : tags){
+                                String tagName = tag.getName();
+//                                String elemText = tag.getContainingComment().getText();
+                                String tagVal = tag.getValueElement().getText();
+
+//                                for (PsiElement e : tag.getDataElements()){
+//
+//                                    logger.debug("tag.getDataElements(): class " + e.getClass() + " text: " + e.getText());
+
+//                                    if (e instanceof PsiDocToken){
+//                                        PsiDocToken docs = (PsiDocToken)e;
+//                                        description = description + "<p>" +docs.getText()+ "</p>";
+//                                    }
+//                            description = description + "<p>" +  e.getText() + "</p>";
+//                                }
+
+
+
+                                logger.debug("psidoctag tagName: " + tagName + " tagVal: " + tagVal );
+
+
+                            }
+
+                        }
+                    }
+                    sd.setDescription(description);
+                    sd.setExample(example);
+                    sd.setSection(section);
+
+
+                    stepClassDescriptor.addStepTags(sd);
+                    break;
+                }
+            }
+        }
+    }
+
+    private String getStringFromPsiDocTag(PsiDocTag exampleTag, boolean highlightFirstWord) {
+        String docTagString = "";
+        if (exampleTag!= null){
+
+            for (PsiElement e : exampleTag.getDataElements()){
+
+                if (e instanceof PsiDocTagValue){
+                    if (highlightFirstWord) {
+                        docTagString = "<strong>" + e.getText().trim() + "</strong>&nbsp;";
+                    }
+                    else {
+                        docTagString = e.getText();
+                    }
+                }
+                else if ( e instanceof PsiDocToken){
+                    docTagString = docTagString + e.getText().trim();
+                }
+            }
+        }
+        return docTagString;
     }
 
 }
