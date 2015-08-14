@@ -38,6 +38,56 @@ public class FeatureLexerTest {
     String accountFeature = "/home/ian/skybet/projects/test-automation/international-testing-parent/test-automation/src/test/resources/com/skybet/international/testing/journey/account/account.feature";
 
     @Test
+    public void testLexingIncompleteFeature(){
+
+        String buf = "Tags: @non-visual\n" +
+                "\n" +
+                "Feature: A feature to self test the webdriver substeps implementations\n" +
+                "\tDescription over multiple lines\n" +
+                "\n" +
+                "# a comment\n" +
+                "\n" +
+                "Background:\n" +
+                "\tGiven stuff that happens first\n" +
+                "\n" +
+                "Scenario: a scenario\n" +
+                "\tGiven I go to the self test page\n" +
+                "\tThen I can see 'Hello Self Test page'\n" +
+                "\n" +
+                "\n" +
+                "Tags: other\n" +
+                "\n" +
+                "Scenario Outline: an outline scenario\n" +
+                "\tGiven something\n" +
+                "\tAnd something else\n" +
+                "\tAnd the header title is '<msg>'\n" +
+                "\n" +
+                "\n" +
+                "\n" +
+                "Examples:\n" +
+                "\t|col1\t|col2\t|\n" +
+                "\t|val1\t|val2\t|\n" +
+                "\t|val3\t|val4\t|\n" +
+                "\t|x | y |\n" +
+                "\n" +
+                "Scenario: X\n" +
+                "\tGiven I go to the self test page\n" +
+                "\n" +
+                "Scenario Outline:\n" +
+                "    Given whatves\n" +
+                "    Then I can see '<page_title>'\n" +
+                "    ClearAndSendKeys \"<value>\"\n" +
+                "\n" +
+                "\n" +
+                "Tags: @Wip\n" +
+                "Scena";
+
+
+        lexFeatureFileText(buf);
+
+    }
+
+    @Test
     public void testAccountFeatureLexer() throws IOException {
 
         lexFeatureFile(new File(accountFeature));
@@ -233,9 +283,7 @@ public class FeatureLexerTest {
     }
 
 
-    private LexingResults lexFeatureFile(File file) throws IOException {
-        String txt = Files.toString(file, Charset.forName("UTF-8"));
-
+    private LexingResults lexFeatureFileText(String txt){
         FeatureLexer lexer = new FeatureLexer();
 
         int startOffset = 0;
@@ -265,6 +313,13 @@ public class FeatureLexerTest {
             previousTokenEnd = tokenEnd;
         }
         return results;
+    }
+
+    private LexingResults lexFeatureFile(File file) throws IOException {
+        String txt = Files.toString(file, Charset.forName("UTF-8"));
+
+        return lexFeatureFileText(txt);
+
     }
 
 

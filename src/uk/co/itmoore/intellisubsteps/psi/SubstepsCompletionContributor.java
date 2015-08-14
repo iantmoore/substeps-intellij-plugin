@@ -1,8 +1,5 @@
 package uk.co.itmoore.intellisubsteps.psi;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.reflect.TypeToken;
 import com.intellij.analysis.AnalysisScope;
 import com.intellij.codeInsight.completion.CompletionContributor;
 import com.intellij.codeInsight.completion.CompletionParameters;
@@ -12,45 +9,32 @@ import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleUtil;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.ModuleRootManager;
-import com.intellij.openapi.roots.OrderRootType;
-import com.intellij.openapi.roots.libraries.Library;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.*;
 import com.intellij.util.PlatformIcons;
 import com.intellij.util.ProcessingContext;
-import com.intellij.util.Processor;
 import com.technophobia.substeps.glossary.StepDescriptor;
 import com.technophobia.substeps.glossary.StepImplementationsDescriptor;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
+import uk.co.itmoore.intellisubsteps.SubstepLibraryManager;
 import uk.co.itmoore.intellisubsteps.SubstepsIcons;
 import uk.co.itmoore.intellisubsteps.psi.stepdefinition.psi.SubstepsDefinitionFile;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.lang.reflect.Type;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
-import java.util.jar.JarFile;
-import java.util.zip.ZipEntry;
 
 /**
  * Created by ian on 22/07/15.
  */
 public abstract class SubstepsCompletionContributor extends CompletionContributor {
 
-    public static final String STEPIMPLEMENTATIONS_JSON_FILENAME = "stepimplementations.json";
-
     private static final Logger logger = LogManager.getLogger(SubstepsCompletionContributor.class);
 
-    protected void buildSuggestionsFromStepImplementationsInProjectSource(Module module,
-                final List<StepImplementationsDescriptor> stepImplsInScope, final CompletionResultSet resultSet) {
+    protected void buildSuggestionsFromProjectSource(Module module,
+                                                     final List<StepImplementationsDescriptor> stepImplsInScope, final CompletionResultSet resultSet) {
 
         long start = System.currentTimeMillis();
         AnalysisScope moduleScope = new AnalysisScope(module);
@@ -170,36 +154,39 @@ public abstract class SubstepsCompletionContributor extends CompletionContributo
             if (a.getQualifiedName().equals(com.technophobia.substeps.model.SubSteps.StepImplementations.class.getCanonicalName())){
                 return true;
             }
+            else {
+                logger.debug("got other class annotation: " + a.getQualifiedName());
+            }
         }
         return false;
     }
 
 
-    protected void addStepImplementationsFromModuleLibraries(ModuleRootManager moduleRootManager, List<StepImplementationsDescriptor> stepImplsInScope) {
-        final List<Library> libraries = new ArrayList<>();
-
-        moduleRootManager.orderEntries().forEachLibrary(new Processor<Library>() {
-            @Override
-            public boolean process(Library library) {
-
-                libraries.add(library);
-                return true;
-            }
-        });
-
-
-        for (Library lib : libraries){
-            logger.debug("looking for stepImplementations in " + lib.getName());
-
-            VirtualFile[] vLibFiles = lib.getFiles(OrderRootType.CLASSES);
-
-//            for (VirtualFile vf  : vLibFiles){
-//                logger.debug("virtual file canonical path: " + vf.getCanonicalPath() + " path: " + vf.getPath());
+//    protected void addStepImplementationsFromModuleLibraries(ModuleRootManager moduleRootManager, List<StepImplementationsDescriptor> stepImplsInScope) {
+//        final List<Library> libraries = new ArrayList<>();
+//
+//        moduleRootManager.orderEntries().forEachLibrary(new Processor<Library>() {
+//            @Override
+//            public boolean process(Library library) {
+//
+//                libraries.add(library);
+//                return true;
 //            }
-            String libraryPath = StringUtils.substringBefore(vLibFiles[0].getPath(), "!/");
-            stepImplsInScope.addAll(findStepImplementationDescriptorsForDependency(libraryPath));
-        }
-    }
+//        });
+//
+//
+//        for (Library lib : libraries){
+//            logger.debug("looking for stepImplementations in " + lib.getName());
+//
+//            VirtualFile[] vLibFiles = lib.getFiles(OrderRootType.CLASSES);
+//
+////            for (VirtualFile vf  : vLibFiles){
+////                logger.debug("virtual file canonical path: " + vf.getCanonicalPath() + " path: " + vf.getPath());
+////            }
+//            String libraryPath = StringUtils.substringBefore(vLibFiles[0].getPath(), "!/");
+//            stepImplsInScope.addAll(findStepImplementationDescriptorsForDependency(libraryPath));
+//        }
+//    }
 
     protected void buildSuggestionsFromStepDescriptions(List<StepImplementationsDescriptor> stepImplsInScope, @NotNull CompletionResultSet resultSet) {
         for (StepImplementationsDescriptor descriptor : stepImplsInScope){
@@ -219,60 +206,60 @@ public abstract class SubstepsCompletionContributor extends CompletionContributo
     }
 
 
-    private List<StepImplementationsDescriptor> findStepImplementationDescriptorsForDependency(final String path) {
-        JarFile jarFile = null;
-        try {
-            jarFile = new JarFile(new File(path));
+//    private List<StepImplementationsDescriptor> findStepImplementationDescriptorsForDependency(final String path) {
+//        JarFile jarFile = null;
+//        try {
+//            jarFile = new JarFile(new File(path));
+//
+//
+//            final List<StepImplementationsDescriptor> stepImplementationDescriptors = loadJsonStepImplementationsDescriptorFromJar(jarFile);
+//
+//            return stepImplementationDescriptors != null ? stepImplementationDescriptors : Collections.<StepImplementationsDescriptor>emptyList();
+//        }
+//        catch (final IOException ex) {
+//
+//            logger.warn("Could not open jar file " + path, ex);
+//        }
+//        finally {
+//            try {
+//                if (jarFile != null) {
+//                    jarFile.close();
+//                }
+//            } catch (final IOException e) {
+//                logger.warn("Could not close jar file " + path);
+//            }
+//        }
+//
+//        return Collections.<StepImplementationsDescriptor> emptyList();
+//    }
 
-
-            final List<StepImplementationsDescriptor> stepImplementationDescriptors = loadJsonStepImplementationsDescriptorFromJar(jarFile);
-
-            return stepImplementationDescriptors != null ? stepImplementationDescriptors : Collections.<StepImplementationsDescriptor>emptyList();
-        }
-        catch (final IOException ex) {
-
-            logger.warn("Could not open jar file " + path, ex);
-        }
-        finally {
-            try {
-                if (jarFile != null) {
-                    jarFile.close();
-                }
-            } catch (final IOException e) {
-                logger.warn("Could not close jar file " + path);
-            }
-        }
-
-        return Collections.<StepImplementationsDescriptor> emptyList();
-    }
-
-    protected List<StepImplementationsDescriptor> loadJsonStepImplementationsDescriptorFromJar(JarFile jarFile){
-        Gson gson = new GsonBuilder().create();
-
-        List<StepImplementationsDescriptor> classStepTagList = null;
-
-        final ZipEntry entry = jarFile.getEntry(STEPIMPLEMENTATIONS_JSON_FILENAME);
-
-        if (entry != null) {
-
-            try {
-                final InputStream is = jarFile.getInputStream(entry);
-
-                Type datasetListType = new TypeToken<Collection<StepImplementationsDescriptor>>() {}.getType();
-
-                classStepTagList = gson.fromJson(new InputStreamReader(is), datasetListType);
-
-
-            } catch (final IOException e) {
-                logger.error("Error loading from jarfile: ", e);
-            }
-        } else {
-            logger.error("couldn't locate file in jar: " + STEPIMPLEMENTATIONS_JSON_FILENAME);
-        }
-
-        return classStepTagList;
-
-    }
+//    protected List<StepImplementationsDescriptor> loadJsonStepImplementationsDescriptorFromJar(JarFile jarFile){
+//        Gson gson = new GsonBuilder().create();
+//
+//        List<StepImplementationsDescriptor> classStepTagList = null;
+//
+//        final ZipEntry entry = jarFile.getEntry(STEPIMPLEMENTATIONS_JSON_FILENAME);
+//
+//        if (entry != null) {
+//
+//            try {
+//                final InputStream is = jarFile.getInputStream(entry);
+//
+//                Type datasetListType = new TypeToken<Collection<StepImplementationsDescriptor>>() {}.getType();
+//
+//                classStepTagList = gson.fromJson(new InputStreamReader(is), datasetListType);
+//
+//
+//            } catch (final IOException e) {
+//                logger.error("Error loading from jarfile: ", e);
+//            }
+//        } else {
+//            logger.error("couldn't locate file in jar: " + STEPIMPLEMENTATIONS_JSON_FILENAME);
+//        }
+//
+//        return classStepTagList;
+//
+//    }
 
 
     public void fillCompletionVariants(CompletionParameters params, CompletionResultSet result){
@@ -300,9 +287,11 @@ public abstract class SubstepsCompletionContributor extends CompletionContributo
             logger.debug("src root: " + vf.getCanonicalPath());
 
         }
-        buildSuggestionsFromStepImplementationsInProjectSource(module, stepImplsInScope, resultSet);
+        buildSuggestionsFromProjectSource(module, stepImplsInScope, resultSet);
 
-        addStepImplementationsFromModuleLibraries(moduleRootManager, stepImplsInScope);
+        stepImplsInScope.addAll(SubstepLibraryManager.INSTANCE.getDescriptorsForProjectFromLibraries(module));
+
+//        addStepImplementationsFromModuleLibraries(moduleRootManager, stepImplsInScope);
 
         logger.debug("completion processing ctx to string:\n" + context.toString());
 

@@ -1,3 +1,23 @@
+## INtelli Substeps PLugin
+
+# Current Bugs
+--------------
+
+* Emsell's missing go to step def - look at logs and compare
+* illegal arguments exceptions been thrown when content is deleted
+
+* rewrite the featurelexer - chunkup and build up the indexes and offsets in one go from the buf provided in the start method, then work out what's what
+- just try using the substeps ff parser and map onto the tokentypes ??
+
+
+# Current Feature impls
+
+
+* Runner
+
+
+# syntax highlighting - show steps that aren't implemented
+
 # finish off feature parsing
 
 # comments on the end of the line
@@ -19,6 +39,13 @@ arch overview
 https://confluence.jetbrains.com/display/IDEADEV/PluginDevelopment
 https://confluence.jetbrains.com/display/IDEADEV/IntelliJ+IDEA+Architectural+Overview#IntelliJIDEAArchitecturalOverview-PsiElements
 
+
+##Tool windows 
+
+https://confluence.jetbrains.com/display/IDEADEV/Creation+of+Tool+Windows
+
+How to get Intellij Quick documentation to hook into the docs ?
+bingo: http://www.jetbrains.org/intellij/sdk/docs/reference_guide/custom_language_support/documentation.html
 
 
 ##Tool windows 
