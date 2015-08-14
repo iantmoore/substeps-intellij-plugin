@@ -4,7 +4,6 @@
 --------------
 
 * Emsell's missing go to step def - look at logs and compare
-* add new scenarios after existing ones - not recognised as such untl file re-opened
 * illegal arguments exceptions been thrown when content is deleted
 
 * rewrite the featurelexer - chunkup and build up the indexes and offsets in one go from the buf provided in the start method, then work out what's what
@@ -12,13 +11,12 @@
 
 
 # Current Feature impls
-* Docs
- - working on getting docs back from project source - not currently bring back javadoc descriptions
 
 
 * Runner
 
 
+# syntax highlighting - show steps that aren't implemented
 
 # finish off feature parsing
 

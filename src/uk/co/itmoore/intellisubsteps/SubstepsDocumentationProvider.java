@@ -1,6 +1,7 @@
 package uk.co.itmoore.intellisubsteps;
 
 import com.intellij.analysis.AnalysisScope;
+import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.lang.documentation.AbstractDocumentationProvider;
 import com.intellij.lang.documentation.DocumentationProvider;
 import com.intellij.openapi.editor.Editor;
@@ -11,6 +12,7 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.*;
 import com.technophobia.substeps.glossary.StepDescriptor;
 import com.technophobia.substeps.glossary.StepImplementationsDescriptor;
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
@@ -37,15 +39,9 @@ public class SubstepsDocumentationProvider extends AbstractDocumentationProvider
     @Override
     public String getQuickNavigateInfo(PsiElement element, PsiElement originalElement) {
 
-        // class	class uk.co.itmoore.intellisubsteps.psi.stepdefinition.impl.SubstepDefinitionStepImpl
-
         log.debug("got element class: " +
         element.getClass().toString());
 
-//        if (element instanceof IProperty) {
-//            return "\"" + renderPropertyValue((IProperty)element) + "\"" + getLocationString(element);
-//        }
-//        return null;
 
         // TODO - not sure where this is seen..?
         return "getQuickNavigateInfo: " + element.getClass().toString();
@@ -54,13 +50,6 @@ public class SubstepsDocumentationProvider extends AbstractDocumentationProvider
     @Nullable
     @Override
     public List<String> getUrlFor(PsiElement psiElement, PsiElement psiElement1) {
-
-//        log.debug("getUrlFor: " +
-//                psiElement.getClass().toString());
-
-//        List<String> results = new ArrayList<>();
-//
-//        results.add("a url");
         return null;
     }
 
@@ -85,11 +74,12 @@ public class SubstepsDocumentationProvider extends AbstractDocumentationProvider
 
         // TODO get step impls from this project
 
-        String elementText = element.getText();
+        final String elementText = element.getText();
 
         log.debug("looking up docs for: " + elementText);
 
         // what is this ?
+        AnalysisScope moduleScope = new AnalysisScope(module);
 
         if (element.getContainingFile() instanceof SubstepsDefinitionFile){
 
@@ -100,23 +90,7 @@ public class SubstepsDocumentationProvider extends AbstractDocumentationProvider
             if (docsFromLibs != null){
                 return docsFromLibs;
             }
-
-            // lets have a look at step impls in code in this project
-            final List<StepImplementationsDescriptor> descriptorsForProjectFromLJavaSource = new ArrayList<>();
-
-            AnalysisScope moduleScope = new AnalysisScope(module);
-            moduleScope.accept(new PsiRecursiveElementVisitor() {
-                @Override
-                public void visitFile(final PsiFile file) {
-
-                    if (file instanceof PsiJavaFile) {
-
-                        descriptorsForProjectFromLJavaSource.addAll(SubstepLibraryManager.INSTANCE.buildStepImplentationDescriptorsFromJavaSource((PsiJavaFile)file));
-                    }
-                }
-            });
-
-            String docsFromProjectSource = buildDocsIfMatching(elementText, descriptorsForProjectFromLJavaSource);
+            String docsFromProjectSource = getDocStringFromStepImplementations(elementText, moduleScope);
 
             if (docsFromProjectSource!= null){
                 return docsFromProjectSource;
@@ -125,6 +99,17 @@ public class SubstepsDocumentationProvider extends AbstractDocumentationProvider
 
             // TODO got here, not found anything - have a look for substep defs for a match
 
+            log.debug("not got anything yet...looking at substep defs");
+
+
+            final String matchingStepDefDocString = getDocsStringFromSubstepDefinitionSource(elementText, moduleScope);
+
+            if (matchingStepDefDocString != null) {
+                return matchingStepDefDocString;
+            }
+
+            // TODO - end build from substep defs
+
 
             log.debug("no match");
             return "<p>Unable to find documentation for:</p><p>" + elementText + "</p>";
@@ -132,12 +117,117 @@ public class SubstepsDocumentationProvider extends AbstractDocumentationProvider
         else if (element.getContainingFile() instanceof FeatureFile){
             // probably substep def, but not necessarily
 
-            log.debug("is feature file");
-            return "feautre file toDO";
+            // look in substep defs first
+            final String matchingStepDefDocString = getDocsStringFromSubstepDefinitionSource(elementText, moduleScope);
+
+            if (matchingStepDefDocString != null) {
+                return matchingStepDefDocString;
+            }
+
+            // then code
+            String docsFromProjectSource = getDocStringFromStepImplementations(elementText, moduleScope);
+
+            if (docsFromProjectSource!= null){
+                return docsFromProjectSource;
+            }
+
+            // unlikely but you never know
+            String docsFromLibs = buildDocsIfMatching(elementText, descriptorsForProjectFromLibraries);
+
+            if (docsFromLibs != null){
+                return docsFromLibs;
+            }
+
+            log.debug("no match");
+            return "<p>Unable to find documentation for:</p><p>" + elementText + "</p>";
         }
 
         else
             return null;
+    }
+
+    protected String getDocStringFromStepImplementations(String elementText, AnalysisScope moduleScope) {
+        // lets have a look at step impls in code in this project
+        final List<StepImplementationsDescriptor> descriptorsForProjectFromLJavaSource = new ArrayList<>();
+
+        moduleScope.accept(new PsiRecursiveElementVisitor() {
+            @Override
+            public void visitFile(final PsiFile file) {
+
+                if (file instanceof PsiJavaFile) {
+
+                    descriptorsForProjectFromLJavaSource.addAll(SubstepLibraryManager.INSTANCE.buildStepImplentationDescriptorsFromJavaSource((PsiJavaFile)file));
+                }
+            }
+        });
+
+        return buildDocsIfMatching(elementText, descriptorsForProjectFromLJavaSource);
+    }
+
+    @Nullable
+    protected String getDocsStringFromSubstepDefinitionSource(final String elementText, AnalysisScope moduleScope) {
+        final List<String> matchingStepDefStrings = new ArrayList<>();
+
+        moduleScope.accept(new PsiRecursiveElementVisitor() {
+            @Override
+            public void visitFile(final PsiFile file) {
+
+                if (file instanceof SubstepsDefinitionFile) {
+
+                    String docsFromSubstepDefs = buildDocsIfMatchingFromSubstepsSource((SubstepsDefinitionFile) file, elementText);
+
+                    if (docsFromSubstepDefs != null) {
+                        matchingStepDefStrings.add(docsFromSubstepDefs);
+                    }
+                }
+            }
+        });
+
+        if (!matchingStepDefStrings.isEmpty()){
+            return matchingStepDefStrings.get(0);
+        }
+        return null;
+    }
+
+    private String buildDocsIfMatchingFromSubstepsSource(SubstepsDefinitionFile substepDefinitionFile, String elementText){
+
+
+        String fileContents = substepDefinitionFile.getText();
+
+        String[] substepDefs = fileContents.split("(?=Define:)");
+
+        Pattern stepDefExtractor = Pattern.compile("Define:\\w?([^\n].*)\n.*");
+
+        for (String substepDef : substepDefs){
+
+            String[] lines = substepDef.split("\\n");
+
+            String stepDef = StringUtils.stripStart(lines[0], "Define:").trim();
+
+            String regEx = stepDef.replaceAll("(\"<[^>]*>\")", "\"([^\"]*)\"").replaceAll("(<[^>]*>)", "\"?([^\"]*)\"?");
+
+            Pattern p = Pattern.compile(regEx);
+
+            log.debug("buildDocsIfMatchingFromSubstepsSource docs looking at expression: " + stepDef + " : regex: [" + regEx + "] elementText: [" + elementText + "]");
+
+            if (p.matcher(elementText).matches()){
+                return generateDocStringForStepDef(stepDef, lines);
+            }
+        }
+        return null;
+    }
+
+    private String generateDocStringForStepDef(String stepDef, String[] lines) {
+
+        StringBuilder buf = new StringBuilder();
+
+        buf.append("<strong>Define:").append("</strong>&nbsp;").append(stepDef).append("<br/>");
+
+        for (int i = 1; i < lines.length; i++){
+            buf.append("&nbsp;&nbsp;&nbsp;").append(lines[i]).append("<br/>");
+        }
+
+        return buf.toString();
     }
 
     private String buildDocsIfMatching(String elementText, List<StepImplementationsDescriptor> descriptorList){
@@ -153,7 +243,7 @@ public class SubstepsDocumentationProvider extends AbstractDocumentationProvider
 
                 Pattern p = Pattern.compile(regEx);
 
-                log.debug("docs looking at expression: " + expression + " : regex: " + regEx);
+                log.debug("buildDocsIfMatching docs looking at expression: " + expression + " : regex: " + regEx);
 
                 if (p.matcher(elementText).matches()){
                     return generateDocString(descriptor, stepImplClasses);

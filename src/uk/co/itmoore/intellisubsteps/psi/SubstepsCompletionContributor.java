@@ -1,8 +1,5 @@
 package uk.co.itmoore.intellisubsteps.psi;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.reflect.TypeToken;
 import com.intellij.analysis.AnalysisScope;
 import com.intellij.codeInsight.completion.CompletionContributor;
 import com.intellij.codeInsight.completion.CompletionParameters;
@@ -12,13 +9,10 @@ import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleUtil;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.ModuleRootManager;
-import com.intellij.openapi.roots.OrderRootType;
-import com.intellij.openapi.roots.libraries.Library;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.*;
 import com.intellij.util.PlatformIcons;
 import com.intellij.util.ProcessingContext;
-import com.intellij.util.Processor;
 import com.technophobia.substeps.glossary.StepDescriptor;
 import com.technophobia.substeps.glossary.StepImplementationsDescriptor;
 import org.apache.commons.lang.StringUtils;
@@ -29,29 +23,18 @@ import uk.co.itmoore.intellisubsteps.SubstepLibraryManager;
 import uk.co.itmoore.intellisubsteps.SubstepsIcons;
 import uk.co.itmoore.intellisubsteps.psi.stepdefinition.psi.SubstepsDefinitionFile;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.lang.reflect.Type;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
-import java.util.jar.JarFile;
-import java.util.zip.ZipEntry;
 
 /**
  * Created by ian on 22/07/15.
  */
 public abstract class SubstepsCompletionContributor extends CompletionContributor {
 
-//    public static final String STEPIMPLEMENTATIONS_JSON_FILENAME = "stepimplementations.json";
-
     private static final Logger logger = LogManager.getLogger(SubstepsCompletionContributor.class);
 
-    protected void buildSuggestionsFromStepImplementationsInProjectSource(Module module,
-                final List<StepImplementationsDescriptor> stepImplsInScope, final CompletionResultSet resultSet) {
+    protected void buildSuggestionsFromProjectSource(Module module,
+                                                     final List<StepImplementationsDescriptor> stepImplsInScope, final CompletionResultSet resultSet) {
 
         long start = System.currentTimeMillis();
         AnalysisScope moduleScope = new AnalysisScope(module);
@@ -304,7 +287,7 @@ public abstract class SubstepsCompletionContributor extends CompletionContributo
             logger.debug("src root: " + vf.getCanonicalPath());
 
         }
-        buildSuggestionsFromStepImplementationsInProjectSource(module, stepImplsInScope, resultSet);
+        buildSuggestionsFromProjectSource(module, stepImplsInScope, resultSet);
 
         stepImplsInScope.addAll(SubstepLibraryManager.INSTANCE.getDescriptorsForProjectFromLibraries(module));
 
