@@ -11,9 +11,11 @@
 
 
 # Current Feature impls
-
-
 * Runner
+
+
+## Substeps feature - 
+# name scenario outline's dynamically, using a parameter from the examples
 
 
 # syntax highlighting - show steps that aren't implemented
@@ -39,13 +41,6 @@ arch overview
 https://confluence.jetbrains.com/display/IDEADEV/PluginDevelopment
 https://confluence.jetbrains.com/display/IDEADEV/IntelliJ+IDEA+Architectural+Overview#IntelliJIDEAArchitecturalOverview-PsiElements
 
-
-##Tool windows 
-
-https://confluence.jetbrains.com/display/IDEADEV/Creation+of+Tool+Windows
-
-How to get Intellij Quick documentation to hook into the docs ?
-bingo: http://www.jetbrains.org/intellij/sdk/docs/reference_guide/custom_language_support/documentation.html
 
 
 ##Tool windows 
@@ -74,6 +69,16 @@ https://github.com/JetBrains/intellij-community/blob/master/plugins/junit_rt/src
 and 
 https://github.com/JetBrains/intellij-community/tree/master/plugins/junit/src/com/intellij/execution/junit
 
+
+## Exectuion
+http://www.jetbrains.org/intellij/sdk/docs/basics/run_configurations/run_configuration_execution.html
+
+# main runner needs to be in the classpath of the project - I think this is ok..?
+
+# need to do some work to allow the persistence of the run config - once in the drop down it doesn't work...
+- http://www.jetbrains.org/intellij/sdk/docs/basics/run_configurations/run_configuration_management.html#persistence
+
+not sure where to hook into persisting or inflating state from...
 
 
 persisting state of components:

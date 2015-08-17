@@ -1,5 +1,7 @@
 package uk.co.itmoore.intellisubsteps.execution;
 
+import com.intellij.execution.configurations.JavaParameters;
+import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
 
 /**
@@ -10,6 +12,11 @@ public class SubstepsRunnerConfigurationModel {
     private String pathToFeature;
     private String tags;
     private boolean strict = false;
+//    private Module module;
+
+    private JavaParameters javaParameters;
+
+    public JavaParameters getJavaParameters() { return javaParameters;}
 
     public String getPathToFeature() {
         return pathToFeature;
@@ -58,9 +65,20 @@ public class SubstepsRunnerConfigurationModel {
 
     public SubstepsRunnerConfigurationModel() {
 
+        javaParameters = new JavaParameters();
+        javaParameters.setMainClass("com.technophobia.substeps.runner.MainExecutionNodeRunner");
+
     }
 
     public void setListener(final SubstepsConfigurable listener) {
         myListener = listener;
     }
+
+//    public Module getModule() {
+//        return module;
+//    }
+//
+//    public void setModule(Module module) {
+//        this.module = module;
+//    }
 }
