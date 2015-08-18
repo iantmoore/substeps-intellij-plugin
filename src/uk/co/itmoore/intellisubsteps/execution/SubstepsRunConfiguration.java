@@ -77,18 +77,21 @@ public class SubstepsRunConfiguration extends ModuleBasedConfiguration {
 
 
 
-//    @Override
-//    public void readExternal(final Element element) throws InvalidDataException {
-//
-//
-//  //      PathMacroManager.getInstance(getProject()).expandPaths(element);
-//        super.readExternal(element);
-//        JavaRunConfigurationExtensionManager.getInstance().readExternal(this, element);
-//        readModule(element);
-//
-//        XmlSerializer.deserializeInto(this, element);
+    @Override
+    public void readExternal(final Element element) throws InvalidDataException {
 
 
+        //      PathMacroManager.getInstance(getProject()).expandPaths(element);
+        super.readExternal(element);
+        JavaRunConfigurationExtensionManager.getInstance().readExternal(this, element);
+        readModule(element);
+
+        XmlSerializer.deserializeInto(this, element);
+
+        if (this.getModel() != null) {
+            XmlSerializer.deserializeInto(this.getModel(), element);
+        }
+    }
 
 
 
@@ -124,15 +127,18 @@ public class SubstepsRunConfiguration extends ModuleBasedConfiguration {
 //        }
 //    }
 
-//    @Override
-//    public void writeExternal(final Element element) throws WriteExternalException {
-//        super.writeExternal(element);
-//        JavaRunConfigurationExtensionManager.getInstance().writeExternal(this, element);
-//        writeModule(element);
-//
-//        XmlSerializer.serializeInto(this, element);
+    @Override
+    public void writeExternal(final Element element) throws WriteExternalException {
+        super.writeExternal(element);
+        JavaRunConfigurationExtensionManager.getInstance().writeExternal(this, element);
+        writeModule(element);
 
+        XmlSerializer.serializeInto(this, element);
 
+        if (this.getModel() != null) {
+            XmlSerializer.serializeInto(this.getModel(), element);
+        }
+    }
 
 
 

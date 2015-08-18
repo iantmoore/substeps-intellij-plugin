@@ -6,13 +6,17 @@ import com.intellij.execution.RunnerAndConfigurationSettings;
 import com.intellij.execution.actions.ConfigurationContext;
 import com.intellij.execution.actions.RunConfigurationProducer;
 import com.intellij.execution.configurations.JavaParameters;
+import com.intellij.execution.configurations.RunConfiguration;
 import com.intellij.execution.junit.JavaRunConfigurationProducerBase;
+import com.intellij.openapi.projectRoots.Sdk;
 import com.intellij.openapi.util.Ref;
 import com.intellij.psi.PsiElement;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import uk.co.itmoore.intellisubsteps.psi.feature.FeatureFile;
 import uk.co.itmoore.intellisubsteps.psi.feature.FeatureFileType;
+
+import java.util.List;
 
 /**
  * Created by ian on 04/08/15.
@@ -22,8 +26,10 @@ public class SubstepsFeatureRunnerConfigProducer extends RunConfigurationProduce
     private static final Logger log = LogManager.getLogger(SubstepsFeatureRunnerConfigProducer.class);
 
 
+    private static FeatureRunnerConfigurationType configType = new FeatureRunnerConfigurationType();
+
     public SubstepsFeatureRunnerConfigProducer(){
-        super(new FeatureRunnerConfigurationType());   // TODO make static ??
+        super(configType);
 
     }
 
@@ -44,6 +50,14 @@ public class SubstepsFeatureRunnerConfigProducer extends RunConfigurationProduce
 
                 try {
                     model.getJavaParameters().configureByModule(configurationContext.getModule(), JavaParameters.JDK_AND_CLASSES_AND_TESTS);
+
+                    Sdk jdk = model.getJavaParameters().getJdk();
+
+                    model.setHomePath(jdk.getHomePath());
+                    model.setVersionString(jdk.getVersionString());
+
+                    model.setClassPathString(model.getJavaParameters().getClassPath().getPathsString());
+
                 } catch (CantRunException e) {
                     log.error("can't run", e);
                     return false;
@@ -56,10 +70,19 @@ public class SubstepsFeatureRunnerConfigProducer extends RunConfigurationProduce
                 substepsRunConfiguration.setName(featureName);
 
 //                this results in two run configs!
-//                RunManager runManager = RunManager.getInstance(configurationContext.getProject());
+                RunManager runManager = RunManager.getInstance(configurationContext.getProject());
 //                RunnerAndConfigurationSettings runAndConfigSettings = runManager.createConfiguration(substepsRunConfiguration, this.getConfigurationFactory());
 //                runManager.addConfiguration(runAndConfigSettings, false);
 
+                List<RunConfiguration> configurationsList = runManager.getConfigurationsList(configType);
+
+                for (RunConfiguration runConfig: configurationsList){
+                    SubstepsRunConfiguration substepsRunConfig = (SubstepsRunConfiguration)runConfig;
+
+                    log.debug("got substeps run config: " +
+                    substepsRunConfig.getName());
+
+                }
                 return true;
             }
         }
@@ -71,7 +94,9 @@ public class SubstepsFeatureRunnerConfigProducer extends RunConfigurationProduce
     public boolean isConfigurationFromContext(SubstepsRunConfiguration substepsRunConfiguration, ConfigurationContext configurationContext) {
 
 
-        log.debug("isConfigurationFromContext? path to feature" + substepsRunConfiguration.getModel().getPathToFeature());
+        log.debug("isConfigurationFromContext? path to feature");
+
+        // TODO how do we tell ??
 
         return false;
     }

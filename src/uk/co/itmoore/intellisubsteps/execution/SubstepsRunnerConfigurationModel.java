@@ -3,6 +3,10 @@ package uk.co.itmoore.intellisubsteps.execution;
 import com.intellij.execution.configurations.JavaParameters;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
+import com.intellij.util.PathsList;
+
+import java.util.Collections;
+import java.util.List;
 
 /**
  * Created by ian on 29/07/15.
@@ -14,7 +18,24 @@ public class SubstepsRunnerConfigurationModel {
     private boolean strict = false;
 //    private Module module;
 
+
+
+    private String homePath;
+    private String versionString;
+//    private PathsList classPath;
+//    private List<String> classPathList;
+    private String classPathString;
+
+
     private JavaParameters javaParameters;
+
+    public void setHomePath(String homePath) {
+        this.homePath = homePath;
+    }
+
+    public void setVersionString(String versionString) {
+        this.versionString = versionString;
+    }
 
     public JavaParameters getJavaParameters() { return javaParameters;}
 
@@ -73,6 +94,33 @@ public class SubstepsRunnerConfigurationModel {
     public void setListener(final SubstepsConfigurable listener) {
         myListener = listener;
     }
+
+
+
+    public String getHomePath() {
+        return homePath;
+    }
+
+    public String getVersionString() {
+        return versionString;
+    }
+
+//    public List<String> getClassPathList() {
+//        return classPathList;
+//    }
+//
+//    public void setClassPathList(List<String> classPathList) {
+//        this.classPathList = classPathList;
+//    }
+
+    public String getClassPathString() {
+        return classPathString;
+    }
+
+    public void setClassPathString(String classPathString) {
+        this.classPathString = classPathString;
+    }
+
 
 //    public Module getModule() {
 //        return module;

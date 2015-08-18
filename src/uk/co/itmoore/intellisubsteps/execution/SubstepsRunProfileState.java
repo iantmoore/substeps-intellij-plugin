@@ -47,8 +47,22 @@ public class SubstepsRunProfileState  extends JavaCommandLineState {
 
 //        params.configureByModule(module, JavaParameters.JDK_AND_CLASSES_AND_TESTS);
 
+
         // TODO - null pointer on this line after run config is persisted and inflated.
-        JavaParameters params = runConfig.getModel().getJavaParameters();
+        SubstepsRunnerConfigurationModel model = runConfig.getModel();
+
+        JavaParameters params = model.getJavaParameters();
+
+        // need to set the SDK off the model
+        if (params.getJdk() == null){
+
+            params.setJdk(new JavaSdkImpl().createJdk(model.getVersionString(), model.getHomePath()));
+
+//            params.getClassPath().addAll(model.getClassPathList());
+
+            params.getClassPath().add(model.getClassPathString());
+            //
+        }
 
                 // TODO these are passed through to the main class args
         params.getProgramParametersList().add("prog-args-env", "prg-localhost");

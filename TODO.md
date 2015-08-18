@@ -14,8 +14,6 @@
 * Runner
 
 
-## Substeps feature - 
-# name scenario outline's dynamically, using a parameter from the examples
 
 
 # syntax highlighting - show steps that aren't implemented
@@ -79,6 +77,15 @@ http://www.jetbrains.org/intellij/sdk/docs/basics/run_configurations/run_configu
 - http://www.jetbrains.org/intellij/sdk/docs/basics/run_configurations/run_configuration_management.html#persistence
 
 not sure where to hook into persisting or inflating state from...
+
+
+
+# TODO
+
+
+
+
+
 
 
 persisting state of components:
