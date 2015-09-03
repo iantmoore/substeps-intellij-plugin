@@ -67,6 +67,18 @@ public class SubstepLibraryManager {
         return stepImplementationsDescriptors;
     }
 
+    public Set<String> getStepImplClassNamesFromProjectLibraries(Module module){
+
+        List<StepImplementationsDescriptor> descriptors = getDescriptorsForProjectFromLibraries(module);
+
+
+        Set<String> classNames = new HashSet<>();
+        for (StepImplementationsDescriptor des : descriptors){
+            classNames.add(des.getClassName());
+        }
+        return classNames;
+    }
+
 
     protected List<StepImplementationsDescriptor> getStepImplementationsFromModuleLibraries(ModuleRootManager moduleRootManager) {
 

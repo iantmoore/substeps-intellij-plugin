@@ -7,6 +7,7 @@ import com.intellij.util.PathsList;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Created by ian on 29/07/15.
@@ -28,6 +29,8 @@ public class SubstepsRunnerConfigurationModel {
 
 
     private JavaParameters javaParameters;
+    private Set<String> stepImplentationClassNames;
+    private String subStepDefinitionDirectory;
 
     public void setHomePath(String homePath) {
         this.homePath = homePath;
@@ -87,7 +90,11 @@ public class SubstepsRunnerConfigurationModel {
     public SubstepsRunnerConfigurationModel() {
 
         javaParameters = new JavaParameters();
-        javaParameters.setMainClass("com.technophobia.substeps.runner.MainExecutionNodeRunner");
+//        javaParameters.setMainClass("com.technophobia.substeps.runner.MainExecutionNodeRunner");
+        javaParameters.setPassParentEnvs(false);
+
+
+        javaParameters.setMainClass("com.technophobia.substeps.jmx.SubstepsJMXServer");
 
     }
 
@@ -119,6 +126,22 @@ public class SubstepsRunnerConfigurationModel {
 
     public void setClassPathString(String classPathString) {
         this.classPathString = classPathString;
+    }
+
+    public void setStepImplentationClassNames(Set<String> stepImplentationClassNames) {
+        this.stepImplentationClassNames = stepImplentationClassNames;
+    }
+
+    public Set<String> getStepImplentationClassNames() {
+        return stepImplentationClassNames;
+    }
+
+    public void setSubStepDefinitionDirectory(String subStepDefinitionDirectory) {
+        this.subStepDefinitionDirectory = subStepDefinitionDirectory;
+    }
+
+    public String getSubStepDefinitionDirectory() {
+        return subStepDefinitionDirectory;
     }
 
 

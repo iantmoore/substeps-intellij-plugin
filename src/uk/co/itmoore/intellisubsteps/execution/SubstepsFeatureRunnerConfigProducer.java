@@ -1,5 +1,6 @@
 package uk.co.itmoore.intellisubsteps.execution;
 
+import com.intellij.analysis.AnalysisScope;
 import com.intellij.execution.CantRunException;
 import com.intellij.execution.RunManager;
 import com.intellij.execution.RunnerAndConfigurationSettings;
@@ -8,15 +9,22 @@ import com.intellij.execution.actions.RunConfigurationProducer;
 import com.intellij.execution.configurations.JavaParameters;
 import com.intellij.execution.configurations.RunConfiguration;
 import com.intellij.execution.junit.JavaRunConfigurationProducerBase;
+import com.intellij.openapi.module.Module;
 import com.intellij.openapi.projectRoots.Sdk;
 import com.intellij.openapi.util.Ref;
-import com.intellij.psi.PsiElement;
+import com.intellij.psi.*;
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
+import uk.co.itmoore.intellisubsteps.SubstepLibraryManager;
+import uk.co.itmoore.intellisubsteps.psi.SubstepsCompletionContributor;
 import uk.co.itmoore.intellisubsteps.psi.feature.FeatureFile;
 import uk.co.itmoore.intellisubsteps.psi.feature.FeatureFileType;
+import uk.co.itmoore.intellisubsteps.psi.stepdefinition.psi.SubstepsDefinitionFile;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Created by ian on 04/08/15.
@@ -48,13 +56,71 @@ public class SubstepsFeatureRunnerConfigProducer extends RunConfigurationProduce
 
                 String featureName = configurationContext.getLocation().getVirtualFile().getName();
 
+                Module module = configurationContext.getModule();
+
+                final Set<String> stepImplClassNames = SubstepLibraryManager.INSTANCE.getStepImplClassNamesFromProjectLibraries(module);
+
+                final Set<String> substepDefDirectory = new HashSet<>();
+
+                AnalysisScope moduleScope = new AnalysisScope(module);
+                moduleScope.accept(new PsiRecursiveElementVisitor() {
+                    @Override
+                    public void visitFile(final PsiFile file) {
+
+
+                        if (file instanceof PsiJavaFile) {
+
+                            PsiJavaFile psiJavaFile = (PsiJavaFile)file;
+                            final PsiClass[] psiClasses = psiJavaFile.getClasses();
+
+                            //final PsiClass psiClass = JavaPsiFacade.getInstance(thisProject).findClass(fqn, psiJavaFile.getResolveScope());
+
+                            for (PsiClass psiClass : psiClasses) {
+
+                                if (SubstepsCompletionContributor.isStepImplementationsClass(psiClass)) {
+
+                                    stepImplClassNames.add(psiClass.getQualifiedName());
+                                }
+                            }
+                        } else if (file instanceof SubstepsDefinitionFile) {
+
+                            String parentPath = file.getParent().getVirtualFile().getPath();
+
+                            if (substepDefDirectory.isEmpty()){
+                                substepDefDirectory.add(parentPath);
+                            }
+                            else if (!substepDefDirectory.contains(parentPath)) {
+                                // find the common ancestor between what's already in and this parent
+                                String current = substepDefDirectory.iterator().next();
+
+                                int commonLength = StringUtils.indexOfDifference(current, parentPath);
+                                substepDefDirectory.remove(current);
+
+                                String common = current.substring(0, commonLength);
+
+                                log.debug("current path for substeps: " + current + " got this time: " + parentPath + " common: " + common);
+
+                                substepDefDirectory.add(common);
+
+                            }
+                        }
+                    }
+                });
+
+
+                model.setStepImplentationClassNames(stepImplClassNames);
+
+                model.setSubStepDefinitionDirectory(substepDefDirectory.iterator().next());
+
                 try {
-                    model.getJavaParameters().configureByModule(configurationContext.getModule(), JavaParameters.JDK_AND_CLASSES_AND_TESTS);
+                    model.getJavaParameters().configureByModule(module, JavaParameters.JDK_AND_CLASSES_AND_TESTS);
 
                     Sdk jdk = model.getJavaParameters().getJdk();
 
                     model.setHomePath(jdk.getHomePath());
                     model.setVersionString(jdk.getVersionString());
+
+                    log.debug("configuring substeps runtime with classpath:\n" + model.getJavaParameters().getClassPath().getPathsString());
 
                     model.setClassPathString(model.getJavaParameters().getClassPath().getPathsString());
 
