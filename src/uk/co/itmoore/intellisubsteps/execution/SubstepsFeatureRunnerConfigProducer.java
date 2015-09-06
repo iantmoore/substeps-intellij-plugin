@@ -70,7 +70,7 @@ public class SubstepsFeatureRunnerConfigProducer extends RunConfigurationProduce
 
                         if (file instanceof PsiJavaFile) {
 
-                            PsiJavaFile psiJavaFile = (PsiJavaFile)file;
+                            PsiJavaFile psiJavaFile = (PsiJavaFile) file;
                             final PsiClass[] psiClasses = psiJavaFile.getClasses();
 
                             //final PsiClass psiClass = JavaPsiFacade.getInstance(thisProject).findClass(fqn, psiJavaFile.getResolveScope());
@@ -86,10 +86,9 @@ public class SubstepsFeatureRunnerConfigProducer extends RunConfigurationProduce
 
                             String parentPath = file.getParent().getVirtualFile().getPath();
 
-                            if (substepDefDirectory.isEmpty()){
+                            if (substepDefDirectory.isEmpty()) {
                                 substepDefDirectory.add(parentPath);
-                            }
-                            else if (!substepDefDirectory.contains(parentPath)) {
+                            } else if (!substepDefDirectory.contains(parentPath)) {
                                 // find the common ancestor between what's already in and this parent
                                 String current = substepDefDirectory.iterator().next();
 
@@ -108,6 +107,8 @@ public class SubstepsFeatureRunnerConfigProducer extends RunConfigurationProduce
                 });
 
 
+
+                model.setWorkingDir(module.getModuleFile().getParent().getCanonicalPath());
                 model.setStepImplentationClassNames(stepImplClassNames);
 
                 model.setSubStepDefinitionDirectory(substepDefDirectory.iterator().next());

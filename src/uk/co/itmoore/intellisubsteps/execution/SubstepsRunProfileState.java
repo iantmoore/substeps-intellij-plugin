@@ -8,6 +8,7 @@ import com.intellij.execution.process.ProcessHandler;
 import com.intellij.execution.runners.ExecutionEnvironment;
 import com.intellij.execution.runners.ProgramRunner;
 import com.intellij.execution.ui.ConsoleView;
+import com.intellij.execution.ui.ConsoleViewContentType;
 import com.intellij.ide.DataManager;
 import com.intellij.openapi.actionSystem.CommonDataKeys;
 import com.intellij.openapi.application.ApplicationManager;
@@ -38,6 +39,7 @@ import java.io.*;
 import java.nio.charset.Charset;
 import java.nio.charset.IllegalCharsetNameException;
 import java.nio.charset.UnsupportedCharsetException;
+import java.rmi.RMISecurityManager;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
@@ -47,7 +49,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * Created by ian on 04/08/15.
  */
 public class SubstepsRunProfileState  extends CommandLineState {
-        //JavaCommandLineState {
+        //extends JavaCommandLineState {
 
     private static final Logger log = LogManager.getLogger(SubstepsRunProfileState.class);
 
@@ -60,8 +62,8 @@ public class SubstepsRunProfileState  extends CommandLineState {
         private final AtomicBoolean processStartedOk;
 
         public WaitingInputStreamConsumer(InputStream stderr, Logger logger, boolean isError,  final CountDownLatch processStarted,
-                                   final AtomicBoolean processStartedOk) {
-            super(stderr, logger, isError);
+                                   final AtomicBoolean processStartedOk, ConsoleView consoleView) {
+            super(stderr, logger, isError, consoleView);
             this.processStarted = processStarted;
             this.processStartedOk = processStartedOk;
 
@@ -102,17 +104,14 @@ public class SubstepsRunProfileState  extends CommandLineState {
         private final boolean isError;
         private InputStreamReader isr = null;
         private BufferedReader br = null;
+        protected ConsoleView consoleView;
 
+        public InputStreamConsumer(final InputStream stderr, final Logger logger, boolean isError, ConsoleView consoleView) {
 
-        public InputStreamConsumer(final InputStream stderr, final Logger logger, boolean isError) {
-
-//        , final CountDownLatch processStarted,
-//                                   final AtomicBoolean processStartedOk) {
             this.logger = logger;
-//            this.processStarted = processStarted;
-//            this.processStartedOk = processStartedOk;
             this.stderr = stderr;
             this.isError = isError;
+            this.consoleView = consoleView;
         }
 
 
@@ -156,6 +155,7 @@ public class SubstepsRunProfileState  extends CommandLineState {
 
                 while ((line = this.br.readLine()) != null) {
 
+                    consoleView.print(line + "\n", ConsoleViewContentType.NORMAL_OUTPUT);
                     // NB. this is not a logger as we don't want to be able to turn
                     // this off
                     // If the level of logging from the child process is verbose,
@@ -217,6 +217,11 @@ public class SubstepsRunProfileState  extends CommandLineState {
 
         JavaParameters params = model.getJavaParameters();
 
+
+        params.setWorkingDirectory(model.getWorkingDir());
+
+
+
         // need to set the SDK off the model
         if (params.getJdk() == null){
 
@@ -230,19 +235,35 @@ public class SubstepsRunProfileState  extends CommandLineState {
             //
         }
 
+
+
                 // TODO these are passed through to the main class args
         params.getProgramParametersList().add("prog-args-env", "prg-localhost");
 
         ParametersList vmParametersList = params.getVMParametersList();
 
+        String apiLibPath = "file:///home/ian/projects/intelliSubsteps/lib/substeps-core-api-1.1.3-SNAPSHOT-SKYBET1.jar";
 
         vmParametersList.addParametersString("-Dfile.encoding=UTF-8");
         vmParametersList.addParametersString("-Dcom.sun.management.jmxremote.port=" + jmxPort);
         vmParametersList.addParametersString("-Dcom.sun.management.jmxremote.authenticate=false");
         vmParametersList.addParametersString("-Dcom.sun.management.jmxremote.ssl=false");
         vmParametersList.addParametersString("-Djava.rmi.server.hostname=localhost");
+
+
+        String rmiClasspathString = "\"file://" + model.getClassPathString().replaceAll(File.pathSeparator, " file://") + "\"";
+        // TODO - space seperated list of urls
+
+        log.debug("rmi classpath: " + rmiClasspathString);
+
+        vmParametersList.addParametersString("-Djava.rmi.server.codebase=" + rmiClasspathString);
+
         vmParametersList.addParametersString("-Dsun.io.serialization.extendedDebugInfo=true");
 
+//        SecurityManager sm = new SecurityManager();
+//        System.setSecurityManager(sm);
+
+        System.setProperty("java.rmi.server.codebase", rmiClasspathString);
 
         //    params.getVMParametersList().add("vmarg-environment", "vm-localhost");
 
@@ -281,6 +302,13 @@ public class SubstepsRunProfileState  extends CommandLineState {
 
 
         OSProcessHandler processHandler = startProcess();
+
+        ConsoleView consoleView = TextConsoleBuilderFactory.getInstance().createBuilder(this.getEnvironment().getProject()).getConsole();
+        consoleView.attachToProcess(processHandler);
+
+        consoleView.print("Starting substeps test...", ConsoleViewContentType.NORMAL_OUTPUT);
+
+
 //        this.getJavaParameters().createOSProcessHandler();
 
 //        log.debug("about to call osprocessHandler start notify");
@@ -288,28 +316,25 @@ public class SubstepsRunProfileState  extends CommandLineState {
 
 //        final OSProcessHandler processHandler = startProcess();
 
-        final ConsoleView console = createConsole(executor);
-        if (console != null) {
-            console.attachToProcess(processHandler);
-        }
-        else {
-            log.error("no console to attach to");
-        }
+//        final ConsoleView console = createConsole(executor);
+//        if (console != null) {
+//            console.attachToProcess(processHandler);
+//        }
+//        else {
+//            log.error("no console to attach to");
+//        }
 
-        ConsoleView consoleView = TextConsoleBuilderFactory.getInstance().createBuilder(this.getEnvironment().getProject()).getConsole();
-
-        consoleView.attachToProcess(processHandler);
 
         final CountDownLatch processStarted = new CountDownLatch(1);
         final AtomicBoolean processStartedOk = new AtomicBoolean(false);
 
         WaitingInputStreamConsumer consumer = new WaitingInputStreamConsumer(processHandler.getProcess().getInputStream(), log, false, processStarted,
-                processStartedOk);
+                processStartedOk, consoleView);
 
         final Thread t = new Thread(consumer);
         t.start();
 
-        InputStreamConsumer errorConsumer = new InputStreamConsumer(processHandler.getProcess().getErrorStream(), log, true);
+        InputStreamConsumer errorConsumer = new InputStreamConsumer(processHandler.getProcess().getErrorStream(), log, true, consoleView);
         final Thread t2 = new Thread(errorConsumer);
         t2.start();
 
@@ -406,16 +431,53 @@ public class SubstepsRunProfileState  extends CommandLineState {
 
 
 
-        ClassLoader cl = RootNode.class.getClassLoader();
-
 
         log.debug("preparing config");
 
         byte[] bytes = jmxClient.prepareExecutionConfigAsBytes(substepsExecutionConfig);
 
+        RootNode rn = getRootNodeFromBytes(bytes);
+
+        log.debug("got root node description: " + rn.getDescription());
+
+
+//        jmxClient.prepareExecutionConfig(substepsExecutionConfig);
+        log.debug("config prepared");
+
+
+        try {
+            log.debug("run!");
+
+            RootNode resultNode = getRootNodeFromBytes(jmxClient.runAsBytes());
+
+            log.debug("done run, shutting down!");
+        }
+        finally {
+            jmxClient.shutdown();
+            log.debug("shut down done!");
+
+        }
+
+        // TODO - how to get hold of the console to see if it the JMX server is open for business ?? or just connect anyway
+
+        // TODO - kick off the jmx client to talk to the server
+
+        // TODO - stop the server
+
+        DefaultExecutionResult execResult = new DefaultExecutionResult(consoleView, processHandler, createActions(consoleView, processHandler, executor));
+
+
+
+
+        log.debug("got result");
+
+        return execResult;
+    }
+
+    protected RootNode getRootNodeFromBytes(byte[] bytes) {
+        RootNode rn = null;
         ByteArrayInputStream bis = new ByteArrayInputStream(bytes);
         ObjectInputStream ois = null;
-        RootNode rn = null;
         try {
             ois = new ObjectInputStream(bis);
             rn = (RootNode)ois.readObject();
@@ -432,42 +494,11 @@ public class SubstepsRunProfileState  extends CommandLineState {
                 e.printStackTrace();
             }
         }
-
-        log.debug("got root node description: " + rn.getDescription());
-
-
-//        jmxClient.prepareExecutionConfig(substepsExecutionConfig);
-        log.debug("config prepared");
-
-
-        try {
-            log.debug("run!");
-
-            RootNode resultNode = jmxClient.run();
-
-            log.debug("done run, shutting down!");
-        }
-        finally {
-            jmxClient.shutdown();
-            log.debug("shut down done!");
-
-        }
-
-        // TODO - how to get hold of the console to see if it the JMX server is open for business ?? or just connect anyway
-
-        // TODO - kick off the jmx client to talk to the server
-
-        // TODO - stop the server
-
-        DefaultExecutionResult execResult = new DefaultExecutionResult(console, processHandler, createActions(console, processHandler, executor));
-
-
-
-
-        log.debug("got result");
-
-        return execResult;
+        return rn;
     }
+
+
+    ///// NEW stuff if we'er extending from Commandline state
 
     @NotNull
     @Override
@@ -562,88 +593,6 @@ public class SubstepsRunProfileState  extends CommandLineState {
         commandLine.getEnvironment().putAll(javaParameters.getEnv());
         commandLine.setPassParentEnvironment(javaParameters.isPassParentEnvs());
 
-//        final Class commandLineWrapper;
-//        if ((commandLineWrapper = getCommandLineWrapperClass()) != null) {
-//            if (forceDynamicClasspath) {
-//                File classpathFile = null;
-//                File vmParamsFile = null;
-//                if (!vmParametersList.hasParameter("-classpath") && !vmParametersList.hasParameter("-cp")) {
-//                    if (javaParameters.isDynamicVMOptions() && useDynamicVMOptions()) {
-//                        try {
-//                            vmParamsFile = FileUtil.createTempFile("vm_params", null);
-//                            final PrintWriter writer = new PrintWriter(vmParamsFile);
-//                            try {
-//                                for (String param : vmParametersList.getList()) {
-//                                    if (param.startsWith("-D")) {
-//                                        writer.println(param);
-//                                    }
-//                                }
-//                            }
-//                            finally {
-//                                writer.close();
-//                            }
-//                        }
-//                        catch (IOException e) {
-//                            LOG.error(e);
-//                        }
-//                        final List<String> list = vmParametersList.getList();
-//                        for (String param : list) {
-//                            if (!param.trim().startsWith("-D")) {
-//                                commandLine.addParameter(param);
-//                            }
-//                        }
-//                    }
-//                    else {
-//                        commandLine.addParameters(vmParametersList.getList());
-//                    }
-//                    try {
-//                        classpathFile = FileUtil.createTempFile("classpath", null);
-//                        final PrintWriter writer = new PrintWriter(classpathFile);
-//                        try {
-//                            for (String path : javaParameters.getClassPath().getPathList()) {
-//                                writer.println(path);
-//                            }
-//                        }
-//                        finally {
-//                            writer.close();
-//                        }
-//
-//                        String classpath = PathUtil.getJarPathForClass(commandLineWrapper);
-//                        final String utilRtPath = PathUtil.getJarPathForClass(StringUtilRt.class);
-//                        if (!classpath.equals(utilRtPath)) {
-//                            classpath += File.pathSeparator + utilRtPath;
-//                        }
-//                        final Class<UrlClassLoader> ourUrlClassLoader = UrlClassLoader.class;
-//                        if (ourUrlClassLoader.getName().equals(vmParametersList.getPropertyValue("java.system.class.loader"))) {
-//                            classpath += File.pathSeparator + PathUtil.getJarPathForClass(ourUrlClassLoader);
-//                            classpath += File.pathSeparator + PathUtil.getJarPathForClass(THashMap.class);
-//                        }
-//
-//                        commandLine.addParameter("-classpath");
-//                        commandLine.addParameter(classpath);
-//                    }
-//                    catch (IOException e) {
-//                        LOG.error(e);
-//                    }
-//                }
-//
-//                appendEncoding(javaParameters, commandLine, vmParametersList);
-//                if (classpathFile != null) {
-//                    commandLine.addParameter(commandLineWrapper.getName());
-//                    commandLine.addParameter(classpathFile.getAbsolutePath());
-//                }
-//
-//                if (vmParamsFile != null) {
-//                    commandLine.addParameter("@vm_params");
-//                    commandLine.addParameter(vmParamsFile.getAbsolutePath());
-//                }
-//            }
-//            else {
-//                appendParamsEncodingClasspath(javaParameters, commandLine, vmParametersList);
-//            }
-//        }
-//        else {
-//        }
 
         appendParamsEncodingClasspath(javaParameters, commandLine, vmParametersList);
 
@@ -661,6 +610,8 @@ public class SubstepsRunProfileState  extends CommandLineState {
         commandLine.addParameters(javaParameters.getProgramParametersList().getList());
 
         commandLine.withWorkDirectory(javaParameters.getWorkingDirectory());
+
+        log.debug("starting process with commandLine: " + commandLine.getCommandLineString());
 
         return commandLine;
     }

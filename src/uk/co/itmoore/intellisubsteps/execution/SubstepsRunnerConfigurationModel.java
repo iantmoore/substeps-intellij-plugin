@@ -27,6 +27,15 @@ public class SubstepsRunnerConfigurationModel {
 //    private List<String> classPathList;
     private String classPathString;
 
+    public String getWorkingDir() {
+        return workingDir;
+    }
+
+    public void setWorkingDir(String workingDir) {
+        this.workingDir = workingDir;
+    }
+
+    private String workingDir;
 
     private JavaParameters javaParameters;
     private Set<String> stepImplentationClassNames;
@@ -91,7 +100,7 @@ public class SubstepsRunnerConfigurationModel {
 
         javaParameters = new JavaParameters();
 //        javaParameters.setMainClass("com.technophobia.substeps.runner.MainExecutionNodeRunner");
-        javaParameters.setPassParentEnvs(false);
+//        javaParameters.setPassParentEnvs(false);
 
 
         javaParameters.setMainClass("com.technophobia.substeps.jmx.SubstepsJMXServer");

@@ -80,6 +80,8 @@ not sure where to hook into persisting or inflating state from...
 
 ## current
 
+# have a look at how the throwable is used in the result - could we build the stacktrace instead and pass that around.  make the throwable transient ?
+
 ## ->>>>>
 
 jmx server classpath:

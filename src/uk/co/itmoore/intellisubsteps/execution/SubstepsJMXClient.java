@@ -158,6 +158,12 @@ public class SubstepsJMXClient implements SubstepsRunner {
         return this.mbean.run();
     }
 
+    public byte[] runAsBytes() {
+
+        return this.mbean.runAsBytes();
+    }
+
+
     public void addNotifier(final IExecutionListener listener) {
 
         this.mbean.addNotifier(listener);
