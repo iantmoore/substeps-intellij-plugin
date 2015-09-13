@@ -51,45 +51,36 @@ public class SubstepsTestProxy extends AbstractTestProxy {
         name = rootNode.getDescription();
     }
 
-    public SubstepsTestProxy(FeatureNode featureNode, SubstepsTestProxy parent){
 
-        List<ScenarioNode<?>> scenarioNodes = featureNode.getChildren();
+    public SubstepsTestProxy  (NodeWithChildren nodeWithChildren, SubstepsTestProxy parent) {
+        List childNodes = nodeWithChildren.getChildren();
+
         this.parent = parent;
-        if (scenarioNodes != null){
+        if (childNodes != null){
             children = new ArrayList();
 
-            for (ScenarioNode scenarioNode : scenarioNodes){
+            for (Object executionNode : childNodes){
 
-                if (scenarioNode instanceof BasicScenarioNode) {
-
-                    children.add(new SubstepsTestProxy((BasicScenarioNode)scenarioNode, this));
+                if (NodeWithChildren.class.isAssignableFrom(executionNode.getClass())){
+                    children.add(new SubstepsTestProxy((NodeWithChildren)executionNode, this));
+                }
+                else {
+                    children.add(new SubstepsTestProxy((IExecutionNode)executionNode, this));
                 }
             }
         }
-        name = featureNode.getDescription();
-    }
-
-    public SubstepsTestProxy(BasicScenarioNode scenarioNode, SubstepsTestProxy parent ){
-
-        List<StepNode> stepNodes = scenarioNode.getChildren();
-        this.parent = parent;
-        if (stepNodes != null){
-            this.children = new ArrayList();
-
-            for (StepNode stepNode : stepNodes){
-                this.children.add(new SubstepsTestProxy(stepNode, this));
-            }
-        }
-        name = scenarioNode.getDescription();
+        name = nodeWithChildren.getDescription();
 
     }
 
-    public SubstepsTestProxy(StepNode stepNode, SubstepsTestProxy parent ){
+    public SubstepsTestProxy  (IExecutionNode leafNode, SubstepsTestProxy parent) {
+
         this.parent = parent;
         this.leaf = true;
+
         this.children = Collections.emptyList();
 
-        name = stepNode.getDescription();
+        name = leafNode.getDescription();
 
     }
 
