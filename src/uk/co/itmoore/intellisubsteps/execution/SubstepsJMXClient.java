@@ -1,5 +1,6 @@
 package uk.co.itmoore.intellisubsteps.execution;
 
+import com.technophobia.substeps.execution.ExecutionNodeResult;
 import com.technophobia.substeps.execution.node.FeatureNode;
 import com.technophobia.substeps.execution.node.RootNode;
 import com.technophobia.substeps.jmx.SubstepsServerMBean;
@@ -15,7 +16,9 @@ import javax.management.remote.JMXConnector;
 import javax.management.remote.JMXConnectorFactory;
 import javax.management.remote.JMXServiceURL;
 import javax.naming.ServiceUnavailableException;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.io.Serializable;
 import java.net.ConnectException;
 import java.util.Collections;
@@ -25,7 +28,7 @@ import java.util.Map;
 /**
  * Created by ian on 26/08/15.
  */
-public class SubstepsJMXClient implements SubstepsRunner {
+public class SubstepsJMXClient implements SubstepsRunner, NotificationListener {
 
     private static final Logger log = LogManager.getLogger(SubstepsJMXClient.class);
 
@@ -55,6 +58,8 @@ public class SubstepsJMXClient implements SubstepsRunner {
             this.mbean = MBeanServerInvocationHandler.newProxyInstance(mbsc, objectName, SubstepsServerMBean.class,
                     false);
 
+            mbsc.addNotificationListener(objectName, this, null, null);
+
         } catch (final IOException e) {
 
             log.error("IOException", e);
@@ -64,6 +69,10 @@ public class SubstepsJMXClient implements SubstepsRunner {
             log.error("MalformedObjectNameException", e);
 
             //throw new MojoExecutionException("Failed to connect to substeps server", e);
+        } catch (InstanceNotFoundException e) {
+            log.error("InstanceNotFoundException", e);
+
+
         }
     }
 
@@ -186,6 +195,37 @@ public class SubstepsJMXClient implements SubstepsRunner {
     }
 
 
+    @Override
+    public void handleNotification(Notification notification, Object handback) {
+
+        byte[] rawBytes = (byte[])notification.getUserData();
+
+        ExecutionNodeResult result = getFromBytes(rawBytes);
+
+        this.log.debug("received a JMX event msg: " + notification.getMessage() + " seq: " + notification.getSequenceNumber() + " exec result node id: " + result.getExecutionNodeId());
+    }
 
 
+    protected static <T> T getFromBytes(byte[] bytes) {
+        T rn = null;
+        ByteArrayInputStream bis = new ByteArrayInputStream(bytes);
+        ObjectInputStream ois = null;
+        try {
+            ois = new ObjectInputStream(bis);
+            rn = (T)ois.readObject();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        finally{
+            try {
+                bis.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        return rn;
+    }
 }

@@ -17,6 +17,10 @@ import java.util.regex.Pattern;
 
 public class SomeTests {
 
+    @Test
+    public void aLittleTest(){
+        System.out.println("a test");
+    }
 
     @Test
     public void testLoadOfSubstepsMetaInfo() throws Exception {

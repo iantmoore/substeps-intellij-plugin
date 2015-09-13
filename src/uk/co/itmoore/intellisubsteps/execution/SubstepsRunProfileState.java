@@ -21,19 +21,26 @@ import com.intellij.openapi.projectRoots.Sdk;
 import com.intellij.openapi.projectRoots.SdkTypeId;
 import com.intellij.openapi.projectRoots.impl.JavaSdkImpl;
 import com.intellij.openapi.util.Computable;
+import com.intellij.openapi.util.Disposer;
 import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.openapi.util.text.StringUtilRt;
 import com.intellij.openapi.vfs.encoding.EncodingManager;
 import com.intellij.util.PathUtil;
 import com.intellij.util.SystemProperties;
 import com.intellij.util.lang.UrlClassLoader;
+import com.technophobia.substeps.execution.node.IExecutionNode;
 import com.technophobia.substeps.execution.node.RootNode;
+import com.technophobia.substeps.runner.IExecutionListener;
 import com.technophobia.substeps.runner.SubstepsExecutionConfig;
 import gnu.trove.THashMap;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import uk.co.itmoore.intellisubsteps.SubstepLibraryManager;
+import uk.co.itmoore.intellisubsteps.ui.SubstepsConsoleProperties;
+import uk.co.itmoore.intellisubsteps.ui.SubstepsConsoleView;
+import uk.co.itmoore.intellisubsteps.ui.SubstepsRunningModel;
+import uk.co.itmoore.intellisubsteps.ui.SubstepsTestProxy;
 
 import java.io.*;
 import java.nio.charset.Charset;
@@ -60,6 +67,7 @@ public class SubstepsRunProfileState  extends CommandLineState {
 
         private final CountDownLatch processStarted;
         private final AtomicBoolean processStartedOk;
+        private boolean doChecks = true;
 
         public WaitingInputStreamConsumer(InputStream stderr, Logger logger, boolean isError,  final CountDownLatch processStarted,
                                    final AtomicBoolean processStartedOk, ConsoleView consoleView) {
@@ -72,12 +80,12 @@ public class SubstepsRunProfileState  extends CommandLineState {
 
         protected void checkLine(String line){
 
-            if (line.contains("awaiting the shutdown notification...")) {
+            if (doChecks && line.contains("awaiting the shutdown notification...")) {
                 this.logger.info("mbean server process started");
                 this.processStartedOk.set(true);
                 this.processStarted.countDown();
-
-            } else if (!this.processStartedOk.get()) {
+                doChecks = false;
+            } else if (doChecks &&  !this.processStartedOk.get()) {
                 this.logger.info("line received but this was not the correct line: " + line);
             }
 
@@ -160,6 +168,7 @@ public class SubstepsRunProfileState  extends CommandLineState {
                     // this off
                     // If the level of logging from the child process is verbose,
                     // change the logging level of the spawned process.
+
                     if (isError){
                         log.error("*\t" + line);
                     }
@@ -293,36 +302,23 @@ public class SubstepsRunProfileState  extends CommandLineState {
 
 
 
-    // TODO this is directly copied from CommandLineState (up the class hierarchy)
     @Override
     @NotNull
     public ExecutionResult execute(@NotNull final Executor executor, @NotNull final ProgramRunner runner) throws ExecutionException {
 
         log.debug("execute: about to call startProcess");
 
-
         OSProcessHandler processHandler = startProcess();
+
 
         ConsoleView consoleView = TextConsoleBuilderFactory.getInstance().createBuilder(this.getEnvironment().getProject()).getConsole();
         consoleView.attachToProcess(processHandler);
-
-        consoleView.print("Starting substeps test...", ConsoleViewContentType.NORMAL_OUTPUT);
-
-
-//        this.getJavaParameters().createOSProcessHandler();
-
-//        log.debug("about to call osprocessHandler start notify");
+      consoleView.print("Starting substeps test...", ConsoleViewContentType.NORMAL_OUTPUT);
 
 
-//        final OSProcessHandler processHandler = startProcess();
 
-//        final ConsoleView console = createConsole(executor);
-//        if (console != null) {
-//            console.attachToProcess(processHandler);
-//        }
-//        else {
-//            log.error("no console to attach to");
-//        }
+        SubstepsRunConfiguration runConfig = (SubstepsRunConfiguration)this.getEnvironment().getRunProfile();
+
 
 
         final CountDownLatch processStarted = new CountDownLatch(1);
@@ -367,24 +363,19 @@ public class SubstepsRunProfileState  extends CommandLineState {
         log.debug("startProcess called");
 
 
-        SubstepsRunConfiguration runConfig = (SubstepsRunConfiguration)this.getEnvironment().getRunProfile();
+      //  SubstepsRunConfiguration runConfig = (SubstepsRunConfiguration)this.getEnvironment().getRunProfile();
 
         SubstepsRunnerConfigurationModel model = runConfig.getModel();
 
 
-        // TODO
-
-        SubstepsJMXClient jmxClient = new SubstepsJMXClient();
+        final SubstepsJMXClient jmxClient = new SubstepsJMXClient();
         jmxClient.init(jmxPort);
 
         SubstepsExecutionConfig substepsExecutionConfig = new SubstepsExecutionConfig();
 
         substepsExecutionConfig.setFeatureFile(model.getPathToFeature());
 
-
-
         String[] stepImplsArray = model.getStepImplentationClassNames().toArray(new String[model.getStepImplentationClassNames().size()]);
-
 
         substepsExecutionConfig.setDescription("description");
 
@@ -401,32 +392,18 @@ public class SubstepsRunProfileState  extends CommandLineState {
         }
         /*
     private String description;
-
     private String tags;
-
     private String nonFatalTags;
-
-
     private String subStepsFileName;
-
     private boolean strict = true;
-
     private boolean fastFailParseErrors = true;
-
     private Properties systemProperties;
-
     private String[] nonStrictKeywordPrecedence;
-
     private String[] stepImplementationClassNames;
-
     private String[] initialisationClass;
-
     private List<Class<?>> stepImplementationClasses;
-
     private Class<?>[] initialisationClasses;
-
     private String[] executionListeners;
-
          */
 
 
@@ -441,40 +418,100 @@ public class SubstepsRunProfileState  extends CommandLineState {
         log.debug("got root node description: " + rn.getDescription());
 
 
-//        jmxClient.prepareExecutionConfig(substepsExecutionConfig);
+        // ******  new stuff for building the UI
+        final SubstepsTestProxy unboundOutputRoot = new SubstepsTestProxy(rn);
+
+        final SubstepsConsoleProperties consoleProperties = new SubstepsConsoleProperties(runConfig, executor);
+        final SubstepsConsoleView substepsConsoleView = new SubstepsConsoleView(consoleView, consoleProperties, this.getEnvironment(), unboundOutputRoot);
+
+
+        DefaultExecutionResult execResult = new DefaultExecutionResult(substepsConsoleView, processHandler,
+                createActions(substepsConsoleView, processHandler, executor));
+
+
+        Disposer.register(this.getEnvironment().getProject(), substepsConsoleView);
+        substepsConsoleView.initUI();
+        substepsConsoleView.attachToProcess(processHandler);
+        unboundOutputRoot.setPrinter(substepsConsoleView.getPrinter());
+        Disposer.register(substepsConsoleView, unboundOutputRoot);
+
+
+        // TODO the setting of this model causes issues!
+        SubstepsRunningModel runModel =  new SubstepsRunningModel(unboundOutputRoot, consoleProperties);
+        substepsConsoleView.attachToModel(runModel);
+
+
         log.debug("config prepared");
 
+        ActualRunner actualRunner = new ActualRunner(jmxClient, log);
 
-        try {
-            log.debug("run!");
-
-            RootNode resultNode = getRootNodeFromBytes(jmxClient.runAsBytes());
-
-            log.debug("done run, shutting down!");
-        }
-        finally {
-            jmxClient.shutdown();
-            log.debug("shut down done!");
-
-        }
-
-        // TODO - how to get hold of the console to see if it the JMX server is open for business ?? or just connect anyway
-
-        // TODO - kick off the jmx client to talk to the server
-
-        // TODO - stop the server
-
-        DefaultExecutionResult execResult = new DefaultExecutionResult(consoleView, processHandler, createActions(consoleView, processHandler, executor));
+        new Thread(actualRunner).start();
 
 
 
 
-        log.debug("got result");
+
+
 
         return execResult;
     }
 
-    protected RootNode getRootNodeFromBytes(byte[] bytes) {
+
+    private static class ActualRunner implements Runnable, Serializable {
+
+        private transient SubstepsJMXClient jmxClient;
+        private transient Logger log;
+
+        public ActualRunner(SubstepsJMXClient jmxClient, Logger log){
+            this.jmxClient = jmxClient;
+            this.log = log;
+
+//            this.jmxClient.addNotifier(this);
+        }
+
+
+        // TODO if we get updates, update the status of the proxy
+
+        @Override
+        public void run() {
+            try {
+                log.debug("run!");
+
+
+                RootNode resultNode = getRootNodeFromBytes(jmxClient.runAsBytes());
+
+                log.debug("done run, shutting down!");
+            }
+            finally {
+                jmxClient.shutdown();
+                log.debug("shut down done!");
+            }
+
+        }
+
+//        @Override
+//        public void onNodeFailed(IExecutionNode iExecutionNode, Throwable throwable) {
+//            log.debug("on node failed");
+//        }
+//
+//        @Override
+//        public void onNodeStarted(IExecutionNode iExecutionNode) {
+//            log.debug("on node started");
+//        }
+//
+//        @Override
+//        public void onNodeFinished(IExecutionNode iExecutionNode) {
+//            log.debug("on node finished");
+//        }
+//
+//        @Override
+//        public void onNodeIgnored(IExecutionNode iExecutionNode) {
+//            log.debug("on node ignored");
+//        }
+    }
+
+
+    protected static RootNode getRootNodeFromBytes(byte[] bytes) {
         RootNode rn = null;
         ByteArrayInputStream bis = new ByteArrayInputStream(bytes);
         ObjectInputStream ois = null;
