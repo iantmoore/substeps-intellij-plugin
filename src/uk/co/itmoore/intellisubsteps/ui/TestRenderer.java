@@ -28,17 +28,18 @@ import javax.swing.*;
 import java.util.Map;
 
 class TestRenderer {
-  private static final Map<Integer,Icon> ourIcons = new HashMap<Integer, Icon>();
+  private static final Map<SubstepTestState,Icon> ourIcons = new HashMap<SubstepTestState, Icon>();
 
   public static Icon getIconFor(final SubstepsTestProxy testProxy, final boolean isPaused) {
 
-    return AllIcons.RunConfigurations.Junit;
+    SubstepTestState state = testProxy.getState();
 
-//    final int magnitude = testProxy.getState().getMagnitude();
-//    if (magnitude == PoolOfTestStates.RUNNING_INDEX)
-//      return isPaused ? AllIcons.RunConfigurations.TestPaused : Animator.getCurrentFrame();
-//    else
-//      return ourIcons.get(new Integer(magnitude));
+    if (state == SubstepTestState.RUNNING){
+      return isPaused ? AllIcons.RunConfigurations.TestPaused : Animator.getCurrentFrame();
+    }
+    else {
+      return ourIcons.get(state);
+    }
   }
 
   private static SimpleTextAttributes getSpecialAttributes() {
@@ -46,19 +47,25 @@ class TestRenderer {
   }
 
   static {
-    mapIcon(PoolOfTestStates.SKIPPED_INDEX, PoolOfTestIcons.SKIPPED_ICON);
-    mapIcon(PoolOfTestStates.NOT_RUN_INDEX, PoolOfTestIcons.NOT_RAN);
-    mapIcon(PoolOfTestStates.PASSED_INDEX, PoolOfTestIcons.PASSED_ICON);
-    mapIcon(PoolOfTestStates.TERMINATED_INDEX, PoolOfTestIcons.TERMINATED_ICON);
-    mapIcon(PoolOfTestStates.FAILED_INDEX, PoolOfTestIcons.FAILED_ICON);
-    mapIcon(PoolOfTestStates.COMPARISON_FAILURE, PoolOfTestIcons.FAILED_ICON);
-    mapIcon(PoolOfTestStates.ERROR_INDEX, PoolOfTestIcons.ERROR_ICON);
-    mapIcon(PoolOfTestStates.IGNORED_INDEX, PoolOfTestIcons.IGNORED_ICON);
+
+//    ourIcons.put(SubstepTestState.RUNNING, // AllIcons.RunConfigurations.TestPaused : Animator.getCurrentFrame();
+    ourIcons.put(SubstepTestState.PASSED, PoolOfTestIcons.PASSED_ICON);
+    ourIcons.put(SubstepTestState.FAILED, PoolOfTestIcons.FAILED_ICON);
+    ourIcons.put(SubstepTestState.SKIPPED, PoolOfTestIcons.SKIPPED_ICON);
+
+    ourIcons.put(SubstepTestState.NOT_RUN, PoolOfTestIcons.NOT_RAN);
+
+
+//    mapIcon(PoolOfTestStates.SKIPPED_INDEX, PoolOfTestIcons.SKIPPED_ICON);
+//    mapIcon(PoolOfTestStates.NOT_RUN_INDEX, PoolOfTestIcons.NOT_RAN);
+//    mapIcon(PoolOfTestStates.PASSED_INDEX, PoolOfTestIcons.PASSED_ICON);
+//    mapIcon(PoolOfTestStates.TERMINATED_INDEX, PoolOfTestIcons.TERMINATED_ICON);
+//    mapIcon(PoolOfTestStates.FAILED_INDEX, PoolOfTestIcons.FAILED_ICON);
+//    mapIcon(PoolOfTestStates.COMPARISON_FAILURE, PoolOfTestIcons.FAILED_ICON);
+//    mapIcon(PoolOfTestStates.ERROR_INDEX, PoolOfTestIcons.ERROR_ICON);
+//    mapIcon(PoolOfTestStates.IGNORED_INDEX, PoolOfTestIcons.IGNORED_ICON);
   }
 
-  private static void mapIcon(final int index, final Icon icon) {
-    ourIcons.put(new Integer(index), icon);
-  }
 
   public static void renderTest(final SubstepsTestProxy test, final SimpleColoredComponent renderer) {
 

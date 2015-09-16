@@ -7,6 +7,7 @@ import com.intellij.ide.util.treeView.NodeDescriptor;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.jetbrains.annotations.Nullable;
+import uk.co.itmoore.intellisubsteps.ui.events.TestEvent;
 
 import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -26,33 +27,33 @@ public class SubstepsTestTreeBuilder extends AbstractTestTreeBuilder {
     private SubstepsRunningModel myModel;
 
 
-    // JunitAdapter implements junitlistner, something that listens for test events
-//    private final JUnitAdapter myListener = new JUnitAdapter() {
-//        private final Collection<SubstepsTestProxy> myNodesToUpdate = new HashSet<SubstepsTestProxy>();
-//
-//        public void onEventsDispatched(final List<TestEvent> events) {
-//            for (final TestEvent event : events) {
-//                final SubstepsTestProxy testSubtree = (SubstepsTestProxy)event.getTestSubtree();
-//                if (testSubtree != null) myNodesToUpdate.add(testSubtree);
-//            }
-//            updateTree();
-//        }
-//
-//        public void doDispose() {
-//            myModel = null;
-//            myNodesToUpdate.clear();
-//        }
-//
-//        private void updateTree() {
-//            SubstepsTestProxy parentToUpdate = null;
-//            for (final SubstepsTestProxy test : myNodesToUpdate) {
-//                parentToUpdate = test.getCommonAncestor(parentToUpdate);
-//                if (parentToUpdate.getParent() == null) break;
-//            }
-//            getUi().queueUpdate(parentToUpdate);
-//            myNodesToUpdate.clear();
-//        }
-//    };
+   //  JunitAdapter implements junitlistner, something that listens for test events
+    private final SubstepsAdapter myListener = new SubstepsAdapter() {
+        private final Collection<SubstepsTestProxy> myNodesToUpdate = new HashSet<SubstepsTestProxy>();
+
+        public void onEventsDispatched(final List<TestEvent> events) {
+            for (final TestEvent event : events) {
+                final SubstepsTestProxy testSubtree = (SubstepsTestProxy)event.getTestSubtree();
+                if (testSubtree != null) myNodesToUpdate.add(testSubtree);
+            }
+            updateTree();
+        }
+
+        public void doDispose() {
+            myModel = null;
+            myNodesToUpdate.clear();
+        }
+
+        private void updateTree() {
+            SubstepsTestProxy parentToUpdate = null;
+            for (final SubstepsTestProxy test : myNodesToUpdate) {
+                parentToUpdate = test.getCommonAncestor(parentToUpdate);
+                if (parentToUpdate.getParent() == null) break;
+            }
+            getUi().queueUpdate(parentToUpdate);
+            myNodesToUpdate.clear();
+        }
+    };
 
     public SubstepsTestTreeBuilder(final SubstepsTestTreeView tree, final SubstepsRunningModel model, final SubstepsConsoleProperties properties) {
         this(tree, new SubstepsTestTreeStructure(model.getRoot(), properties), model);
@@ -61,7 +62,7 @@ public class SubstepsTestTreeBuilder extends AbstractTestTreeBuilder {
     private SubstepsTestTreeBuilder(final JTree tree, final SubstepsTestTreeStructure treeStructure, final SubstepsRunningModel model) {
         treeStructure.setSpecialNode(new SpecialNode(this, model));
         myModel = model;
-//        myModel.addListener(myListener);
+        myModel.addListener(myListener);
         init(tree, new DefaultTreeModel(new DefaultMutableTreeNode(treeStructure.createDescriptor(model.getRoot(), null))), treeStructure,
                 IndexComparator.INSTANCE, true);
         initRootNode();

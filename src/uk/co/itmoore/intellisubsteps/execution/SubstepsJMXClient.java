@@ -19,8 +19,6 @@ import javax.naming.ServiceUnavailableException;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
-import java.io.Serializable;
-import java.net.ConnectException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -37,6 +35,12 @@ public class SubstepsJMXClient implements SubstepsRunner, NotificationListener {
 
     private JMXConnector cntor = null;
     private MBeanServerConnection mbsc = null;
+
+    public void setNotificiationHandler(ExecutionNodeResultNotificationHandler notificiationHandler) {
+        this.notificiationHandler = notificiationHandler;
+    }
+
+    private ExecutionNodeResultNotificationHandler notificiationHandler = null;
 
     public void init(final int portNumber) { //throws MojoExecutionException {
 
@@ -203,6 +207,9 @@ public class SubstepsJMXClient implements SubstepsRunner, NotificationListener {
         ExecutionNodeResult result = getFromBytes(rawBytes);
 
         this.log.debug("received a JMX event msg: " + notification.getMessage() + " seq: " + notification.getSequenceNumber() + " exec result node id: " + result.getExecutionNodeId());
+
+        notificiationHandler.handleNotification(result);
+
     }
 
 

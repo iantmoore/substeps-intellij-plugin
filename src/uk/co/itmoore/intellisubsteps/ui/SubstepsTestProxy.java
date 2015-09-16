@@ -22,6 +22,7 @@ import java.util.List;
  */
 public class SubstepsTestProxy extends AbstractTestProxy {
 
+    private final Long executionNodeId;
     List<SubstepsTestProxy> children;
     private boolean leaf = false;
     private String name;
@@ -32,11 +33,17 @@ public class SubstepsTestProxy extends AbstractTestProxy {
     private SubstepTestState state = SubstepTestState.NOT_RUN;
 
     private TestInfo myInfo;
+    private SubstepsListenersNotifier eventsConsumer;
 
     public SubstepsTestProxy(@NotNull final TestInfo info) {
         myInfo = info;
+        executionNodeId = -1L;
     }
 
+
+    public Long getExecutionNodeId() {
+        return executionNodeId;
+    }
 
     public SubstepsTestProxy(RootNode rootNode){
 
@@ -49,6 +56,7 @@ public class SubstepsTestProxy extends AbstractTestProxy {
             }
         }
         name = rootNode.getDescription();
+        executionNodeId = -1L;
     }
 
 
@@ -70,6 +78,7 @@ public class SubstepsTestProxy extends AbstractTestProxy {
             }
         }
         name = nodeWithChildren.getDescription();
+        this.executionNodeId = nodeWithChildren.getLongId();
 
     }
 
@@ -81,7 +90,7 @@ public class SubstepsTestProxy extends AbstractTestProxy {
         this.children = Collections.emptyList();
 
         name = leafNode.getDescription();
-
+        this.executionNodeId = leafNode.getLongId();
     }
 
 
@@ -218,5 +227,29 @@ public class SubstepsTestProxy extends AbstractTestProxy {
 
     public boolean hasChildren() {
         return getChildCount() > 0;
+    }
+
+    public void setEventsConsumer(SubstepsListenersNotifier eventsConsumer) {
+        this.eventsConsumer = eventsConsumer;
+    }
+
+    public SubstepsListenersNotifier getEventsConsumer() {
+        return eventsConsumer;
+    }
+
+
+    public SubstepsTestProxy getCommonAncestor(final SubstepsTestProxy test) {
+        if (test == null) return this;
+        if (test.isAncestorOf(this)) return test;
+        for (SubstepsTestProxy parent = this; parent != null; parent = parent.getParent())
+            if (parent.isAncestorOf(test)) return parent;
+        return null;
+    }
+
+    public boolean isAncestorOf(final SubstepsTestProxy test) {
+        if (test == null) return false;
+        for (SubstepsTestProxy parent = test; parent != null; parent = parent.getParent())
+            if (parent == this) return true;
+        return false;
     }
 }

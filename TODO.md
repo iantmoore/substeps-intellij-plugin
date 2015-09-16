@@ -119,8 +119,10 @@ http://examples.javacodegeeks.com/enterprise-java/jmx/send-notification-at-mbean
  
 # deadlock around the shutdown countdownlatch in the core SubstepsJMXServer - something to do with it being final and run again ? take out the while... ??
 
-# treeview - handling the updates from JMX and update the icons status etc..
 # expand the tree as the tests run with changing icons...
+
+
+
 
 
 # structure viewwer: 

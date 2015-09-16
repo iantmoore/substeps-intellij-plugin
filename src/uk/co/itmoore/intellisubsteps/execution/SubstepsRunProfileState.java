@@ -1,6 +1,8 @@
 package uk.co.itmoore.intellisubsteps.execution;
 
+import com.google.common.base.Strings;
 import com.intellij.execution.*;
+import com.intellij.execution.ExecutionResult;
 import com.intellij.execution.configurations.*;
 import com.intellij.execution.filters.TextConsoleBuilderFactory;
 import com.intellij.execution.process.OSProcessHandler;
@@ -28,6 +30,7 @@ import com.intellij.openapi.vfs.encoding.EncodingManager;
 import com.intellij.util.PathUtil;
 import com.intellij.util.SystemProperties;
 import com.intellij.util.lang.UrlClassLoader;
+import com.technophobia.substeps.execution.*;
 import com.technophobia.substeps.execution.node.IExecutionNode;
 import com.technophobia.substeps.execution.node.RootNode;
 import com.technophobia.substeps.runner.IExecutionListener;
@@ -37,17 +40,17 @@ import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import uk.co.itmoore.intellisubsteps.SubstepLibraryManager;
-import uk.co.itmoore.intellisubsteps.ui.SubstepsConsoleProperties;
-import uk.co.itmoore.intellisubsteps.ui.SubstepsConsoleView;
-import uk.co.itmoore.intellisubsteps.ui.SubstepsRunningModel;
-import uk.co.itmoore.intellisubsteps.ui.SubstepsTestProxy;
+import uk.co.itmoore.intellisubsteps.ui.*;
+import uk.co.itmoore.intellisubsteps.ui.events.StateChangedEvent;
 
 import java.io.*;
 import java.nio.charset.Charset;
 import java.nio.charset.IllegalCharsetNameException;
 import java.nio.charset.UnsupportedCharsetException;
 import java.rmi.RMISecurityManager;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -156,28 +159,55 @@ public class SubstepsRunProfileState  extends CommandLineState {
 
             String line = null;
             try {
-                this.isr = new InputStreamReader(this.stderr);
-                this.br = new BufferedReader(this.isr);
 
-                log.debug("awaiting input...");
 
-                while ((line = this.br.readLine()) != null) {
+                int c;
+                StringBuilder buf = new StringBuilder();
+                while ((c = this.stderr.read()) != -1){
 
-                    consoleView.print(line + "\n", ConsoleViewContentType.NORMAL_OUTPUT);
-                    // NB. this is not a logger as we don't want to be able to turn
-                    // this off
-                    // If the level of logging from the child process is verbose,
-                    // change the logging level of the spawned process.
+                    String s = String.valueOf((char) c);
+                    consoleView.print(s, ConsoleViewContentType.NORMAL_OUTPUT);
 
-                    if (isError){
-                        log.error("*\t" + line);
+                    if ((char)c == '\n'){
+                        line = buf.toString();
+                        buf = new StringBuilder();
+                        if (isError){
+                            log.error("*\t" + line);
+                        }
+                        else {
+                            log.debug("*\t" + line);
+                        }
+                        checkLine(line);
+
                     }
                     else {
-                        log.debug("*\t" + line);
+                        buf.append(s);
                     }
-                    checkLine(line);
-
                 }
+
+
+//                this.isr = new InputStreamReader(this.stderr);
+//                this.br = new BufferedReader(this.isr);
+//
+//                log.debug("awaiting input...");
+//
+//                while ((line = this.br.readLine()) != null) {
+//
+//                    consoleView.print(line + "\n", ConsoleViewContentType.NORMAL_OUTPUT);
+//                    // NB. this is not a logger as we don't want to be able to turn
+//                    // this off
+//                    // If the level of logging from the child process is verbose,
+//                    // change the logging level of the spawned process.
+//
+//                    if (isError){
+//                        log.error("*\t" + line);
+//                    }
+//                    else {
+//                        log.debug("*\t" + line);
+//                    }
+//                    checkLine(line);
+//
+//                }
             } catch (final IOException e) {
 
                 e.printStackTrace();
@@ -321,43 +351,52 @@ public class SubstepsRunProfileState  extends CommandLineState {
 
 
 
-        final CountDownLatch processStarted = new CountDownLatch(1);
-        final AtomicBoolean processStartedOk = new AtomicBoolean(false);
-
-        WaitingInputStreamConsumer consumer = new WaitingInputStreamConsumer(processHandler.getProcess().getInputStream(), log, false, processStarted,
-                processStartedOk, consoleView);
-
-        final Thread t = new Thread(consumer);
-        t.start();
-
-        InputStreamConsumer errorConsumer = new InputStreamConsumer(processHandler.getProcess().getErrorStream(), log, true, consoleView);
-        final Thread t2 = new Thread(errorConsumer);
-        t2.start();
-
-
-
+//        final CountDownLatch processStarted = new CountDownLatch(1);
+//        final AtomicBoolean processStartedOk = new AtomicBoolean(false);
+//
+//        WaitingInputStreamConsumer consumer = new WaitingInputStreamConsumer(processHandler.getProcess().getInputStream(), log, false, processStarted,
+//                processStartedOk, consoleView);
+//
+//        ApplicationManager.getApplication().invokeLater(consumer);
+//
+//
+////        final Thread t = new Thread(consumer);
+////        t.start();
+//
+//        InputStreamConsumer errorConsumer = new InputStreamConsumer(processHandler.getProcess().getErrorStream(), log, true, consoleView);
+//        ApplicationManager.getApplication().invokeLater(errorConsumer);
+////        final Thread t2 = new Thread(errorConsumer);
+////        t2.start();
+//
+//
+//
         processHandler.startNotify();
+//
+//
+//
+//        boolean exceptionThrown = false;
+//        try {
+//            this.log.info("waiting for process to start...");
+//            processStarted.await(30, TimeUnit.SECONDS);
+//
+//            this.log.info("waited..");
+//
+//            if (!processStartedOk.get()) {
+//                exceptionThrown = true;
+//                throw new ExecutionException("Unable to launch VM process");
+//            }
+//
+//            this.log.info("process started");
+//        } catch (final InterruptedException e) {
+//
+//            e.printStackTrace();
+//        }
 
-
-
-        boolean exceptionThrown = false;
         try {
-            this.log.info("waiting for process to start...");
-            processStarted.await(30, TimeUnit.SECONDS);
-
-            this.log.info("waited..");
-
-            if (!processStartedOk.get()) {
-                exceptionThrown = true;
-                throw new ExecutionException("Unable to launch VM process");
-            }
-
-            this.log.info("process started");
-        } catch (final InterruptedException e) {
-
+            Thread.currentThread().sleep(5000);
+        } catch (InterruptedException e) {
             e.printStackTrace();
         }
-
 
 
         log.debug("startProcess called");
@@ -377,7 +416,7 @@ public class SubstepsRunProfileState  extends CommandLineState {
 
         String[] stepImplsArray = model.getStepImplentationClassNames().toArray(new String[model.getStepImplentationClassNames().size()]);
 
-        substepsExecutionConfig.setDescription("description");
+        substepsExecutionConfig.setDescription("Substeps Tests");
 
         substepsExecutionConfig.setStepImplementationClassNames(stepImplsArray);
 
@@ -438,12 +477,21 @@ public class SubstepsRunProfileState  extends CommandLineState {
 
         // TODO the setting of this model causes issues!
         SubstepsRunningModel runModel =  new SubstepsRunningModel(unboundOutputRoot, consoleProperties);
+
+        SubstepsListenersNotifier eventsConsumer = unboundOutputRoot.getEventsConsumer();
+
         substepsConsoleView.attachToModel(runModel);
 
 
         log.debug("config prepared");
 
-        ActualRunner actualRunner = new ActualRunner(jmxClient, log);
+        List<SubstepsTestProxy> allTestNodes = unboundOutputRoot.getAllTests();
+        Map<Long, SubstepsTestProxy> proxyMap = new HashMap<>();
+        for (SubstepsTestProxy proxy : allTestNodes){
+            proxyMap.put(proxy.getExecutionNodeId(), proxy);
+        }
+
+        ActualRunner actualRunner = new ActualRunner(jmxClient, log, eventsConsumer, proxyMap);
 
         new Thread(actualRunner).start();
 
@@ -457,15 +505,19 @@ public class SubstepsRunProfileState  extends CommandLineState {
     }
 
 
-    private static class ActualRunner implements Runnable, Serializable {
+    private static class ActualRunner implements Runnable, Serializable, ExecutionNodeResultNotificationHandler {
 
         private transient SubstepsJMXClient jmxClient;
         private transient Logger log;
+        private final SubstepsListenersNotifier eventsConsumer;
+        private final  Map<Long, SubstepsTestProxy> proxyMap;
 
-        public ActualRunner(SubstepsJMXClient jmxClient, Logger log){
+        public ActualRunner(SubstepsJMXClient jmxClient, Logger log, SubstepsListenersNotifier eventsConsumer,  Map<Long, SubstepsTestProxy> proxyMap ){
             this.jmxClient = jmxClient;
+            this.jmxClient.setNotificiationHandler(this);
             this.log = log;
-
+            this.eventsConsumer = eventsConsumer;
+            this.proxyMap = proxyMap;
 //            this.jmxClient.addNotifier(this);
         }
 
@@ -489,25 +541,65 @@ public class SubstepsRunProfileState  extends CommandLineState {
 
         }
 
-//        @Override
-//        public void onNodeFailed(IExecutionNode iExecutionNode, Throwable throwable) {
-//            log.debug("on node failed");
-//        }
-//
-//        @Override
-//        public void onNodeStarted(IExecutionNode iExecutionNode) {
-//            log.debug("on node started");
-//        }
-//
-//        @Override
-//        public void onNodeFinished(IExecutionNode iExecutionNode) {
-//            log.debug("on node finished");
-//        }
-//
-//        @Override
-//        public void onNodeIgnored(IExecutionNode iExecutionNode) {
-//            log.debug("on node ignored");
-//        }
+        @Override
+        public void handleNotification(ExecutionNodeResult result) {
+            // convert to a SubstepsTestProxy and a TestEvent class
+
+            Long executionNodeId = Long.valueOf(result.getExecutionNodeId());
+
+            SubstepsTestProxy testProxy = proxyMap.get(executionNodeId);
+
+            log.debug("got notification: " + executionNodeId + " result: " + result.getResult());
+
+            switch (result.getResult()){
+
+                case FAILED : {
+                    testProxy.setState(SubstepTestState.FAILED);
+                    break;
+                }
+                case IGNORED:{
+                    testProxy.setState(SubstepTestState.SKIPPED);
+                    break;
+
+                }
+                case NOT_INCLUDED: {
+                    testProxy.setState(SubstepTestState.SKIPPED);
+                    break;
+                }
+                case NOT_RUN:{
+                    testProxy.setState(SubstepTestState.NOT_RUN);
+                    break;
+
+                }
+                case RUNNING:{
+                    testProxy.setState(SubstepTestState.RUNNING);
+                    break;
+
+                }
+                case PASSED:{
+                    testProxy.setState(SubstepTestState.PASSED);
+                    break;
+
+                }
+                case NON_CRITICAL_FAILURE:{
+                    testProxy.setState(SubstepTestState.FAILED);
+                    break;
+
+                }
+                case PARSE_FAILURE:{
+                    testProxy.setState(SubstepTestState.FAILED);
+                    break;
+
+                }
+                case SETUP_TEARDOWN_FAILURE:{
+                    testProxy.setState(SubstepTestState.FAILED);
+                    break;
+
+                }
+            }
+
+            eventsConsumer.onEvent(new StateChangedEvent(testProxy));
+        }
     }
 
 

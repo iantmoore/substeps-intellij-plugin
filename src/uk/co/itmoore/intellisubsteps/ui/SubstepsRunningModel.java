@@ -16,12 +16,7 @@
 
 package uk.co.itmoore.intellisubsteps.ui;
 
-//import com.intellij.execution.junit.JUnitConfiguration;
-//import com.intellij.execution.junit2.TestProxy;
-//import com.intellij.execution.junit2.ui.Animator;
-//import com.intellij.execution.junit2.ui.TestProgress;
-//import com.intellij.execution.junit2.ui.TestProxyClient;
-//import com.intellij.execution.junit2.ui.properties.JUnitConsoleProperties;
+
 import com.intellij.execution.testframework.*;
 import com.intellij.execution.testframework.ui.AbstractTestTreeBuilder;
 import com.intellij.openapi.Disposable;
@@ -42,8 +37,8 @@ import java.awt.event.FocusEvent;
 public class SubstepsRunningModel implements TestFrameworkRunningModel {
 
 //  private final TestProgress myProgress;
-//  private final JUnitListenersNotifier myNotifier = new JUnitListenersNotifier();
-//  private final Animator myAnimator;
+  private final SubstepsListenersNotifier myNotifier = new SubstepsListenersNotifier();
+  private final Animator myAnimator;
 
 
   private final SubstepsTestProxy myRoot;
@@ -60,16 +55,16 @@ public class SubstepsRunningModel implements TestFrameworkRunningModel {
   public SubstepsRunningModel(final SubstepsTestProxy root, final SubstepsConsoleProperties properties) {
     myRoot = root;
     myProperties = properties;
-//    myRoot.setEventsConsumer(myNotifier);
+    myRoot.setEventsConsumer(myNotifier);
 //    myProgress = new TestProgress(this);
 //    Disposer.register(this, myProgress);
     Disposer.register(this, myTreeListener);
-//    Disposer.register(this, new Disposable() {
-//      public void dispose() {
-//        myNotifier.fireDisposed(JUnitRunningModel.this);
-//      }
-//    });
-//    myAnimator = new Animator(this);
+    Disposer.register(this, new Disposable() {
+      public void dispose() {
+        myNotifier.fireDisposed(SubstepsRunningModel.this);
+      }
+    });
+      myAnimator = new Animator(this);
   }
 
   @Override
@@ -123,14 +118,14 @@ public class SubstepsRunningModel implements TestFrameworkRunningModel {
 
     public void valueChanged(final TreeSelectionEvent e) {
       final SubstepsTestProxy test = SubstepsTestProxy.from(e.getPath());
-//      myNotifier.fireTestSelected(test);
+      myNotifier.fireTestSelected(test);
     }
 
     public void focusGained(final FocusEvent e) {
       ApplicationManager.getApplication().invokeLater(new Runnable() {
         public void run() {
           if (!myTreeBuilder.isDisposed()) {
-//            myNotifier.fireTestSelected((TestProxy)getTreeView().getSelectedTest());
+            myNotifier.fireTestSelected((SubstepsTestProxy)getTreeView().getSelectedTest());
           }
         }
       });
@@ -152,7 +147,7 @@ public class SubstepsRunningModel implements TestFrameworkRunningModel {
   public void attachToTree(final SubstepsTestTreeView treeView) {
     myTreeBuilder = new SubstepsTestTreeBuilder(treeView, this, myProperties);
     Disposer.register(this, myTreeBuilder);
-  //  myAnimator.setModel(this);
+    myAnimator.setModel(this);
     myTreeView = treeView;
     selectTest(getRoot());
     myTreeListener.install();
@@ -166,6 +161,15 @@ public class SubstepsRunningModel implements TestFrameworkRunningModel {
 
   public JTree getTree() {
     return myTreeView;
+  }
+
+
+  public void addListener(final SubstepsListener listener) {
+    myNotifier.addListener(listener);
+  }
+
+  public void removeListener(final SubstepsListener listener) {
+    myNotifier.removeListener(listener);
   }
 
 }
@@ -227,13 +231,6 @@ public class SubstepsRunningModel implements TestFrameworkRunningModel {
     return (SubstepsTestTreeStructure)myTreeBuilder.getTreeStructure();
   }
 
-  public void addListener(final JUnitListener listener) {
-    myNotifier.addListener(listener);
-  }
-
-  public void removeListener(final JUnitListener listener) {
-    myNotifier.removeListener(listener);
-  }
 
   public void onUIBuilt() {
     //myNotifier.fireTestSelected(myRoot);
