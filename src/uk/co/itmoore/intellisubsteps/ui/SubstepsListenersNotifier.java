@@ -25,6 +25,8 @@ import org.jetbrains.annotations.NotNull;
 import uk.co.itmoore.intellisubsteps.ui.events.TestEvent;
 import uk.co.itmoore.intellisubsteps.ui.events.TestEventsConsumer;
 
+import javax.swing.*;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -32,7 +34,7 @@ import java.util.Set;
 
 public class SubstepsListenersNotifier implements TestEventsConsumer, DispatchListener, Runnable {
 
-  private static final Logger LOG = Logger.getInstance(SubstepsListenersNotifier.class);
+  private static final Logger logger = Logger.getInstance(SubstepsListenersNotifier.class);
 
   private final ArrayList<SubstepsListener> myListeners = new ArrayList<SubstepsListener>();
   private final ArrayList<TestEvent> myEventsQueue = new ArrayList<TestEvent>();
@@ -82,6 +84,9 @@ public class SubstepsListenersNotifier implements TestEventsConsumer, DispatchLi
 
   public void fireRunnerStateChanged(final StateEvent event) {
 //    if (!event.isRunning()) MEASURER.printAll();
+
+    logger.debug("fireRunnerStateChanged");
+
     final SubstepsListener[] listeners = getListeners();
     for (final SubstepsListener listener : listeners) {
       listener.onRunnerStateChanged(event);
@@ -115,24 +120,37 @@ public class SubstepsListenersNotifier implements TestEventsConsumer, DispatchLi
 
   public void onEvent(final TestEvent event) {
 
-    ApplicationManager.getApplication().invokeLater(new Runnable() {
-      public void run() {
+//    ApplicationManager.getApplication().in
 
-        if (myEventsQueue.isEmpty() && myDeferEvents) {
-          myAlarm.cancelAllRequests();
-          myAlarm.addRequest(this, 400);
+//    ApplicationManager.getApplication().invokeLater
+//    try {
+      ApplicationManager.getApplication().invokeAndWait(new Runnable() {
+        public void run() {
+
+          logger.debug("onEvent invoked and wait");
+
+          dispatchTestEvent(event);
+
+          if (myEventsQueue.isEmpty() && myDeferEvents) {
+            myAlarm.cancelAllRequests();
+            myAlarm.addRequest(this, 400);
+          }
+          myEventsQueue.add(event);
+
         }
-        myEventsQueue.add(event);
-
-      }
-    }, ModalityState.defaultModalityState());  // ModalityState.NON_MODAL tree is updated, but only updates when you click on it
+      }, ModalityState.defaultModalityState());  // ModalityState.NON_MODAL tree is updated, but only updates when you click on it
+//    } catch (InterruptedException e) {
+//      e.printStackTrace();
+//    } catch (InvocationTargetException e) {
+//      e.printStackTrace();
+//    }
 
 
   }
 
   public void onStarted() {
 
-    LOG.assertTrue(false == myCollectingEvents, "first time");
+    logger.assertTrue(false == myCollectingEvents, "first time");
 
 //    myCollectingEvents.assertValue(false);
     myCollectingEvents = true;
@@ -140,7 +158,7 @@ public class SubstepsListenersNotifier implements TestEventsConsumer, DispatchLi
 
   public void onFinished() {
 
-    LOG.assertTrue(true == myCollectingEvents, "first time");
+    logger.assertTrue(true == myCollectingEvents, "first time");
 
 
 //    myCollectingEvents.assertValue(true);
@@ -150,7 +168,8 @@ public class SubstepsListenersNotifier implements TestEventsConsumer, DispatchLi
   }
 
   public void run() {
-    LOG.assertTrue(false == myCollectingEvents, "first time");
+    logger.assertTrue(false == myCollectingEvents, "first time");
+    logger.debug("run");
 
 //    myCollectingEvents.assertValue(false);
     dispatchAllEvents();
@@ -158,6 +177,9 @@ public class SubstepsListenersNotifier implements TestEventsConsumer, DispatchLi
 
   private void dispatchAllEvents() {
     //long start = System.currentTimeMillis();
+
+    logger.debug("dispatchAllEvents");
+
     final List<TestEvent> filteredEvents = removeDuplicates(myEventsQueue);
     myEventsQueue.clear();
 //    MEASURER.start(DISPATCH_SINGLES);

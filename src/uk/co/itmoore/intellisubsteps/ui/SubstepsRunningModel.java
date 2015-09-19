@@ -36,7 +36,7 @@ import java.awt.event.FocusEvent;
 
 public class SubstepsRunningModel implements TestFrameworkRunningModel {
 
-//  private final TestProgress myProgress;
+  private final TestProgress myProgress;
   private final SubstepsListenersNotifier myNotifier = new SubstepsListenersNotifier();
   private final Animator myAnimator;
 
@@ -56,8 +56,8 @@ public class SubstepsRunningModel implements TestFrameworkRunningModel {
     myRoot = root;
     myProperties = properties;
     myRoot.setEventsConsumer(myNotifier);
-//    myProgress = new TestProgress(this);
-//    Disposer.register(this, myProgress);
+    myProgress = new TestProgress(this);
+    Disposer.register(this, myProgress);
     Disposer.register(this, myTreeListener);
     Disposer.register(this, new Disposable() {
       public void dispose() {
@@ -104,7 +104,8 @@ public class SubstepsRunningModel implements TestFrameworkRunningModel {
 
   @Override
   public void selectAndNotify(AbstractTestProxy testProxy) {
-
+    selectTest((SubstepsTestProxy)testProxy);
+    myNotifier.fireTestSelected((SubstepsTestProxy)testProxy);
   }
 
   @Override
@@ -112,6 +113,17 @@ public class SubstepsRunningModel implements TestFrameworkRunningModel {
 
   }
 
+  public Project getProject() {
+    return myProperties.getProject();
+  }
+
+  public TestProgress getProgress() {
+    return myProgress;
+  }
+
+  public void onUIBuilt() {
+
+  }
 
 
   private class MyTreeSelectionListener extends FocusAdapter implements TreeSelectionListener, Disposable {
@@ -159,6 +171,31 @@ public class SubstepsRunningModel implements TestFrameworkRunningModel {
     myTreeBuilder.select(test, null);
   }
 
+  public void expandTest(final SubstepsTestProxy test) {
+    if (test == null) return;
+
+    myTreeBuilder.expand(test, null);
+  }
+
+  public void collapse(final SubstepsTestProxy test) {
+    if (test == getRoot())
+      return;
+    final TreePath path = pathToTest(test, false);
+    if (path == null) return;
+    myTreeView.collapsePath(path);
+  }
+
+  private TreePath pathToTest(final SubstepsTestProxy test, final boolean expandIfCollapsed) {
+//    final TestTreeBuilder treeBuilder = getTreeBuilder();
+    DefaultMutableTreeNode node = myTreeBuilder.getNodeForElement(test);
+    if (node == null && !expandIfCollapsed)
+      return null;
+    node = myTreeBuilder.ensureTestVisible(test);
+    if (node == null)
+      return null;
+    return TreeUtil.getPath((TreeNode) myTreeView.getModel().getRoot(), node);
+  }
+
   public JTree getTree() {
     return myTreeView;
   }
@@ -179,42 +216,12 @@ public class SubstepsRunningModel implements TestFrameworkRunningModel {
 
 
 
-  public void dispose() {
-  }
-
-
-
-  public TestProgress getProgress() {
-    return myProgress;
-  }
-
-
-  public void selectAndNotify(final AbstractTestProxy testProxy) {
-    selectTest((TestProxy)testProxy);
-    myNotifier.fireTestSelected((TestProxy)testProxy);
-  }
-
-  public Project getProject() {
-    return myProperties.getProject();
-  }
 
 
 
 
-  public void expandTest(final TestProxy test) {
-    if (test == null) return;
-
-    myTreeBuilder.expand(test, null);
-  }
 
 
-  public void collapse(final TestProxy test) {
-    if (test == getRoot())
-      return;
-    final TreePath path = pathToTest(test, false);
-    if (path == null) return;
-    myTreeView.collapsePath(path);
-  }
 
   public JUnitListenersNotifier getNotifier() {
     return myNotifier;

@@ -102,31 +102,22 @@ eclipse plugin - get suggestions from jars
 look at TestObject in the JUNIT plugin
 
 
-** 11.09.2015 **
-- mbean emits notifications - listen and interpret! these are the state updates of the execution nodes..
-
-- have a look at junit and what it does around testproxy state, magnitude and firing events..
-
 
 
 http://examples.javacodegeeks.com/enterprise-java/jmx/send-notification-at-mbean-attribute-change/
 
 
-# RMI and exceptions
-- in the sample project have an unimplemented step - this throws an unimpl step exc. doesn't work over rmi - UndeclaredThrowableException
- - change code to not throw, but return something in the root node ?
  
  
 # deadlock around the shutdown countdownlatch in the core SubstepsJMXServer - something to do with it being final and run again ? take out the while... ??
 
-# expand the tree as the tests run with changing icons...
-
-
-
-
 
 # structure viewwer: 
 http://www.jetbrains.org/intellij/sdk/docs/tutorials/custom_language_support/structure_view_factory.html
+
+
+# running progress - report 61 out of 99 ??
+
 
 
 

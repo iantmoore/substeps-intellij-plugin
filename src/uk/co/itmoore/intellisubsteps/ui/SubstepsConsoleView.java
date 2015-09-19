@@ -62,9 +62,9 @@ public class SubstepsConsoleView implements ConsoleView, ObservableConsoleView, 
             myConsolePanel.getTreeView().attachToModel(model);
             model.attachToTree(myConsolePanel.getTreeView());
             myConsolePanel.setModel(model);
-//            model.onUIBuilt();
+            model.onUIBuilt();
 
-            //new TreeCollapser().setModel(model);
+            new TreeCollapser().setModel(model);
         }
     }
 

@@ -92,14 +92,14 @@ public class ConsolePanel extends TestResultsPanel {
         treeView.setLargeModel(true);
         setLeftComponent(treeView);
         myToolbarPanel.setModel(model);
-//        myStatusLine.setModel(model);
+        myStatusLine.setModel(model);
 //
-//        model.addListener(new JUnitAdapter() {
-//            @Override
-//            public void onTestSelected(final TestProxy test) {
-//                if (myPrinter != null) myPrinter.updateOnTestSelected(test);
-//            }
-//        });
+        model.addListener(new SubstepsAdapter() {
+            @Override
+            public void onTestSelected(final SubstepsTestProxy test) {
+                if (myPrinter != null) myPrinter.updateOnTestSelected(test);
+            }
+        });
 //        myStatisticsPanel.attachTo(model);
     }
 

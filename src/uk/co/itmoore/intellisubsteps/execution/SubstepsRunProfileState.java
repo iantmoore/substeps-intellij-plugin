@@ -41,6 +41,7 @@ import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import uk.co.itmoore.intellisubsteps.SubstepLibraryManager;
 import uk.co.itmoore.intellisubsteps.ui.*;
+import uk.co.itmoore.intellisubsteps.ui.actions.RunningTestTracker;
 import uk.co.itmoore.intellisubsteps.ui.events.StateChangedEvent;
 
 import java.io.*;
@@ -407,6 +408,7 @@ public class SubstepsRunProfileState  extends CommandLineState {
         SubstepsRunnerConfigurationModel model = runConfig.getModel();
 
 
+
         final SubstepsJMXClient jmxClient = new SubstepsJMXClient();
         jmxClient.init(jmxPort);
 
@@ -475,12 +477,14 @@ public class SubstepsRunProfileState  extends CommandLineState {
         Disposer.register(substepsConsoleView, unboundOutputRoot);
 
 
-        // TODO the setting of this model causes issues!
         SubstepsRunningModel runModel =  new SubstepsRunningModel(unboundOutputRoot, consoleProperties);
+
 
         SubstepsListenersNotifier eventsConsumer = unboundOutputRoot.getEventsConsumer();
 
         substepsConsoleView.attachToModel(runModel);
+
+        RunningTestTracker.install(runModel);
 
 
         log.debug("config prepared");
@@ -491,7 +495,7 @@ public class SubstepsRunProfileState  extends CommandLineState {
             proxyMap.put(proxy.getExecutionNodeId(), proxy);
         }
 
-        ActualRunner actualRunner = new ActualRunner(jmxClient, log, eventsConsumer, proxyMap);
+        ActualRunner actualRunner = new ActualRunner(jmxClient, log, eventsConsumer, proxyMap, unboundOutputRoot);
 
         new Thread(actualRunner).start();
 
@@ -511,26 +515,38 @@ public class SubstepsRunProfileState  extends CommandLineState {
         private transient Logger log;
         private final SubstepsListenersNotifier eventsConsumer;
         private final  Map<Long, SubstepsTestProxy> proxyMap;
+        private final SubstepsTestProxy root;
 
-        public ActualRunner(SubstepsJMXClient jmxClient, Logger log, SubstepsListenersNotifier eventsConsumer,  Map<Long, SubstepsTestProxy> proxyMap ){
+        public ActualRunner(SubstepsJMXClient jmxClient, Logger log, SubstepsListenersNotifier eventsConsumer,  Map<Long, SubstepsTestProxy> proxyMap, SubstepsTestProxy root ){
             this.jmxClient = jmxClient;
             this.jmxClient.setNotificiationHandler(this);
             this.log = log;
             this.eventsConsumer = eventsConsumer;
             this.proxyMap = proxyMap;
-//            this.jmxClient.addNotifier(this);
+            this.root = root;
+
         }
 
-
-        // TODO if we get updates, update the status of the proxy
 
         @Override
         public void run() {
             try {
                 log.debug("run!");
 
+                this.root.setState(SubstepTestState.RUNNING);
+                eventsConsumer.onEvent(new StateChangedEvent(this.root));
 
                 RootNode resultNode = getRootNodeFromBytes(jmxClient.runAsBytes());
+
+                if (resultNode.getResult().getResult() == com.technophobia.substeps.execution.ExecutionResult.PASSED){
+                    this.root.setState(SubstepTestState.PASSED);
+                }
+
+                else if (resultNode.getResult().getResult() == com.technophobia.substeps.execution.ExecutionResult.FAILED){
+                    this.root.setState(SubstepTestState.FAILED);
+                }
+                eventsConsumer.onEvent(new StateChangedEvent(this.root));
+
 
                 log.debug("done run, shutting down!");
             }

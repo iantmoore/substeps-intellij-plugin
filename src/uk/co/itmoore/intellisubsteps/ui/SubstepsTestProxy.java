@@ -47,6 +47,8 @@ public class SubstepsTestProxy extends AbstractTestProxy {
 
     public SubstepsTestProxy(RootNode rootNode){
 
+        myInfo = new RootTestInfo();
+
         List<FeatureNode> featureNodes = rootNode.getChildren();
         if (featureNodes != null){
             children = new ArrayList();
@@ -252,4 +254,10 @@ public class SubstepsTestProxy extends AbstractTestProxy {
             if (parent == this) return true;
         return false;
     }
+
+    public TestInfo getInfo() {
+        return myInfo;
+    }
+
+
 }
