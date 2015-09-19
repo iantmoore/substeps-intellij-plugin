@@ -16,6 +16,8 @@ import com.intellij.ide.HelpIdProvider;
 import com.intellij.openapi.Disposable;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.util.Disposer;
+import org.apache.log4j.LogManager;
+import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -26,6 +28,7 @@ import javax.swing.*;
  */
 public class SubstepsConsoleView implements ConsoleView, ObservableConsoleView, HelpIdProvider {
 
+    private static final Logger logger = LogManager.getLogger(SubstepsConsoleView.class);
 
     private ConsoleView myConsole;
     private TestsOutputConsolePrinter myPrinter;
@@ -94,6 +97,9 @@ public class SubstepsConsoleView implements ConsoleView, ObservableConsoleView, 
 
     @Override
     public void clear() {
+
+        logger.debug("** console cleared");
+
         myConsole.clear();
     }
 

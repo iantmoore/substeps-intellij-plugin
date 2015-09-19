@@ -118,6 +118,8 @@ http://www.jetbrains.org/intellij/sdk/docs/tutorials/custom_language_support/str
 
 # running progress - report 61 out of 99 ??
 
+# Console - break up so that when you select a test it moves the console to the appropriate place ?
+line 100 ConsolePanel - removed the listener that cleared stuff
 
 
 

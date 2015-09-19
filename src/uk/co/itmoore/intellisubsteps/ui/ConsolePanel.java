@@ -94,12 +94,19 @@ public class ConsolePanel extends TestResultsPanel {
         myToolbarPanel.setModel(model);
         myStatusLine.setModel(model);
 //
-        model.addListener(new SubstepsAdapter() {
-            @Override
-            public void onTestSelected(final SubstepsTestProxy test) {
-                if (myPrinter != null) myPrinter.updateOnTestSelected(test);
-            }
-        });
+
+
+        // adding this listener results in the console being cleared after every test
+//        model.addListener(new SubstepsAdapter() {
+//            @Override
+//            public void onTestSelected(final SubstepsTestProxy test) {
+//                if (myPrinter != null) myPrinter.updateOnTestSelected(test);
+//            }
+//        });
+
+
+
+
 //        myStatisticsPanel.attachTo(model);
     }
 
