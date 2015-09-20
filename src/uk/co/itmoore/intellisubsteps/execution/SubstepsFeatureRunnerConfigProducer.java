@@ -109,7 +109,9 @@ public class SubstepsFeatureRunnerConfigProducer extends RunConfigurationProduce
 
 
                 model.setWorkingDir(module.getModuleFile().getParent().getCanonicalPath());
-                model.setStepImplentationClassNames(stepImplClassNames);
+
+
+                model.setStepImplentationClassNames(stepImplClassNames.toArray(new String[stepImplClassNames.size()]));
 
                 model.setSubStepDefinitionDirectory(substepDefDirectory.iterator().next());
 

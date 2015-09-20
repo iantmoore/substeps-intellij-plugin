@@ -17,15 +17,15 @@ public class SubstepsRunnerConfigurationModel {
     private String pathToFeature;
     private String tags;
     private boolean strict = false;
-//    private Module module;
-
-
-
     private String homePath;
     private String versionString;
-//    private PathsList classPath;
-//    private List<String> classPathList;
     private String classPathString;
+    private String workingDir;
+    private JavaParameters javaParameters;
+    private String subStepDefinitionDirectory;
+
+    private String[] stepImplentationClassNames;
+
 
     public String getWorkingDir() {
         return workingDir;
@@ -34,12 +34,6 @@ public class SubstepsRunnerConfigurationModel {
     public void setWorkingDir(String workingDir) {
         this.workingDir = workingDir;
     }
-
-    private String workingDir;
-
-    private JavaParameters javaParameters;
-    private Set<String> stepImplentationClassNames;
-    private String subStepDefinitionDirectory;
 
     public void setHomePath(String homePath) {
         this.homePath = homePath;
@@ -121,14 +115,6 @@ public class SubstepsRunnerConfigurationModel {
         return versionString;
     }
 
-//    public List<String> getClassPathList() {
-//        return classPathList;
-//    }
-//
-//    public void setClassPathList(List<String> classPathList) {
-//        this.classPathList = classPathList;
-//    }
-
     public String getClassPathString() {
         return classPathString;
     }
@@ -137,11 +123,11 @@ public class SubstepsRunnerConfigurationModel {
         this.classPathString = classPathString;
     }
 
-    public void setStepImplentationClassNames(Set<String> stepImplentationClassNames) {
+    public void setStepImplentationClassNames(String[] stepImplentationClassNames) {
         this.stepImplentationClassNames = stepImplentationClassNames;
     }
 
-    public Set<String> getStepImplentationClassNames() {
+    public String[] getStepImplentationClassNames() {
         return stepImplentationClassNames;
     }
 
@@ -152,13 +138,4 @@ public class SubstepsRunnerConfigurationModel {
     public String getSubStepDefinitionDirectory() {
         return subStepDefinitionDirectory;
     }
-
-
-//    public Module getModule() {
-//        return module;
-//    }
-//
-//    public void setModule(Module module) {
-//        this.module = module;
-//    }
 }

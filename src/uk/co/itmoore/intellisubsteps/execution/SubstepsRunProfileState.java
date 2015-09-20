@@ -416,7 +416,7 @@ public class SubstepsRunProfileState  extends CommandLineState {
 
         substepsExecutionConfig.setFeatureFile(model.getPathToFeature());
 
-        String[] stepImplsArray = model.getStepImplentationClassNames().toArray(new String[model.getStepImplentationClassNames().size()]);
+        String[] stepImplsArray = model.getStepImplentationClassNames();//.toArray(new String[model.getStepImplentationClassNames().size()]);
 
         substepsExecutionConfig.setDescription("Substeps Tests");
 

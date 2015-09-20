@@ -71,9 +71,6 @@ http://www.jetbrains.org/intellij/sdk/docs/basics/run_configurations/run_configu
 
     
 
-- problem serializing collections - list of step impls classes.  single delimitted string ?
-
-- warning about module being serilaized multiple times
 
 # TODO
 
@@ -116,10 +113,19 @@ http://examples.javacodegeeks.com/enterprise-java/jmx/send-notification-at-mbean
 http://www.jetbrains.org/intellij/sdk/docs/tutorials/custom_language_support/structure_view_factory.html
 
 
+## TODO
 # running progress - report 61 out of 99 ??
+# what happens with a test failure
+
+
 
 # Console - break up so that when you select a test it moves the console to the appropriate place ?
 line 100 ConsolePanel - removed the listener that cleared stuff
+not sure where you'd sture that info - on the proxy ?  testinfo ?  junit seems to have a range of test infos, not completely sure what they all do..
+
+
+
+
 
 
 
