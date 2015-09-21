@@ -30,6 +30,7 @@ public class SubstepsJMXClient implements SubstepsRunner, NotificationListener {
 
     private static final Logger log = LogManager.getLogger(SubstepsJMXClient.class);
 
+    private static final int JMX_CLIENT_TIMEOUT_SECS = 10;
 
     private SubstepsServerMBean mbean;
 
@@ -85,7 +86,7 @@ public class SubstepsJMXClient implements SubstepsRunner, NotificationListener {
 
         JMXConnector connector = null;
 
-        long timeout = System.currentTimeMillis() + 5000;
+        long timeout = System.currentTimeMillis() + (JMX_CLIENT_TIMEOUT_SECS * 1000);
 
         while (connector == null && System.currentTimeMillis() < timeout ) {
 

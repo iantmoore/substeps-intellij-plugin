@@ -7,6 +7,7 @@ import com.technophobia.substeps.glossary.StepImplementationsDescriptor;
 import com.technophobia.substeps.glossary.XMLSubstepsGlossarySerializer;
 import org.junit.Assert;
 import org.junit.Test;
+import uk.co.itmoore.intellisubsteps.execution.SubstepsJMXClient;
 
 import javax.swing.*;
 import java.io.File;
@@ -19,6 +20,10 @@ public class SomeTests {
 
     @Test
     public void aLittleTest(){
+
+        final SubstepsJMXClient jmxClient = new SubstepsJMXClient();
+        jmxClient.init(45133);
+
         System.out.println("a test");
     }
 

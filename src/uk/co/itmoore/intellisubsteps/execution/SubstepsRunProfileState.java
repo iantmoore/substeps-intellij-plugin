@@ -393,11 +393,11 @@ public class SubstepsRunProfileState  extends CommandLineState {
 //            e.printStackTrace();
 //        }
 
-        try {
-            Thread.currentThread().sleep(5000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+//        try {
+//            Thread.currentThread().sleep(5000);
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
 
 
         log.debug("startProcess called");
