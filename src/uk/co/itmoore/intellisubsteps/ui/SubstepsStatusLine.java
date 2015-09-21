@@ -17,6 +17,8 @@ import com.intellij.execution.process.ProcessHandler;
 import com.intellij.execution.testframework.ui.TestStatusLine;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.progress.util.ColorProgressBar;
+import org.apache.log4j.LogManager;
+import org.apache.log4j.Logger;
 import uk.co.itmoore.intellisubsteps.ui.events.NewChildEvent;
 import uk.co.itmoore.intellisubsteps.ui.events.StateChangedEvent;
 import uk.co.itmoore.intellisubsteps.ui.events.TestEvent;
@@ -28,6 +30,9 @@ import javax.swing.*;
  * Created by ian on 06/09/15.
  */
 public class SubstepsStatusLine extends TestStatusLine {
+
+    private final Logger logger = LogManager.getLogger(SubstepsStatusLine.class);
+
 
     private final StateInfo myStateInfo = new StateInfo();
     private boolean myTestsBuilt = false;
@@ -60,6 +65,9 @@ public class SubstepsStatusLine extends TestStatusLine {
     }
 
     private static class StateInfo {
+
+        private final Logger logger = LogManager.getLogger(StateInfo.class);
+
         private int myTotal = 0;
         private int myCompleted = 0;
         private int myDefects = 0;
@@ -72,11 +80,15 @@ public class SubstepsStatusLine extends TestStatusLine {
         }
 
         public void updateCounters(final TestProgress progress) {
+
             myTotal = progress.getMaximum();
             myCompleted = progress.getValue();
             myDefects = progress.countDefects();
+
             final SubstepsTestProxy currentTest = progress.getCurrentTest();
             myCurrentTestName = currentTest == null ? "" : Formatters.printTest(currentTest);
+
+            logger.debug("updateCounters: total: " + myTotal + " complete: " + myCompleted + " Num defects: " + myDefects + " currentTest: " + myCurrentTestName);
         }
 
         public double getCompletedPercents() {
@@ -121,6 +133,10 @@ public class SubstepsStatusLine extends TestStatusLine {
     }
 
     private class TestProgressListener extends SubstepsAdapter {
+
+        private final Logger logger = LogManager.getLogger(TestProgressListener.class);
+
+
         private TestProgress myProgress;
 
         public TestProgressListener(final TestProgress progress) {
@@ -129,6 +145,9 @@ public class SubstepsStatusLine extends TestStatusLine {
 
         @Override
         public void onRunnerStateChanged(final StateEvent event) {
+
+            logger.debug("onRunnerStateChanged");
+
             if (!event.isRunning()) {
                 final CompletionEvent completionEvent = (CompletionEvent) event;
                 myStateInfo.setDone(completionEvent);
@@ -142,6 +161,9 @@ public class SubstepsStatusLine extends TestStatusLine {
 
         @Override
         public void onTestChanged(final TestEvent event) {
+
+            logger.debug("onTestChanged");
+
             if (event instanceof StateChangedEvent || event instanceof NewChildEvent)
                 updateCounters();
         }

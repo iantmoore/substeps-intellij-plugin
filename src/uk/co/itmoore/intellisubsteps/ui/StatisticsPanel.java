@@ -16,11 +16,6 @@
 
 package uk.co.itmoore.intellisubsteps.ui;
 
-//import com.intellij.execution.junit2.TestProxy;
-//import com.intellij.execution.junit2.events.TestEvent;
-//import com.intellij.execution.junit2.ui.actions.TestContext;
-//import com.intellij.execution.junit2.ui.model.JUnitAdapter;
-//import com.intellij.execution.junit2.ui.model.JUnitRunningModel;
 import com.intellij.execution.testframework.TestsUIUtil;
 import com.intellij.openapi.actionSystem.ActionPlaces;
 import com.intellij.openapi.actionSystem.DataProvider;
@@ -32,15 +27,16 @@ import com.intellij.ui.table.TableView;
 import com.intellij.util.EditSourceOnDoubleClickHandler;
 import com.intellij.util.config.Storage;
 import com.intellij.util.ui.ListTableModel;
+import uk.co.itmoore.intellisubsteps.ui.events.TestEvent;
 
 import javax.swing.*;
 import javax.swing.table.TableCellRenderer;
 import java.awt.*;
 
 class StatisticsPanel extends JPanel implements DataProvider{
-//  private final MyJUnitListener myListener = new MyJUnitListener();
-//  private TestProxy myCurrentTest = null;
- // private StatisticsTable myChildInfo = null;
+  private final MySubstepsListener myListener = new MySubstepsListener();
+  private SubstepsTestProxy myCurrentTest = null;
+//  private StatisticsTable myChildInfo = null;
 
 
 //  private TestCaseStatistics myTestCaseInfo = new TestCaseStatistics(TestColumnInfo.COLUMN_NAMES);
@@ -50,9 +46,10 @@ class StatisticsPanel extends JPanel implements DataProvider{
   private SimpleColoredComponent myTotalLabel;
   private SimpleColoredComponent myTimeLabel;
 
+
   public StatisticsPanel() {
     super(new BorderLayout(0, 0));
-   // myChildInfo = new StatisticsTable(TestColumnInfo.COLUMN_NAMES);
+//    myChildInfo = new StatisticsTable(TestColumnInfo.COLUMN_NAMES);
 //    myTable = new TableView(myChildInfo) {
 //      @Override
 //      public TableCellRenderer getCellRenderer(int row, int column) {
@@ -78,16 +75,16 @@ class StatisticsPanel extends JPanel implements DataProvider{
 
   private void updateStatistics() {
 //    myTable.setVisible(true);
-//    myTestCaseInfo.setVisible(false);
-//    TestProxy proxy = myCurrentTest != null ? myCurrentTest : myModel.getRoot();
-//    if (proxy.isLeaf() && proxy.getParent() != null) {
-//      proxy = proxy.getParent();
-//    }
+   // myTestCaseInfo.setVisible(false);
+    SubstepsTestProxy proxy = myCurrentTest != null ? myCurrentTest : myModel.getRoot();
+    if (proxy.isLeaf() && proxy.getParent() != null) {
+      proxy = proxy.getParent();
+    }
 //    myChildInfo.updateStatistics(proxy);
     myTotalLabel.clear();
-//    myTotalLabel.append(TestsUIUtil.getTestSummary(proxy), SimpleTextAttributes.REGULAR_BOLD_ATTRIBUTES);
-//    myTimeLabel.clear();
-//    myTimeLabel.append("Total time: " + Formatters.statisticsFor(proxy).getTime(), SimpleTextAttributes.REGULAR_BOLD_ATTRIBUTES);
+    myTotalLabel.append(TestsUIUtil.getTestSummary(proxy), SimpleTextAttributes.REGULAR_BOLD_ATTRIBUTES);
+    myTimeLabel.clear();
+    myTimeLabel.append("Total time: TODO", SimpleTextAttributes.REGULAR_BOLD_ATTRIBUTES);   ///  + Formatters.statisticsFor(proxy).getTime()
 //    final int idx = myChildInfo.getIndexOf(myCurrentTest);
 //    if (idx >= 0) TableUtil.selectRows(myTable, new int[]{myTable.convertRowIndexToView(idx)});
 //    TableUtil.scrollSelectionToVisible(myTable);
@@ -95,9 +92,9 @@ class StatisticsPanel extends JPanel implements DataProvider{
 
   public void attachTo(final SubstepsRunningModel model) {
     myModel = model;
-  //  myModel.addListener(myListener);
-  //  myChildInfo.setModel(model);
-   // BaseTableView.restore(myStorage, myTable);
+    myModel.addListener(myListener);
+//    myChildInfo.setModel(model);
+//    BaseTableView.restore(myStorage, myTable);
   }
 
   public Object getData(final String dataId) {
@@ -105,41 +102,41 @@ class StatisticsPanel extends JPanel implements DataProvider{
 
     return null;
 //    final int selectedRow = myTable.getSelectedRow();
-//    final TestProxy selectedTest = selectedRow == -1 ? null : myChildInfo.getTestAt(myTable.convertRowIndexToModel(selectedRow));
+//    final SubstepsTestProxy selectedTest = selectedRow == -1 ? null : myChildInfo.getTestAt(myTable.convertRowIndexToModel(selectedRow));
 //    if (TestContext.DATA_KEY.is(dataId)) {
 //      return new TestContext(myModel, selectedTest);
 //    }
 //    return TestsUIUtil.getData(selectedTest, dataId, myModel);
   }
 
-//  private class MyJUnitListener extends JUnitAdapter {
-//    public void onTestChanged(final TestEvent event) {
-//      if (!StatisticsPanel.this.isShowing()) return;
-//      final TestProxy source = event.getSource();
-//      if (myCurrentTest == source || myCurrentTest == null && source == myModel.getRoot()) {
-//        updateStatistics();
-//      }
-//    }
-//
-//    public void onTestSelected(final TestProxy test) {
-//      if (!StatisticsPanel.this.isShowing()) return;
-//      if (myCurrentTest == test)
-//        return;
-//      if (test == null) {
+  private class MySubstepsListener extends SubstepsAdapter {
+    public void onTestChanged(final TestEvent event) {
+      if (!StatisticsPanel.this.isShowing()) return;
+      final SubstepsTestProxy source = event.getSource();
+      if (myCurrentTest == source || myCurrentTest == null && source == myModel.getRoot()) {
+        updateStatistics();
+      }
+    }
+
+    public void onTestSelected(final SubstepsTestProxy test) {
+      if (!StatisticsPanel.this.isShowing()) return;
+      if (myCurrentTest == test)
+        return;
+      if (test == null) {
 //        myTable.setVisible(false);
-//        return;
-//      }
-//      myCurrentTest = test;
-//      updateStatistics();
-//    }
-//
-//
-//    public void doDispose() {
+        return;
+      }
+      myCurrentTest = test;
+      updateStatistics();
+    }
+
+
+    public void doDispose() {
 //      BaseTableView.store(myStorage, myTable);
-////      myTable.setModelAndUpdateColumns(new ListTableModel(TestColumnInfo.COLUMN_NAMES));
-//      myModel = null;
-////      myChildInfo = null;
-//      myCurrentTest = null;
-//    }
-//  }
+//      myTable.setModelAndUpdateColumns(new ListTableModel(TestColumnInfo.COLUMN_NAMES));
+      myModel = null;
+//      myChildInfo = null;
+      myCurrentTest = null;
+    }
+  }
 }

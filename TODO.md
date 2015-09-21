@@ -115,6 +115,12 @@ http://www.jetbrains.org/intellij/sdk/docs/tutorials/custom_language_support/str
 
 ## TODO
 # running progress - report 61 out of 99 ??
+TestProgress not being called - not registered as a listener correctly ?
+
+SubstepsStatusLine.TestProgressListener - extra logging onRunnerStateChanged onTestChanged ?  need to create some Stateevents too ?
+
+
+
 # what happens with a test failure
 
 
@@ -124,7 +130,7 @@ line 100 ConsolePanel - removed the listener that cleared stuff
 not sure where you'd sture that info - on the proxy ?  testinfo ?  junit seems to have a range of test infos, not completely sure what they all do..
 
 
-
+model.getRoot().getInfo().getTestsCount(); - this is the one returning 5
 
 
 

@@ -517,6 +517,8 @@ public class SubstepsRunProfileState  extends CommandLineState {
         private final  Map<Long, SubstepsTestProxy> proxyMap;
         private final SubstepsTestProxy root;
 
+        private final CountDownLatch countDownLatch = new CountDownLatch(1);
+
         public ActualRunner(SubstepsJMXClient jmxClient, Logger log, SubstepsListenersNotifier eventsConsumer,  Map<Long, SubstepsTestProxy> proxyMap, SubstepsTestProxy root ){
             this.jmxClient = jmxClient;
             this.jmxClient.setNotificiationHandler(this);
@@ -537,6 +539,15 @@ public class SubstepsRunProfileState  extends CommandLineState {
                 eventsConsumer.onEvent(new StateChangedEvent(this.root));
 
                 RootNode resultNode = getRootNodeFromBytes(jmxClient.runAsBytes());
+
+                // lets wait for any notifications
+                try {
+                    countDownLatch.await();
+                } catch (InterruptedException e) {
+                    if (countDownLatch.getCount() > 0) {
+                        log.error("premature interupted ex waiting for complete notification");
+                    }
+                }
 
                 if (resultNode.getResult().getResult() == com.technophobia.substeps.execution.ExecutionResult.PASSED){
                     this.root.setState(SubstepTestState.PASSED);
@@ -615,6 +626,11 @@ public class SubstepsRunProfileState  extends CommandLineState {
             }
 
             eventsConsumer.onEvent(new StateChangedEvent(testProxy));
+        }
+
+        @Override
+        public void handleCompleteMessage() {
+            countDownLatch.countDown();
         }
     }
 

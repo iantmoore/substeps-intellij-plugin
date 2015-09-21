@@ -20,7 +20,8 @@ import com.intellij.execution.testframework.AbstractTestProxy;
 import com.intellij.execution.testframework.Filter;
 import com.intellij.execution.testframework.TestsUIUtil;
 import com.intellij.openapi.Disposable;
-import com.intellij.openapi.diagnostic.Logger;
+import org.apache.log4j.LogManager;
+import org.apache.log4j.Logger;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NonNls;
 import uk.co.itmoore.intellisubsteps.ui.events.NewChildEvent;
@@ -30,7 +31,8 @@ import uk.co.itmoore.intellisubsteps.ui.events.TestEvent;
 import javax.swing.*;
 
 public class TestProgress extends DefaultBoundedRangeModel implements Disposable {
-  private static final Logger LOG = Logger.getInstance("#com.intellij.execution.junit2.ui.TestProgress");
+  private static final Logger LOG = LogManager.getLogger(TestProgress.class);
+
   private int myProblemsCounter = 0;
   private SubstepsTestProxy myCurrentState = null;
   private final MyJUnitListener myListener = new MyJUnitListener();
@@ -56,7 +58,7 @@ public class TestProgress extends DefaultBoundedRangeModel implements Disposable
     myMissingChildren = 0;
     myProject = model.getProject();
     final int knownTestCases = TEST_CASE.select(model.getRoot().getAllTests()).size();
-    final int declaredTestCases = model.getRoot().getInfo().getTestsCount();
+    final int declaredTestCases = model.getTestCount();// model.getRoot().getInfo().getTestsCount();
     if (declaredTestCases > knownTestCases)
       myMissingChildren = declaredTestCases - knownTestCases;
     setMaximum(knownTestCases + myMissingChildren);
@@ -98,8 +100,10 @@ public class TestProgress extends DefaultBoundedRangeModel implements Disposable
 
     public void onChanged(final StateChangedEvent event) {
       final SubstepsTestProxy test = event.getSource();
-      if (!test.isLeaf())
-        return;
+
+// take this out to progress the higher level substep constructs
+//      if (!test.isLeaf())
+//        return;
 
       SubstepTestState state = test.getState();
 //      final int stateMagnitude = ((SubstepTestState) state).getMagnitude();
@@ -136,6 +140,9 @@ public class TestProgress extends DefaultBoundedRangeModel implements Disposable
 
   @Override
   public void setValue(int n) {
+
+    LOG.debug("test progress set value: " + n);
+
     super.setValue(n);
     TestsUIUtil.showIconProgress(myProject, n, getMaximum(), myProblemsCounter);
   }

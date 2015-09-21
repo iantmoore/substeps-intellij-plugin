@@ -107,7 +107,7 @@ public class ConsolePanel extends TestResultsPanel {
 
 
 
-//        myStatisticsPanel.attachTo(model);
+        myStatisticsPanel.attachTo(model);
     }
 
     private void stopStartingProgress() {

@@ -202,14 +202,22 @@ public class SubstepsJMXClient implements SubstepsRunner, NotificationListener {
     @Override
     public void handleNotification(Notification notification, Object handback) {
 
-        byte[] rawBytes = (byte[])notification.getUserData();
 
-        ExecutionNodeResult result = getFromBytes(rawBytes);
+        if (notification.getType().compareTo("ExNode")==0) {
+            byte[] rawBytes = (byte[])notification.getUserData();
 
-        this.log.debug("received a JMX event msg: " + notification.getMessage() + " seq: " + notification.getSequenceNumber() + " exec result node id: " + result.getExecutionNodeId());
+            ExecutionNodeResult result = getFromBytes(rawBytes);
 
-        notificiationHandler.handleNotification(result);
+            this.log.debug("received a JMX event msg: " + notification.getMessage() + " seq: " + notification.getSequenceNumber() + " exec result node id: " + result.getExecutionNodeId());
 
+            notificiationHandler.handleNotification(result);
+        }
+        else if (notification.getType().compareTo("ExecConfigComplete")==0) {
+            notificiationHandler.handleCompleteMessage();
+        }
+        else {
+            log.error("unknown notificaion type");
+        }
     }
 
 

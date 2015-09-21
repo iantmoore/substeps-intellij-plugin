@@ -7,4 +7,5 @@ import com.technophobia.substeps.execution.ExecutionNodeResult;
  */
 public interface ExecutionNodeResultNotificationHandler {
     void handleNotification(ExecutionNodeResult result);
+    void handleCompleteMessage();
 }

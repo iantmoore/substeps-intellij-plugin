@@ -39,7 +39,7 @@ public class TreeCollapser extends SubstepsAdapter {
 
     final SubstepsTestProxy testProxy = event.getSource();
 
-    log.debug("onTestChanged: " + testProxy.getName() + " state: " + testProxy.getState());
+    log.debug("onTestChanged id: " + testProxy.getExecutionNodeId() + " name: " + testProxy.getName() + " state: " + testProxy.getState());
 
     if (!(event instanceof NewChildEvent))
       return;

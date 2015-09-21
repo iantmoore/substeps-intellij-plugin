@@ -125,6 +125,12 @@ public class SubstepsRunningModel implements TestFrameworkRunningModel {
 
   }
 
+  public int getTestCount() {
+
+    return getRoot().getInfo().getTestsCount() + 1; // +1 for the root
+
+  }
+
 
   private class MyTreeSelectionListener extends FocusAdapter implements TreeSelectionListener, Disposable {
 
