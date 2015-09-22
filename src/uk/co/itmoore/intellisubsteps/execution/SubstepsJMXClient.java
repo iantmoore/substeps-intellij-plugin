@@ -4,6 +4,7 @@ import com.technophobia.substeps.execution.ExecutionNodeResult;
 import com.technophobia.substeps.execution.node.FeatureNode;
 import com.technophobia.substeps.execution.node.RootNode;
 import com.technophobia.substeps.jmx.SubstepsServerMBean;
+import com.technophobia.substeps.model.exception.SubstepsConfigurationException;
 import com.technophobia.substeps.runner.IExecutionListener;
 import com.technophobia.substeps.runner.SubstepExecutionFailure;
 import com.technophobia.substeps.runner.SubstepsExecutionConfig;
@@ -123,10 +124,16 @@ public class SubstepsJMXClient implements SubstepsRunner, NotificationListener {
 
     public byte[] prepareExecutionConfigAsBytes(final SubstepsExecutionConfig cfg) {
 
-        return this.mbean.prepareExecutionConfigAsBytes(cfg);
-
+        try {
+            return this.mbean.prepareExecutionConfigAsBytes(cfg);
+        }
+        catch (SubstepsConfigurationException ex){
+            log.error("Failed to init tests: " + ex.getMessage());
+            return null;
+        }
     }
 
+    // TODO - only called in tests
     public RootNode prepareExecutionConfig(final SubstepsExecutionConfig cfg) {
 
         RootNode rn = new RootNode("dummy", Collections.<FeatureNode>emptyList());

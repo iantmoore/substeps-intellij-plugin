@@ -167,7 +167,7 @@ public class SubstepsRunProfileState  extends CommandLineState {
                 while ((c = this.stderr.read()) != -1){
 
                     String s = String.valueOf((char) c);
-                    consoleView.print(s, ConsoleViewContentType.NORMAL_OUTPUT);
+               //     consoleView.print(s, ConsoleViewContentType.NORMAL_OUTPUT);
 
                     if ((char)c == '\n'){
                         line = buf.toString();
@@ -354,23 +354,15 @@ public class SubstepsRunProfileState  extends CommandLineState {
 
 //        final CountDownLatch processStarted = new CountDownLatch(1);
 //        final AtomicBoolean processStartedOk = new AtomicBoolean(false);
-//
-//        WaitingInputStreamConsumer consumer = new WaitingInputStreamConsumer(processHandler.getProcess().getInputStream(), log, false, processStarted,
-//                processStartedOk, consoleView);
-//
-//        ApplicationManager.getApplication().invokeLater(consumer);
-//
-//
-////        final Thread t = new Thread(consumer);
-////        t.start();
+
+//        InputStreamConsumer consumer = new InputStreamConsumer(processHandler.getProcess().getInputStream(), log, false, consoleView);
+//        final Thread t = new Thread(consumer);
+//        t.start();
 //
 //        InputStreamConsumer errorConsumer = new InputStreamConsumer(processHandler.getProcess().getErrorStream(), log, true, consoleView);
-//        ApplicationManager.getApplication().invokeLater(errorConsumer);
-////        final Thread t2 = new Thread(errorConsumer);
-////        t2.start();
-//
-//
-//
+//        final Thread t2 = new Thread(errorConsumer);
+//        t2.start();
+
         processHandler.startNotify();
 //
 //
@@ -456,6 +448,7 @@ public class SubstepsRunProfileState  extends CommandLineState {
 
         RootNode rn = getRootNodeFromBytes(bytes);
 
+
         log.debug("got root node description: " + rn.getDescription());
 
 
@@ -468,6 +461,9 @@ public class SubstepsRunProfileState  extends CommandLineState {
 
         DefaultExecutionResult execResult = new DefaultExecutionResult(substepsConsoleView, processHandler,
                 createActions(substepsConsoleView, processHandler, executor));
+
+
+
 
 
         Disposer.register(this.getEnvironment().getProject(), substepsConsoleView);
@@ -487,23 +483,33 @@ public class SubstepsRunProfileState  extends CommandLineState {
         RunningTestTracker.install(runModel);
 
 
-        log.debug("config prepared");
+        log.debug("rootNode result from prepare config: " + rn.getResult().getResult());
 
-        List<SubstepsTestProxy> allTestNodes = unboundOutputRoot.getAllTests();
-        Map<Long, SubstepsTestProxy> proxyMap = new HashMap<>();
-        for (SubstepsTestProxy proxy : allTestNodes){
-            proxyMap.put(proxy.getExecutionNodeId(), proxy);
+
+        if(rn.getResult().getResult().isFailure()){
+
+            // bail out early
+            unboundOutputRoot.setState(SubstepTestState.FAILED);
+            eventsConsumer.onEvent(new StateChangedEvent(unboundOutputRoot));
+
+
+            jmxClient.shutdown();
+            log.debug("shut down done!");
+
         }
+        else {
+            log.debug("config prepared");
 
-        ActualRunner actualRunner = new ActualRunner(jmxClient, log, eventsConsumer, proxyMap, unboundOutputRoot);
+            List<SubstepsTestProxy> allTestNodes = unboundOutputRoot.getAllTests();
+            Map<Long, SubstepsTestProxy> proxyMap = new HashMap<>();
+            for (SubstepsTestProxy proxy : allTestNodes){
+                proxyMap.put(proxy.getExecutionNodeId(), proxy);
+            }
 
-        new Thread(actualRunner).start();
+            ActualRunner actualRunner = new ActualRunner(jmxClient, log, eventsConsumer, proxyMap, unboundOutputRoot);
 
-
-
-
-
-
+            new Thread(actualRunner).start();
+        }
 
         return execResult;
     }
