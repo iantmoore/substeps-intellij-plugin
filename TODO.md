@@ -16,7 +16,9 @@
 
 
 
-# syntax highlighting - show steps that aren't implemented
+# syntax highlighting - show steps that aren't implemented ( w. Alt-enter - create definition)
+                      - show steps that aren't used!
+
 
 # finish off feature parsing
 
@@ -24,8 +26,7 @@
 # resolving lax definitions - given/when/ then gubbins
 
 
-# highlight missing step impls
-# Alt-enter - create definition
+
 
 
 # changing branches causes mayhem!
@@ -104,9 +105,6 @@ look at TestObject in the JUNIT plugin
 http://examples.javacodegeeks.com/enterprise-java/jmx/send-notification-at-mbean-attribute-change/
 
 
- 
- 
-# deadlock around the shutdown countdownlatch in the core SubstepsJMXServer - something to do with it being final and run again ? take out the while... ??
 
 
 # structure viewwer: 
@@ -115,8 +113,6 @@ http://www.jetbrains.org/intellij/sdk/docs/tutorials/custom_language_support/str
 
 ## TODO
 
-
-# what happens with a test failure
 
 
 

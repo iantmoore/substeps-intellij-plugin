@@ -127,7 +127,7 @@ public class SubstepsRunningModel implements TestFrameworkRunningModel {
 
   public int getTestCount() {
 
-    return getRoot().getInfo().getTestsCount() + 1; // +1 for the root
+    return getRoot().getInfo().getTestsCount() ; // +1 for the root
 
   }
 

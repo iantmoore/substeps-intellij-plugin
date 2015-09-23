@@ -2,15 +2,6 @@ package uk.co.itmoore.intellisubsteps.ui;
 
 import com.intellij.execution.ExecutionBundle;
 
-//import com.intellij.execution.junit2.TestProxy;
-//import com.intellij.execution.junit2.events.NewChildEvent;
-//import com.intellij.execution.junit2.events.StateChangedEvent;
-//import com.intellij.execution.junit2.events.TestEvent;
-//import com.intellij.execution.junit2.ui.model.CompletionEvent;
-//import com.intellij.execution.junit2.ui.model.JUnitAdapter;
-//import com.intellij.execution.junit2.ui.model.JUnitRunningModel;
-//import com.intellij.execution.junit2.ui.model.StateEvent;
-
 import com.intellij.execution.process.ProcessAdapter;
 import com.intellij.execution.process.ProcessEvent;
 import com.intellij.execution.process.ProcessHandler;

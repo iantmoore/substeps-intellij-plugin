@@ -64,21 +64,30 @@ public class SubstepsJMXClient implements SubstepsRunner, NotificationListener {
             this.mbean = MBeanServerInvocationHandler.newProxyInstance(mbsc, objectName, SubstepsServerMBean.class,
                     false);
 
-            mbsc.addNotificationListener(objectName, this, null, null);
+            addNotificationListener(objectName);
 
         } catch (final IOException e) {
 
             log.error("IOException", e);
-            // TODO
-            // throw new MojoExecutionException("Failed to connect to substeps server", e);
         } catch (final MalformedObjectNameException e) {
             log.error("MalformedObjectNameException", e);
+        }
+    }
 
-            //throw new MojoExecutionException("Failed to connect to substeps server", e);
-        } catch (InstanceNotFoundException e) {
-            log.error("InstanceNotFoundException", e);
+    protected void addNotificationListener(ObjectName objectName) throws IOException {
 
+        boolean added = false;
+        int tries = 0;
 
+        while (!added || tries < 3){
+
+            try {
+                tries++;
+                mbsc.addNotificationListener(objectName, this, null, null);
+                added = true;
+            } catch (InstanceNotFoundException e) {
+                log.debug("adding notification InstanceNotFoundException");
+            }
         }
     }
 
