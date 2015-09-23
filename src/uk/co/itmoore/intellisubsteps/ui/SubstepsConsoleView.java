@@ -32,7 +32,6 @@ public class SubstepsConsoleView implements ConsoleView, ObservableConsoleView, 
 
     private ConsoleView myConsole;
     private TestsOutputConsolePrinter myPrinter;
-//    protected TestConsoleProperties myProperties;
     protected TestResultsPanel myTestResultsPanel;
 
     private ConsolePanel myConsolePanel;
@@ -47,10 +46,6 @@ public class SubstepsConsoleView implements ConsoleView, ObservableConsoleView, 
         myEnvironment = environment;
 
         this.myConsole = myConsole;
-//        myConsole = new TestsConsoleBuilderImpl(properties.getProject(),
-//                myProperties.getScope(),
-//                !properties.isEditable(),
-//                properties.isUsePredefinedMessageFilter()).getConsole();
         myPrinter = new TestsOutputConsolePrinter(this, properties, unboundOutputRoot);
         myProperties.setConsole(this);
 
@@ -98,8 +93,6 @@ public class SubstepsConsoleView implements ConsoleView, ObservableConsoleView, 
     @Override
     public void clear() {
 
-        logger.debug("** console cleared");
-
         myConsole.clear();
     }
 
@@ -117,7 +110,6 @@ public class SubstepsConsoleView implements ConsoleView, ObservableConsoleView, 
 
     @Override
     public boolean isOutputPaused() {
-        //noinspection SimplifiableConditionalExpression
         return myPrinter == null ? true : myPrinter.isPaused();
     }
 
@@ -206,14 +198,6 @@ public class SubstepsConsoleView implements ConsoleView, ObservableConsoleView, 
 
 
 
-
-
-
-
-
-
-
-
     protected TestResultsPanel createTestResultsPanel() {
         myConsolePanel = new ConsolePanel(getConsole().getComponent(), getPrinter(), myProperties, myEnvironment,
                 getConsole().createConsoleActions());
@@ -222,7 +206,6 @@ public class SubstepsConsoleView implements ConsoleView, ObservableConsoleView, 
 
     @Override
     public void attachToProcess(final ProcessHandler processHandler) {
-//        myConsole.attachToProcess(processHandler);
         myConsolePanel.onProcessStarted(processHandler);
     }
 

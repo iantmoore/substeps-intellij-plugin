@@ -3,18 +3,28 @@
 <idea-plugin version="2">
   <id>uk.co.itmoore.intellisubsteps</id>
   <name>Substeps IntelliJ Plugin</name>
-  <version>0.0.8-SNAPSHOT</version>
+  <version>0.0.8</version>
   <vendor email="ian@itmoore.co.uk" url="n/a">Substeps</vendor>
 
   <description><![CDATA[
-      A plugin to help compose Substep features and substeps
+      <h2>A plugin to help write and execute Substep features and compose substeps</h2>
+
+      Inspired heavily by the <a href="https://github.com/JetBrains/intellij-community/tree/master/plugins/junit">IntelliJ Junit plugin</a> much of the code here is based on that and adapted for substeps.
+
     ]]></description>
+
 
     <!--      Enter short description for your plugin here.<br>
       <em>most HTML tags may be used</em> -->
 
 
   <change-notes><![CDATA[
+
+    <h3>0.0.8</h3>
+    <ul>
+        <li>Run features</li>
+    </ul>
+
 
     <h3>0.0.7</h3>
     <ul>

@@ -26,8 +26,6 @@ public class SubstepsTestTreeBuilder extends AbstractTestTreeBuilder {
 
     private SubstepsRunningModel myModel;
 
-
-   //  JunitAdapter implements junitlistner, something that listens for test events
     private final SubstepsAdapter myListener = new SubstepsAdapter() {
         private final Collection<SubstepsTestProxy> myNodesToUpdate = new HashSet<SubstepsTestProxy>();
 
