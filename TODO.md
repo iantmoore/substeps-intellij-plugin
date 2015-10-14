@@ -26,7 +26,7 @@
 # resolving lax definitions - given/when/ then gubbins
 
 
-
+##  HOW TO MAKE SURE THE SERVER IS ALWAYS STOPPED !!
 
 
 # changing branches causes mayhem!
