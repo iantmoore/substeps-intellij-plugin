@@ -3,10 +3,7 @@ package uk.co.itmoore.intellisubsteps.psi.feature.impl;
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.util.PsiTreeUtil;
 import org.jetbrains.annotations.NotNull;
-import uk.co.itmoore.intellisubsteps.psi.feature.FeatureTokenTypes;
-import uk.co.itmoore.intellisubsteps.psi.feature.Step;
-import uk.co.itmoore.intellisubsteps.psi.feature.StepsHolder;
-import uk.co.itmoore.intellisubsteps.psi.feature.Tag;
+import uk.co.itmoore.intellisubsteps.psi.feature.*;
 
 /**
  * Created by ian on 25/07/15.
@@ -15,7 +12,6 @@ public abstract class StepsHolderImpl extends FeaturePsiElementBase implements S
     public StepsHolderImpl(@NotNull ASTNode node) {
         super(node);
     }
-
 
 
 

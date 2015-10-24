@@ -146,22 +146,11 @@ public class FeatureLexer extends LexerBase {
             previousPosition = myPosition;
         }
 
-//        positionHistory.add(Integer.valueOf(myPosition));
-//
-//        log.debug("positionHistory: " +             StringUtils.join(positionHistory, ",")        );
-
-//        if (myPosition!= -1 && myPosition == previousPosition){
-//
-//            log.warn("myPosition same as previousPosition, bailing out to the end..");
-//            myPosition = myEndOffset;
-//        }
-
 
         if (myPosition >= myEndOffset) {
             myCurrentToken = null;
             return;
         }
-//        previousPosition = myPosition;
 
         myCurrentTokenStart = myPosition;
         char c = myBuffer.charAt(myPosition);
@@ -203,7 +192,6 @@ public class FeatureLexer extends LexerBase {
             log.debug("current state = " + myState + " myPosition: " + myPosition + " myEndOffset: " +  myEndOffset);
 
 
-
             if (myState == FeatureLexerState.STATE_DEFAULT || myState == FeatureLexerState.STATE_AFTER_FEATURE_NAME) {
 
                 for (String keyword : myKeywords) {
@@ -225,82 +213,82 @@ public class FeatureLexer extends LexerBase {
                 log.debug("in default state, falling through..");
             }
 
-            if(myState == FeatureLexerState.STATE_AFTER_EXAMPLES_KEYWORD){
-                advanceToEOL();
-                return;
-            }
 
-            if(myState == FeatureLexerState.STATE_AFTER_FEATURE_KEYWORD){
-                myCurrentToken = FeatureElementTypes.FEATURE_NAME_ELEMENT_TYPE;
-                advanceToEOL();
-                myState = FeatureLexerState.STATE_AFTER_FEATURE_NAME;
-                return;
-            }
+            if (myState == FeatureLexerState.STATE_IN_TABLE_HEADER_ROW || myState == FeatureLexerState.STATE_IN_TABLE_VALUE_ROWS ) {
 
-            if(myState == FeatureLexerState.STATE_AFTER_FEATURE_NAME){
-                myCurrentToken = FeatureElementTypes.FEATURE_DESCRIPTION_ELEMENT_TYPE;
-                advanceToEOL();
-                myState = FeatureLexerState.STATE_AFTER_FEATURE_NAME;
-                return;
-            }
+                if (myState == FeatureLexerState.STATE_IN_TABLE_HEADER_ROW) {
 
-            if (myState == FeatureLexerState.STATE_AFTER_BACKGROUND_KEYWORD
-                    || myState == FeatureLexerState.STATE_IN_BACKGROUND_STEPS){
-                myCurrentToken = FeatureElementTypes.BACKGROUND_STEP_ELEMENT_TYPE;
-                advanceToEOL();
-                myState = FeatureLexerState.STATE_IN_BACKGROUND_STEPS;
-                return;
-            }
+                    myCurrentToken = FeatureElementTypes.TABLE_HEADER_VALUE;
+                    //advanceToTableCellBoundary();
+                    //return;
+                } else if (myState == FeatureLexerState.STATE_IN_TABLE_VALUE_ROWS) {
 
-            if (myState == FeatureLexerState.STATE_AFTER_SCENARIO_KEYWORD){
-                myCurrentToken = FeatureElementTypes.SCENARIO_NAME_ELEMENT_TYPE;
-                advanceToEOL();
-                myState = FeatureLexerState.STATE_AFTER_SCENARIO_NAME;
-                return;
-
-            }
-
-            if (myState == FeatureLexerState.STATE_AFTER_SCENARIO_NAME
-                    || myState == FeatureLexerState.STATE_IN_SCENARIO_STEPS){
-                myCurrentToken = FeatureElementTypes.STEP_ELEMENT_TYPE;
-                advanceToEOL();
-                myState = FeatureLexerState.STATE_IN_SCENARIO_STEPS;
-                return;
-            }
-            if (myState == FeatureLexerState.STATE_AFTER_TAGS_KEYWORD){
-                myCurrentToken = FeatureElementTypes.TAG_ELEMENT_TYPE;
-                advanceToEOL();
-                myState = FeatureLexerState.STATE_DEFAULT;
-                return;
-            }
-            if (myState == FeatureLexerState.STATE_AFTER_SCENARIO_OUTLINE_KEYWORD){
-                myCurrentToken = FeatureElementTypes.SCENARIO_OUTLINE_NAME_ELEMENT_TYPE;
-                advanceToEOL();
-                myState = FeatureLexerState.STATE_AFTER_SCENARIO_OUTLINE_NAME;
-
-                return;
-            }
-
-            if (myState == FeatureLexerState.STATE_AFTER_SCENARIO_OUTLINE_NAME
-                    || myState == FeatureLexerState.STATE_IN_SCENARIO_OUTLINE_STEPS){
-                myCurrentToken = FeatureElementTypes.STEP_ELEMENT_TYPE;
-                advanceToEOL();
-                myState = FeatureLexerState.STATE_IN_SCENARIO_OUTLINE_STEPS;
-                return;
-            }
-
-            if (myState == FeatureLexerState.STATE_IN_TABLE_HEADER_ROW){
-                myCurrentToken = FeatureElementTypes.TABLE_HEADER_VALUE;
+                    myCurrentToken = FeatureElementTypes.TABLE_ROW_VALUE;
+                    //advanceToTableCellBoundary();
+                    //return;
+                }
                 advanceToTableCellBoundary();
-                return;
             }
+            else {
+                if (myState == FeatureLexerState.STATE_AFTER_EXAMPLES_KEYWORD) {
+                    //advanceToEOL();
+                    //   return;
+                } else if (myState == FeatureLexerState.STATE_AFTER_FEATURE_KEYWORD) {
+                    myCurrentToken = FeatureElementTypes.FEATURE_NAME_ELEMENT_TYPE;
+                    //advanceToEOL();
+                    myState = FeatureLexerState.STATE_AFTER_FEATURE_NAME;
+                    //  return;
+                } else if (myState == FeatureLexerState.STATE_AFTER_FEATURE_NAME) {
+                    myCurrentToken = FeatureElementTypes.FEATURE_DESCRIPTION_ELEMENT_TYPE;
+                    //advanceToEOL();
+                    myState = FeatureLexerState.STATE_AFTER_FEATURE_NAME;
+                    //  return;
+                } else if (myState == FeatureLexerState.STATE_AFTER_BACKGROUND_KEYWORD
+                        || myState == FeatureLexerState.STATE_IN_BACKGROUND_STEPS) {
 
-            if (myState == FeatureLexerState.STATE_IN_TABLE_VALUE_ROWS){
-                myCurrentToken = FeatureElementTypes.TABLE_ROW_VALUE;
-                advanceToTableCellBoundary();
-                return;
+                    myCurrentToken = FeatureElementTypes.BACKGROUND_STEP_ELEMENT_TYPE;
+                    //advanceToEOL();
+                    myState = FeatureLexerState.STATE_IN_BACKGROUND_STEPS;
+                    //    return;
+                } else if (myState == FeatureLexerState.STATE_AFTER_SCENARIO_KEYWORD) {
+
+                    myCurrentToken = FeatureElementTypes.SCENARIO_NAME_ELEMENT_TYPE;
+                    //advanceToEOL();
+                    myState = FeatureLexerState.STATE_AFTER_SCENARIO_NAME;
+                    // return;
+
+                } else if (myState == FeatureLexerState.STATE_AFTER_SCENARIO_NAME || myState == FeatureLexerState.STATE_IN_SCENARIO_STEPS) {
+
+                    myCurrentToken = FeatureElementTypes.STEP_ELEMENT_TYPE;
+                    //advanceToEOL();
+                    myState = FeatureLexerState.STATE_IN_SCENARIO_STEPS;
+                    //return;
+                } else if (myState == FeatureLexerState.STATE_AFTER_TAGS_KEYWORD) {
+
+                    myCurrentToken = FeatureElementTypes.TAG_ELEMENT_TYPE;
+                    //advanceToEOL();
+                    myState = FeatureLexerState.STATE_DEFAULT;
+                    //return;
+                } else if (myState == FeatureLexerState.STATE_AFTER_SCENARIO_OUTLINE_KEYWORD) {
+
+                    myCurrentToken = FeatureElementTypes.SCENARIO_OUTLINE_NAME_ELEMENT_TYPE;
+                    //advanceToEOL();
+                    myState = FeatureLexerState.STATE_AFTER_SCENARIO_OUTLINE_NAME;
+                    //return;
+                } else if (myState == FeatureLexerState.STATE_AFTER_SCENARIO_OUTLINE_NAME || myState == FeatureLexerState.STATE_IN_SCENARIO_OUTLINE_STEPS) {
+
+                    myCurrentToken = FeatureElementTypes.STEP_ELEMENT_TYPE;
+                    //advanceToEOL();
+                    myState = FeatureLexerState.STATE_IN_SCENARIO_OUTLINE_STEPS;
+                    //return;
+                } else {
+                    log.error("advance fell through");
+                }
+                advanceToEOL();
             }
         }
+
+        log.trace("end of advance myState is now: " + myState + " token is: " + myCurrentToken);
 
     }
 
@@ -377,13 +365,15 @@ public class FeatureLexer extends LexerBase {
     }
 
     private void advanceToEOL() {
-        //log.debug("advanceToEOL");
+        log.trace("advanceToEOL");
         myPosition++;
         int mark = myPosition;
 
         // TODO - stop if you reach a comment character that's not quoted...
 
-        while (myPosition < myEndOffset && myBuffer.charAt(myPosition) != '\n') {
+        // TODO - sometimes get an array idx out of bounds here...???
+
+        while (myPosition < myEndOffset && myPosition < myBuffer.length() && myBuffer.charAt(myPosition) != '\n') {
             myPosition++;
         }
         returnWhitespace(mark);
@@ -392,6 +382,8 @@ public class FeatureLexer extends LexerBase {
 
     private void returnWhitespace(int mark) {
         while(myPosition > mark && Character.isWhitespace(myBuffer.charAt(myPosition - 1))) {
+
+            log.trace("returnWhitespace re-winding");
             myPosition--;
         }
     }

@@ -16,15 +16,17 @@
         <layout class="org.apache.log4j.PatternLayout">
             <param name="ConversionPattern" value="[%7r] %6p - %30.30c - %m \n"/>
         </layout>
+<!--
         <filter class="org.apache.log4j.varia.LevelRangeFilter">
             <param name="LevelMin" value="DEBUG"/>
             <param name="LevelMax" value="DEBUG"/>
         </filter>
+-->
     </appender>
 
 
     <logger name="uk.co.itmoore" additivity="false">
-        <level value="DEBUG"/>
+        <level value="TRACE"/>
         <appender-ref ref="CONSOLE-DEBUG"/>
     </logger>
 

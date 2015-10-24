@@ -90,6 +90,10 @@ public class FeatureParserDefinition implements ParserDefinition {
 
         if (astNode.getElementType() == FeatureElementTypes.TABLE_BLOCK_ELEMENT_TYPE) return new  TableBlockImpl(astNode);
 
+        if (astNode.getElementType() == FeatureElementTypes.TABLE_HEADER_VALUE) return new TableHeaderValueImpl(astNode);
+
+        if (astNode.getElementType() == FeatureElementTypes.TABLE_ROW_VALUE) return new TableRowValueImpl(astNode);
+
 //        if (astNode.getElementType() == SubstepDefinitionElementTypes.SUBSTEP_DEFINITION_ELEMENT_TYPE) return new SubstepDefinitionImpl(astNode);
 //        if (astNode.getElementType() == SubstepDefinitionElementTypes.SUBSTEP_DEFINITION_STEP_ELEMENT_TYPE) return new SubstepDefinitionStepImpl(astNode);
 //        if (astNode.getElementType() == SubstepDefinitionElementTypes.SUBSTEP_DEFINITION_DEFINE_BLOCK_ELEMENT_TYPE) return new SubstepDefinitionDefineBlockImpl(astNode);
@@ -107,6 +111,9 @@ public class FeatureParserDefinition implements ParserDefinition {
 //        if (node.getElementType() == GherkinElementTypes.TAG) return new GherkinTagImpl(node);
 //        if (node.getElementType() == GherkinElementTypes.STEP_PARAMETER) return new GherkinStepParameterImpl(node);
 //        if (node.getElementType() == GherkinElementTypes.PYSTRING) return new GherkinPystringImpl(node);
+
+        logger.error("feature parser definition fallen through, null psi element for: " + astNode.getElementType());
+
         return PsiUtilCore.NULL_PSI_ELEMENT;
 
     }

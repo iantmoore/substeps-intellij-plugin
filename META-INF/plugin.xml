@@ -112,6 +112,8 @@
 
       <runConfigurationProducer implementation="uk.co.itmoore.intellisubsteps.execution.SubstepsFeatureRunnerConfigProducer"/>
 
+      <lang.psiStructureViewFactory language="SubstepsFeature" implementationClass="uk.co.itmoore.intellisubsteps.SubstepsFeatureStructureViewFactory"/>
+
 
       <!--  not sure that this does anything..
 

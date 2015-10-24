@@ -24,7 +24,7 @@ public class FeatureNameImpl extends FeaturePsiElementBase {
 
     @Override
     protected void acceptFeature(FeatureElementVisitor featureElementVisitor) {
-
+        featureElementVisitor.visitFeatureName(this);
     }
 
 

@@ -33,8 +33,8 @@ public class FeatureImpl extends FeaturePsiElementBase implements Feature {
             return featureNameImpl.getElementText();
         }
 
+        final ASTNode firstText = node.findChildByType(FeatureElementTypes.FEATURE_NAME_ELEMENT_TYPE);
 
-        final ASTNode firstText = node.findChildByType(FeatureTokenTypes.TEXT_TOKEN);// TODO should this be feature name token ?
         if (firstText != null) {
             return firstText.getText();
         }

@@ -91,7 +91,7 @@ public static class FeatureParsingTest2 extends ParsingTestCase {
     @Test
     public void runTests() throws Exception{
 
-        String base = "/home/ian/skybet/plugin-testing/test-automation/international-testing-parent/test-automation/src/test/resources/com/skybet/international/testing/";
+        String base = "/home/ian/skybet/plugin-testing/test-automation/international-testing-parent/test-automation/src/main/resources/features/";
 
         TreeTraverser<File> fileTreeTraverser = Files.fileTreeTraverser();
 
@@ -107,6 +107,13 @@ public static class FeatureParsingTest2 extends ParsingTestCase {
                 return file.getName().endsWith(".feature");
             }
         }).toList();
+
+
+        for (File feature : featureFiles) {
+            System.out.println("going to process: feature file: " + feature.getAbsolutePath() + "\n name: " + feature.getName());
+
+        }
+
 
         for (File feature : featureFiles){
             System.out.println("feature file: " + feature.getAbsolutePath() + "\n name: " + feature.getName());
@@ -124,44 +131,6 @@ public static class FeatureParsingTest2 extends ParsingTestCase {
         }
 
 
-        String[] featurePaths = {
-        "poc",
-        "journey/placesinglesbet",
-        "journey/eventlist",
-        "journey/viewsinglesbetslip",
-        "journey/translations",
-        "journey/translations",
-        "journey/login",
-        "journey/login",
-        "journey/account",
-        "journey/account",
-        "journey/vieweventpage",
-        "journey/addtoslip",
-        "journey/addtoslip",
-        "journey/registration",
-        "journey/editpassword",
-        "journey/bethistory"
-        };
-
-
-                String featureNames[] = {
-                "sample",
-                        "placesinglesbet",
-                        "eventlist",
-                        "viewsinglesbetslip",
-                        "translationtoggle",
-                        "translations",
-                        "welcomebanner",
-                        "login",
-                        "showbalance",
-                        "account",
-                        "vieweventpage",
-                        "suspendedoutcome",
-                        "addtoslip",
-                        "registration",
-                        "editpassword",
-                        "bethistory"
-                };
         
 //        for (int i = 0; i < featurePaths.length; i++){
 //

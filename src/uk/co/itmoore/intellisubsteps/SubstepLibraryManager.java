@@ -159,9 +159,10 @@ public class SubstepLibraryManager {
             } catch (final IOException e) {
                 logger.error("Error loading from jarfile: ", e);
             }
-        } else {
-            logger.error("couldn't locate file in jar: " + STEPIMPLEMENTATIONS_JSON_FILENAME);
         }
+//        else {
+//            logger.error("couldn't locate file in jar: " + STEPIMPLEMENTATIONS_JSON_FILENAME);
+//        }
 
         return classStepTagList;
 

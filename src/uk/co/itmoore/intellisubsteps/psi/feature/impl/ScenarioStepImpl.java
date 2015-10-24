@@ -23,7 +23,7 @@ public class ScenarioStepImpl extends FeaturePsiElementBase implements Step {
 
     @Override
     protected void acceptFeature(FeatureElementVisitor featureElementVisitor) {
-
+        featureElementVisitor.visitScenarioStep(this);
     }
 
 }

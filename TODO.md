@@ -11,7 +11,8 @@
 
 
 # Current Feature impls
-* Runner
+* outlines
+* parse / lexing - inline step table arguments
 
 
 

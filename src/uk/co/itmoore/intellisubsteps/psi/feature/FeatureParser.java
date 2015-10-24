@@ -57,6 +57,8 @@ public class FeatureParser implements PsiParser {
 
         while(true) {
 
+            int start = builder.getCurrentOffset();
+
             if (builder.eof()) {
                 featureMarker.done(FeatureElementTypes.FEATURE_ELEMENT_TYPE);
                 break;
@@ -99,8 +101,10 @@ public class FeatureParser implements PsiParser {
                 }
             }
 
-            log.trace("parseFeature advancing lexer");
-            builder.advanceLexer();
+            if (builder.getCurrentOffset() == start) {
+
+                advanceLexer(builder, "parseFeature advancing lexer");
+            }
         }
     }
 
@@ -125,8 +129,7 @@ public class FeatureParser implements PsiParser {
             } else {
                 if (tokenType == FeatureTokenTypes.COLON_TOKEN) {
                     // nop
-                    log.trace("parsed colon");
-                    builder.advanceLexer();
+                    advanceLexer(builder, "parsed colon");
                 } else if (tokenType == FeatureElementTypes.BACKGROUND_STEP_ELEMENT_TYPE) {
 
                     final PsiBuilder.Marker step = builder.mark();
@@ -136,8 +139,7 @@ public class FeatureParser implements PsiParser {
                     log.error("parse background fell through..");
                 }
             }
-            log.trace("parseBackground advancing  lexer");
-            builder.advanceLexer();
+            advanceLexer(builder, "parseBackground advancing  lexer");
         }
     }
 
@@ -163,8 +165,7 @@ public class FeatureParser implements PsiParser {
 
                 if (tokenType == FeatureTokenTypes.COLON_TOKEN || tokenType == FeatureTokenTypes.TABLE_SEPARATOR_TOKEN){
                     // nop
-                    log.trace("parsed colon or separator");
-                    builder.advanceLexer();
+                    advanceLexer(builder, "parsed colon or separator");
                 }
                 else if (tokenType == FeatureElementTypes.TABLE_HEADER_VALUE){
 
@@ -190,8 +191,7 @@ public class FeatureParser implements PsiParser {
                     log.error("parse examples fell through..");
                 }
             }
-            log.trace("parse examples  advancing  lexer");
-            builder.advanceLexer();
+            advanceLexer(builder, "parse examples  advancing  lexer");
 
         }
 
@@ -215,11 +215,14 @@ public class FeatureParser implements PsiParser {
 
     private void parseScenarioOutline(PsiBuilder builder) {
 
+        int start = builder.getCurrentOffset();
+
         log.trace("parse scenario outline");
+
 
         Set<FeatureElementType> endOfScenarioTokens = new HashSet<>();
         endOfScenarioTokens.add(FeatureTokenTypes.SCENARIO_KEYWORD_TOKEN);
-        endOfScenarioTokens.add(FeatureTokenTypes.SCENARIO_OUTLINE_KEYWORD_TOKEN);
+//        endOfScenarioTokens.add();
         endOfScenarioTokens.add(FeatureTokenTypes.TAGS_KEYWORD_TOKEN);
 
 
@@ -229,7 +232,7 @@ public class FeatureParser implements PsiParser {
             final IElementType tokenType = builder.getTokenType();
 
 
-            if (tokenType == null || endOfScenarioTokens.contains(tokenType) || builder.eof()) {
+            if (tokenType == null || endOfScenarioTokens.contains(tokenType) || builder.eof() || (builder.getCurrentOffset() > start && tokenType == FeatureTokenTypes.SCENARIO_OUTLINE_KEYWORD_TOKEN)) {
                 log.trace("breaking out of parseScenario outline");
                 break;
             } else {
@@ -237,8 +240,7 @@ public class FeatureParser implements PsiParser {
 
                 if (tokenType == FeatureTokenTypes.COLON_TOKEN){
                     // nop
-                    log.trace("parsed colon");
-                    builder.advanceLexer();
+                    advanceLexer(builder, "parsed colon");
                 }
                 else if (tokenType == FeatureElementTypes.SCENARIO_OUTLINE_NAME_ELEMENT_TYPE){
 
@@ -266,79 +268,90 @@ public class FeatureParser implements PsiParser {
                     log.error("parse scenario outline fell through..");
                 }
             }
-            log.trace("parse scenario outline advancing  lexer");
-            builder.advanceLexer();
+            advanceLexer(builder, "parse scenario outline advancing  lexer");
 
         }
     }
 
     private void parseScenario(PsiBuilder builder) {
 
-        log.trace("parse scenario");
+        int start = builder.getCurrentOffset();
+        log.trace("parse scenario @" + start);
 
         Set<FeatureElementType> endOfScenarioTokens = new HashSet<>();
-        endOfScenarioTokens.add(FeatureTokenTypes.SCENARIO_KEYWORD_TOKEN);
+       // endOfScenarioTokens.add(FeatureTokenTypes.SCENARIO_KEYWORD_TOKEN);
         endOfScenarioTokens.add(FeatureTokenTypes.SCENARIO_OUTLINE_KEYWORD_TOKEN);
         endOfScenarioTokens.add(FeatureTokenTypes.TAGS_KEYWORD_TOKEN);
 
 
-        while(true) {
-                final IElementType tokenType = builder.getTokenType();
 
+
+        while(true) {
+            final IElementType tokenType = builder.getTokenType();
+
+            log.trace("going round the parse loop, offset: " + builder.getCurrentOffset());
 
             if (tokenType == null ) {
                 log.debug("breaking out of parseScenario because token is null");
                 break;
             }
-            else if (endOfScenarioTokens.contains(tokenType)){
-                log.debug("breaking out of parseScenario because end of scenario token");
-                break;
+            else {
+
+                log.trace("token: " + tokenType.toString() + " text: " + builder.getTokenText());
+
+
+                if (endOfScenarioTokens.contains(tokenType) || (tokenType == FeatureTokenTypes.SCENARIO_KEYWORD_TOKEN && builder.getCurrentOffset() > start)){
+                    log.debug("breaking out of parseScenario because end of scenario token");
+                    break;
+                }
+                else if (builder.eof()){
+                    log.debug("breaking out of parseScenario");
+                    break;
+                } else {
+                    log.trace("parseScenario tokenType == " + tokenType.toString());
+
+                    if (tokenType == FeatureTokenTypes.COLON_TOKEN) {
+                        // nop
+                        advanceLexer(builder, "parsed colon");
+                    } else if (tokenType == FeatureElementTypes.SCENARIO_NAME_ELEMENT_TYPE) {
+
+                        log.debug("scenario name element");
+
+                        final PsiBuilder.Marker scenarioNameMarker = builder.mark();
+
+                        advanceLexer(builder, "parse scenario");
+
+                        scenarioNameMarker.done(FeatureElementTypes.SCENARIO_NAME_ELEMENT_TYPE);
+
+                    } else if (tokenType == FeatureElementTypes.STEP_ELEMENT_TYPE) {
+
+                        log.debug("scenario step element start");
+
+                        final PsiBuilder.Marker step = builder.mark();
+
+                        advanceLexer(builder, "parse scenario");
+
+                        step.done(FeatureElementTypes.STEP_ELEMENT_TYPE);
+
+                        log.debug("scenario step element complete");
+
+
+                    } else {
+                        log.error("parse scenario fell through..");
+                        advanceLexer(builder, "parse scenario");
+                    }
+                }
             }
-            else if (builder.eof()){
-                log.debug("breaking out of parseScenario");
-                break;
-            } else {
-                log.trace("parseScenario tokenType == " + tokenType.toString());
-
-                if (tokenType == FeatureTokenTypes.COLON_TOKEN){
-                    // nop
-                    log.trace("parsed colon");
-                    builder.advanceLexer();
-                }
-                else if (tokenType == FeatureElementTypes.SCENARIO_NAME_ELEMENT_TYPE){
-
-                    log.debug("scenario name element");
-
-                    final PsiBuilder.Marker scenarioNameMarker = builder.mark();
-
-                    builder.advanceLexer();
-
-                    scenarioNameMarker.done(FeatureElementTypes.SCENARIO_NAME_ELEMENT_TYPE);
-
-                }
-                else if (tokenType == FeatureElementTypes.STEP_ELEMENT_TYPE){
-
-                    log.debug("scenario step element start");
-
-                    final PsiBuilder.Marker step = builder.mark();
-
-                    builder.advanceLexer();
-
-                    step.done(FeatureElementTypes.STEP_ELEMENT_TYPE);
-
-                    log.debug("scenario step element complete");
-
-
-                }
-                else {
-                    log.error("parse scenario fell through..");
-                }
-            }
-            log.trace("parse scenario advancing  lexer");
-            builder.advanceLexer();
+           // advanceLexer(builder, "parse scenario");
 
         }
     }
+
+    private void advanceLexer(PsiBuilder builder, String message) {
+        log.trace(message + "  advancing  lexer");
+        builder.advanceLexer();
+    }
+
 
     private void parseTags(PsiBuilder builder) {
 
@@ -369,8 +382,7 @@ public class FeatureParser implements PsiParser {
 
                 if (tokenType == FeatureTokenTypes.COLON_TOKEN){
                     // nop
-                           log.trace("parsed colon");
-                    builder.advanceLexer();
+                    advanceLexer(builder, "parsed colon");
                 }
                 else if (tokenType == FeatureElementTypes.TAG_ELEMENT_TYPE){
 
@@ -383,8 +395,7 @@ public class FeatureParser implements PsiParser {
                 }
 
             }
-            log.trace("parse tags advancing  lexer");
-            builder.advanceLexer();
+            advanceLexer(builder, "parse tags advancing  lexer");
         }
 
     }
@@ -403,9 +414,7 @@ public class FeatureParser implements PsiParser {
                 parseTags(builder);
             }
             else {
-                log.trace("parseFeatureFile advancing lexer");
-
-                builder.advanceLexer();
+                advanceLexer(builder, "parseFeatureFile advancing lexer");
             }
         }
     }

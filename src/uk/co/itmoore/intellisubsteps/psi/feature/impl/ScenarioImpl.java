@@ -18,11 +18,36 @@ public class ScenarioImpl extends StepsHolderImpl implements Scenario {
         super(node);
     }
 
+    public String getName() {
+
+        final ASTNode firstText = getNode().findChildByType(FeatureElementTypes.SCENARIO_NAME_ELEMENT_TYPE);
+
+        if (firstText != null) {
+            return firstText.getText();
+        }
+
+        return "??";
+    }
+
+    @Override
+    protected String getPresentableText() {
+        return "Scenario: " + getName();
+    }
+
+
+
+
     @Override
     public final String getScenarioName() {
         ASTNode node = getNode().getFirstChildNode();
         while (node != null && node.getElementType() != FeatureTokenTypes.SCENARIO_NAME_TOKEN) {
             node = node.getTreeNext();
+        }
+
+        final ASTNode firstText = getNode().findChildByType(FeatureElementTypes.SCENARIO_NAME_ELEMENT_TYPE);
+
+        if (firstText != null) {
+            return firstText.getText();
         }
 
         return node != null ? node.getText() : "";
@@ -32,6 +57,7 @@ public class ScenarioImpl extends StepsHolderImpl implements Scenario {
 
     @Override
     protected void acceptFeature(FeatureElementVisitor featureElementVisitor) {
+        featureElementVisitor.visitScenario(this);
 
     }
 

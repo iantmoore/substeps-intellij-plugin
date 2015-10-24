@@ -10,6 +10,8 @@ import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.tree.TokenSet;
 import com.intellij.util.Function;
 import com.intellij.util.IncorrectOperationException;
+import org.apache.log4j.LogManager;
+import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import uk.co.itmoore.intellisubsteps.psi.SubstepsNamedElement;
@@ -26,6 +28,9 @@ import javax.swing.*;
  */
 public abstract class FeaturePsiElementBase extends SubstepsNamedElementImpl {
     private static final TokenSet TEXT_FILTER = TokenSet.create(FeatureTokenTypes.TEXT_TOKEN);
+
+    private static final Logger log = LogManager.getLogger(FeaturePsiElementBase.class);
+
 
     public FeaturePsiElementBase(@NotNull final ASTNode node) {
         super(node);
@@ -54,7 +59,7 @@ public abstract class FeaturePsiElementBase extends SubstepsNamedElementImpl {
     public ItemPresentation getPresentation() {
         return new ItemPresentation() {
             public String getPresentableText() {
-                return this.getPresentableText();
+                return FeaturePsiElementBase.this.getPresentableText();
             }
 
             public String getLocationString() {
@@ -82,11 +87,18 @@ public abstract class FeaturePsiElementBase extends SubstepsNamedElementImpl {
 
     @Override
     public void accept(@NotNull PsiElementVisitor visitor) {
+
+
         if (visitor instanceof FeatureElementVisitor) {
             acceptFeature((FeatureElementVisitor) visitor);
         }
         else {
+
+            log.debug("calling super.accept on " + visitor.toString());
+
             super.accept(visitor);
+
+            log.debug("super.accept called");
         }
     }
 

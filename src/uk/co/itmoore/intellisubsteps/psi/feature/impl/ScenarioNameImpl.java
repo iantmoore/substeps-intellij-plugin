@@ -22,7 +22,7 @@ public class ScenarioNameImpl extends FeaturePsiElementBase {
 
     @Override
     protected void acceptFeature(FeatureElementVisitor featureElementVisitor) {
-
+        featureElementVisitor.visitScenarioName(this);
     }
 
 }
