@@ -43,119 +43,125 @@ public class SubstepsFeatureRunnerConfigProducer extends RunConfigurationProduce
 
     @Override
     protected boolean setupConfigurationFromContext(SubstepsRunConfiguration substepsRunConfiguration, ConfigurationContext configurationContext, Ref<PsiElement> ref) {
-        if (ref != null && ref.get() != null && ref.get().getContainingFile() != null){
 
-            if (ref.get().getContainingFile() instanceof FeatureFile){
+        if (ref != null) {
 
-                SubstepsRunnerConfigurationModel model = new SubstepsRunnerConfigurationModel();
+            log.debug("ref: " + ref.toString());
 
+            // TODO in the project view, a feature is IFileElementType: FeatureElementTypes.FEATURE_FILE
+            // structure view on a scenario, the ref: ScenarioImpl(SCENARIO_BLOCK_ELEMENT_TYPE)
 
+            if (ref.get() != null && ref.get().getContainingFile() != null) {
 
-                String featureFilePath = configurationContext.getLocation().getVirtualFile().getPath();
-                model.setPathToFeature(featureFilePath);
+                if (ref.get().getContainingFile() instanceof FeatureFile) {
 
-                String featureName = configurationContext.getLocation().getVirtualFile().getName();
-
-                Module module = configurationContext.getModule();
-
-                final Set<String> stepImplClassNames = SubstepLibraryManager.INSTANCE.getStepImplClassNamesFromProjectLibraries(module);
-
-                final Set<String> substepDefDirectory = new HashSet<>();
-
-                AnalysisScope moduleScope = new AnalysisScope(module);
-                moduleScope.accept(new PsiRecursiveElementVisitor() {
-                    @Override
-                    public void visitFile(final PsiFile file) {
+                    SubstepsRunnerConfigurationModel model = new SubstepsRunnerConfigurationModel();
 
 
-                        if (file instanceof PsiJavaFile) {
+                    String featureFilePath = configurationContext.getLocation().getVirtualFile().getPath();
+                    model.setPathToFeature(featureFilePath);
 
-                            PsiJavaFile psiJavaFile = (PsiJavaFile) file;
-                            final PsiClass[] psiClasses = psiJavaFile.getClasses();
+                    String featureName = configurationContext.getLocation().getVirtualFile().getName();
 
-                            //final PsiClass psiClass = JavaPsiFacade.getInstance(thisProject).findClass(fqn, psiJavaFile.getResolveScope());
+                    Module module = configurationContext.getModule();
 
-                            for (PsiClass psiClass : psiClasses) {
+                    final Set<String> stepImplClassNames = SubstepLibraryManager.INSTANCE.getStepImplClassNamesFromProjectLibraries(module);
 
-                                if (SubstepsCompletionContributor.isStepImplementationsClass(psiClass)) {
+                    final Set<String> substepDefDirectory = new HashSet<>();
 
-                                    stepImplClassNames.add(psiClass.getQualifiedName());
+                    AnalysisScope moduleScope = new AnalysisScope(module);
+                    moduleScope.accept(new PsiRecursiveElementVisitor() {
+                        @Override
+                        public void visitFile(final PsiFile file) {
+
+
+                            if (file instanceof PsiJavaFile) {
+
+                                PsiJavaFile psiJavaFile = (PsiJavaFile) file;
+                                final PsiClass[] psiClasses = psiJavaFile.getClasses();
+
+                                //final PsiClass psiClass = JavaPsiFacade.getInstance(thisProject).findClass(fqn, psiJavaFile.getResolveScope());
+
+                                for (PsiClass psiClass : psiClasses) {
+
+                                    if (SubstepsCompletionContributor.isStepImplementationsClass(psiClass)) {
+
+                                        stepImplClassNames.add(psiClass.getQualifiedName());
+                                    }
+                                }
+                            } else if (file instanceof SubstepsDefinitionFile) {
+
+                                String parentPath = file.getParent().getVirtualFile().getPath();
+
+                                if (substepDefDirectory.isEmpty()) {
+                                    substepDefDirectory.add(parentPath);
+                                } else if (!substepDefDirectory.contains(parentPath)) {
+                                    // find the common ancestor between what's already in and this parent
+                                    String current = substepDefDirectory.iterator().next();
+
+                                    int commonLength = StringUtils.indexOfDifference(current, parentPath);
+                                    substepDefDirectory.remove(current);
+
+                                    String common = current.substring(0, commonLength);
+
+                                    log.debug("current path for substeps: " + current + " got this time: " + parentPath + " common: " + common);
+
+                                    substepDefDirectory.add(common);
+
                                 }
                             }
-                        } else if (file instanceof SubstepsDefinitionFile) {
-
-                            String parentPath = file.getParent().getVirtualFile().getPath();
-
-                            if (substepDefDirectory.isEmpty()) {
-                                substepDefDirectory.add(parentPath);
-                            } else if (!substepDefDirectory.contains(parentPath)) {
-                                // find the common ancestor between what's already in and this parent
-                                String current = substepDefDirectory.iterator().next();
-
-                                int commonLength = StringUtils.indexOfDifference(current, parentPath);
-                                substepDefDirectory.remove(current);
-
-                                String common = current.substring(0, commonLength);
-
-                                log.debug("current path for substeps: " + current + " got this time: " + parentPath + " common: " + common);
-
-                                substepDefDirectory.add(common);
-
-                            }
                         }
+                    });
+
+
+                    model.setWorkingDir(module.getModuleFile().getParent().getCanonicalPath());
+
+
+                    model.setStepImplentationClassNames(stepImplClassNames.toArray(new String[stepImplClassNames.size()]));
+
+                    model.setSubStepDefinitionDirectory(substepDefDirectory.iterator().next());
+
+                    try {
+                        model.getJavaParameters().configureByModule(module, JavaParameters.JDK_AND_CLASSES_AND_TESTS);
+
+                        Sdk jdk = model.getJavaParameters().getJdk();
+
+                        model.setHomePath(jdk.getHomePath());
+                        model.setVersionString(jdk.getVersionString());
+
+                        log.debug("configuring substeps runtime with classpath:\n" + model.getJavaParameters().getClassPath().getPathsString());
+
+                        model.setClassPathString(model.getJavaParameters().getClassPath().getPathsString());
+
+                    } catch (CantRunException e) {
+                        log.error("can't run", e);
+                        return false;
                     }
-                });
-
-
-
-                model.setWorkingDir(module.getModuleFile().getParent().getCanonicalPath());
-
-
-                model.setStepImplentationClassNames(stepImplClassNames.toArray(new String[stepImplClassNames.size()]));
-
-                model.setSubStepDefinitionDirectory(substepDefDirectory.iterator().next());
-
-                try {
-                    model.getJavaParameters().configureByModule(module, JavaParameters.JDK_AND_CLASSES_AND_TESTS);
-
-                    Sdk jdk = model.getJavaParameters().getJdk();
-
-                    model.setHomePath(jdk.getHomePath());
-                    model.setVersionString(jdk.getVersionString());
-
-                    log.debug("configuring substeps runtime with classpath:\n" + model.getJavaParameters().getClassPath().getPathsString());
-
-                    model.setClassPathString(model.getJavaParameters().getClassPath().getPathsString());
-
-                } catch (CantRunException e) {
-                    log.error("can't run", e);
-                    return false;
-                }
 
 //                model.setModule(configurationContext.getModule());
 
-                substepsRunConfiguration.setModel(model);
+                    substepsRunConfiguration.setModel(model);
 
-                substepsRunConfiguration.setName(featureName);
+                    substepsRunConfiguration.setName(featureName);
 
 //                this results in two run configs!
-                RunManager runManager = RunManager.getInstance(configurationContext.getProject());
+                    RunManager runManager = RunManager.getInstance(configurationContext.getProject());
 //                RunnerAndConfigurationSettings runAndConfigSettings = runManager.createConfiguration(substepsRunConfiguration, this.getConfigurationFactory());
 //                runManager.addConfiguration(runAndConfigSettings, false);
 
-                List<RunConfiguration> configurationsList = runManager.getConfigurationsList(configType);
+                    List<RunConfiguration> configurationsList = runManager.getConfigurationsList(configType);
 
-                for (RunConfiguration runConfig: configurationsList){
-                    SubstepsRunConfiguration substepsRunConfig = (SubstepsRunConfiguration)runConfig;
+                    for (RunConfiguration runConfig : configurationsList) {
+                        SubstepsRunConfiguration substepsRunConfig = (SubstepsRunConfiguration) runConfig;
 
-                    log.debug("got substeps run config: " +
-                    substepsRunConfig.getName());
+                        log.debug("got substeps run config: " +
+                                substepsRunConfig.getName());
 
+                    }
+                    return true;
                 }
-                return true;
             }
         }
-
         return false;
     }
 

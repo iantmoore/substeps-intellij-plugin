@@ -93,12 +93,7 @@ public abstract class FeaturePsiElementBase extends SubstepsNamedElementImpl {
             acceptFeature((FeatureElementVisitor) visitor);
         }
         else {
-
-            log.debug("calling super.accept on " + visitor.toString());
-
             super.accept(visitor);
-
-            log.debug("super.accept called");
         }
     }
 

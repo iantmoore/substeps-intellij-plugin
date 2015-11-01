@@ -11,14 +11,29 @@
 
 
 # Current Feature impls
-* outlines
+* outlines - in the project view (implement psimember ?)
+ - https://github.com/joewalnes/idea-community/blob/master/java/java-impl/src/com/intellij/ide/projectView/impl/nodes/ClassTreeNode.java
+ - mentions getSettings().isShowMembers() ..?  not sure how psi nodes fit into it all
+ - http://www.jetbrains.org/intellij/sdk/docs/tutorials/tree_structure_view.html and ClassesTreeStructureProvider
+ 
+
+* outlines for substep defs too ?
+
+
 * parse / lexing - inline step table arguments
 
 
+* Run configs - reuse existing configs rather than duplicating
+
+
+
+* new substeps project
+http://www.jetbrains.org/intellij/sdk/docs/tutorials/project_wizard/adding_new_steps.html
 
 
 # syntax highlighting - show steps that aren't implemented ( w. Alt-enter - create definition)
                       - show steps that aren't used!
+  see Annotator http://www.jetbrains.org/intellij/sdk/docs/reference_guide/custom_language_support/syntax_highlighting_and_error_highlighting.html
 
 
 # finish off feature parsing
@@ -108,11 +123,6 @@ http://examples.javacodegeeks.com/enterprise-java/jmx/send-notification-at-mbean
 
 
 
-# structure viewwer: 
-http://www.jetbrains.org/intellij/sdk/docs/tutorials/custom_language_support/structure_view_factory.html
-
-
-## TODO
 
 
 
@@ -150,8 +160,8 @@ https://confluence.jetbrains.com/display/IntelliJIDEA/Parsing+Test
 
 * how to distribute ?
     
-* content assist
+x content assist
 
 * outline, navigation
 
-* execution
+x execution 
