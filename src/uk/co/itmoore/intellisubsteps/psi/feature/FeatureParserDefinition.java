@@ -85,6 +85,7 @@ public class FeatureParserDefinition implements ParserDefinition {
         if (astNode.getElementType() == FeatureElementTypes.STEP_ELEMENT_TYPE) return new  ScenarioStepImpl(astNode);
 
         if (astNode.getElementType() == FeatureElementTypes.SCENARIO_OUTLINE_BLOCK_ELEMENT_TYPE) return new  ScenarioOutlineImpl(astNode);
+        if (astNode.getElementType() == FeatureElementTypes.SCENARIO_OUTLINE_NAME_ELEMENT_TYPE) return new ScenarioNameImpl(astNode);
 
         if (astNode.getElementType() == FeatureElementTypes.EXAMPLES_BLOCK_ELEMENT_TYPE) return new  ExamplesBlockImpl(astNode);
 

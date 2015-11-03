@@ -11,7 +11,10 @@
 
 
 # Current Feature impls
-* outlines - in the project view (implement psimember ?)
+
+   # view settings filtering (check the show members flag ?)
+
+
  - https://github.com/joewalnes/idea-community/blob/master/java/java-impl/src/com/intellij/ide/projectView/impl/nodes/ClassTreeNode.java
  - mentions getSettings().isShowMembers() ..?  not sure how psi nodes fit into it all
  - http://www.jetbrains.org/intellij/sdk/docs/tutorials/tree_structure_view.html and ClassesTreeStructureProvider

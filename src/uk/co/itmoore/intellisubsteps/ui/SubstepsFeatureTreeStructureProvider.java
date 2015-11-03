@@ -115,7 +115,7 @@ public class SubstepsFeatureTreeStructureProvider implements TreeStructureProvid
 
 
                 for (StepsHolder stepsHolder : featureFileImpl.getFeature().getScenarios()) {
-
+                    log.debug("adding scenario node: " + stepsHolder.getScenarioName());
                     nodes.add(new ScenarioNode(stepsHolder, project, settings));
                 }
 

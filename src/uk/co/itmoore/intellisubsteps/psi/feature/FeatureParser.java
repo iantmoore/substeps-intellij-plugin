@@ -146,22 +146,29 @@ public class FeatureParser implements PsiParser {
     private void parseExamples(PsiBuilder builder) {
         log.trace("parse examples");
 
+        int start = builder.getCurrentOffset();
+
         Set<FeatureElementType> endOfScenarioTokens = new HashSet<>();
         endOfScenarioTokens.add(FeatureTokenTypes.SCENARIO_KEYWORD_TOKEN);
         endOfScenarioTokens.add(FeatureTokenTypes.SCENARIO_OUTLINE_KEYWORD_TOKEN);
         endOfScenarioTokens.add(FeatureTokenTypes.TAGS_KEYWORD_TOKEN);
 
-
-
         while(true) {
             final IElementType tokenType = builder.getTokenType();
 
+            log.trace("going round the parse loop, offset: " + builder.getCurrentOffset());
 
-            if (tokenType == null || endOfScenarioTokens.contains(tokenType) || builder.eof()) {
-                log.trace("breaking out of parseexamples");
+            if (tokenType == null ) {
+                log.debug("breaking out of parseExamples because token is null");
                 break;
-            } else {
-                log.trace("parse examples tokenType == " + tokenType.toString());
+            }
+            else if (endOfScenarioTokens.contains(tokenType) || builder.eof()){
+                log.debug("breaking out of parseExamples because endOfScenarioTokens reached or eof");
+                break;
+            }
+            else {
+                log.trace("token: " + tokenType.toString() + " text: " + builder.getTokenText());
+
 
                 if (tokenType == FeatureTokenTypes.COLON_TOKEN || tokenType == FeatureTokenTypes.TABLE_SEPARATOR_TOKEN){
                     // nop
@@ -172,45 +179,26 @@ public class FeatureParser implements PsiParser {
 
                     final PsiBuilder.Marker scenarioNameMarker = builder.mark();
 
-                    builder.advanceLexer();
+                    advanceLexer(builder, "parsed header value");
 
                     scenarioNameMarker.done(FeatureElementTypes.TABLE_HEADER_VALUE);
                 }
                 else if (tokenType == FeatureElementTypes.TABLE_ROW_VALUE){
 
-
-
                     final PsiBuilder.Marker scenarioNameMarker = builder.mark();
 
-                    builder.advanceLexer();
+                    advanceLexer(builder, "parsed row value");
 
                     scenarioNameMarker.done(FeatureElementTypes.TABLE_ROW_VALUE);
                 }
 
                 else {
                     log.error("parse examples fell through..");
+                    advanceLexer(builder, "parsed examples fall through..");
                 }
+
             }
-            advanceLexer(builder, "parse examples  advancing  lexer");
-
         }
-
-
-//        Set<FeatureElementType> endOfTagsTokens = new HashSet<>();
-//        while(true) {
-//            final IElementType tokenType = builder.getTokenType();
-//
-//            log.trace("parseTags tokenType == " + tokenType.toString());
-//
-//            if (endOfTagsTokens.contains(tokenType) || builder.eof()) {
-//                log.trace("breaking out of parse tags");
-//                break;
-//            } else {
-//
-//            }
-//            log.trace("parse scenario advancing  lexer");
-//            builder.advanceLexer();
-
     }
 
     private void parseScenarioOutline(PsiBuilder builder) {
@@ -219,57 +207,68 @@ public class FeatureParser implements PsiParser {
 
         log.trace("parse scenario outline");
 
-
         Set<FeatureElementType> endOfScenarioTokens = new HashSet<>();
         endOfScenarioTokens.add(FeatureTokenTypes.SCENARIO_KEYWORD_TOKEN);
-//        endOfScenarioTokens.add();
         endOfScenarioTokens.add(FeatureTokenTypes.TAGS_KEYWORD_TOKEN);
-
-
-        // TODO - what tokens could end the scenaio ? another scenario / outline / tags ?
 
         while(true) {
             final IElementType tokenType = builder.getTokenType();
 
+            log.trace("going round the parse loop, offset: " + builder.getCurrentOffset());
 
-            if (tokenType == null || endOfScenarioTokens.contains(tokenType) || builder.eof() || (builder.getCurrentOffset() > start && tokenType == FeatureTokenTypes.SCENARIO_OUTLINE_KEYWORD_TOKEN)) {
-                log.trace("breaking out of parseScenario outline");
+            if (tokenType == null ) {
+                log.debug("breaking out of parseScenario outline because token is null");
                 break;
-            } else {
-                log.trace("parseScenario outline tokenType == " + tokenType.toString());
+            }
+            else {
+                log.trace("token: " + tokenType.toString() + " text: " + builder.getTokenText());
 
-                if (tokenType == FeatureTokenTypes.COLON_TOKEN){
-                    // nop
-                    advanceLexer(builder, "parsed colon");
+                if (endOfScenarioTokens.contains(tokenType) || (tokenType == FeatureTokenTypes.SCENARIO_OUTLINE_KEYWORD_TOKEN && builder.getCurrentOffset() > start)){
+                    log.debug("breaking out of parseScenario outline because end of scenario token");
+                    break;
                 }
-                else if (tokenType == FeatureElementTypes.SCENARIO_OUTLINE_NAME_ELEMENT_TYPE){
+                else if (builder.eof()){
+                    log.debug("breaking out of parseScenario outline");
+                    break;
+                } else {
+                    log.trace("parseScenario outline tokenType == " + tokenType.toString());
 
-                    final PsiBuilder.Marker scenarioNameMarker = builder.mark();
+                    if (tokenType == FeatureTokenTypes.COLON_TOKEN){
+                        // nop
+                        advanceLexer(builder, "parsed colon");
+                    }
+                    else if (tokenType == FeatureElementTypes.SCENARIO_OUTLINE_NAME_ELEMENT_TYPE){
 
-                    builder.advanceLexer();
+                        log.debug("scenario outline name element");
 
-                    scenarioNameMarker.done(FeatureElementTypes.SCENARIO_NAME_ELEMENT_TYPE);
+                        final PsiBuilder.Marker scenarioNameMarker = builder.mark();
 
-                }
-                else if (tokenType == FeatureElementTypes.STEP_ELEMENT_TYPE){
+                        advanceLexer(builder, "parse scenario outline advancing  lexer");
 
-                    final PsiBuilder.Marker step = builder.mark();
+                        scenarioNameMarker.done(FeatureElementTypes.SCENARIO_NAME_ELEMENT_TYPE);
 
-                    builder.advanceLexer();
+                    }
+                    else if (tokenType == FeatureElementTypes.STEP_ELEMENT_TYPE){
 
-                    step.done(FeatureElementTypes.STEP_ELEMENT_TYPE);
+                        log.debug("scenario outline step element start");
 
-                }
-                else if (tokenType == FeatureTokenTypes.EXAMPLES_KEYWORD_TOKEN) {
-                    parseExamples(builder);
-                }
+                        final PsiBuilder.Marker step = builder.mark();
 
-                else {
-                    log.error("parse scenario outline fell through..");
+                        advanceLexer(builder, "parse scenario outline advancing  lexer");
+
+                        step.done(FeatureElementTypes.STEP_ELEMENT_TYPE);
+
+                    }
+                    else if (tokenType == FeatureTokenTypes.EXAMPLES_KEYWORD_TOKEN) {
+                        parseExamples(builder);
+                    }
+
+                    else {
+                        log.debug("parse scenario outline fell through..");
+                        advanceLexer(builder, "parse scenario outline advancing  lexer");
+                    }
                 }
             }
-            advanceLexer(builder, "parse scenario outline advancing  lexer");
-
         }
     }
 
@@ -279,12 +278,8 @@ public class FeatureParser implements PsiParser {
         log.trace("parse scenario @" + start);
 
         Set<FeatureElementType> endOfScenarioTokens = new HashSet<>();
-       // endOfScenarioTokens.add(FeatureTokenTypes.SCENARIO_KEYWORD_TOKEN);
         endOfScenarioTokens.add(FeatureTokenTypes.SCENARIO_OUTLINE_KEYWORD_TOKEN);
         endOfScenarioTokens.add(FeatureTokenTypes.TAGS_KEYWORD_TOKEN);
-
-
-
 
         while(true) {
             final IElementType tokenType = builder.getTokenType();
@@ -298,7 +293,6 @@ public class FeatureParser implements PsiParser {
             else {
 
                 log.trace("token: " + tokenType.toString() + " text: " + builder.getTokenText());
-
 
                 if (endOfScenarioTokens.contains(tokenType) || (tokenType == FeatureTokenTypes.SCENARIO_KEYWORD_TOKEN && builder.getCurrentOffset() > start)){
                     log.debug("breaking out of parseScenario because end of scenario token");
@@ -342,8 +336,6 @@ public class FeatureParser implements PsiParser {
                     }
                 }
             }
-           // advanceLexer(builder, "parse scenario");
-
         }
     }
 
