@@ -16,7 +16,7 @@ public class SubstepsFeatureStructureViewFactory implements PsiStructureViewFact
 
     @Nullable
     @Override
-    public StructureViewBuilder getStructureViewBuilder(PsiFile psiFile) {
+    public StructureViewBuilder getStructureViewBuilder(final PsiFile psiFile) {
         return new TreeBasedStructureViewBuilder() {
             @NotNull
             @Override

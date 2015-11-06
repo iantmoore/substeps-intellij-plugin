@@ -16,6 +16,7 @@ public class SubstepsRunnerConfigurationModel {
 
     private String pathToFeature;
     private String tags;
+    private String scenarioName;
     private boolean strict = false;
     private String homePath;
     private String versionString;
@@ -137,5 +138,13 @@ public class SubstepsRunnerConfigurationModel {
 
     public String getSubStepDefinitionDirectory() {
         return subStepDefinitionDirectory;
+    }
+
+    public String getScenarioName() {
+        return scenarioName;
+    }
+
+    public void setScenarioName(String scenarioName) {
+        this.scenarioName = scenarioName;
     }
 }

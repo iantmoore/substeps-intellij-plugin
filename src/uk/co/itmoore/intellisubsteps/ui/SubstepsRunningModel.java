@@ -4,11 +4,14 @@ package uk.co.itmoore.intellisubsteps.ui;
 
 import com.intellij.execution.testframework.*;
 import com.intellij.execution.testframework.ui.AbstractTestTreeBuilder;
+import com.intellij.execution.testframework.ui.TestsProgressAnimator;
 import com.intellij.openapi.Disposable;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Disposer;
 import com.intellij.util.ui.tree.TreeUtil;
+import uk.co.itmoore.intellisubsteps.ui.events.StateChangedEvent;
+import uk.co.itmoore.intellisubsteps.ui.events.TestEvent;
 
 import javax.swing.*;
 import javax.swing.event.TreeSelectionEvent;
@@ -23,7 +26,7 @@ public class SubstepsRunningModel implements TestFrameworkRunningModel {
 
   private final TestProgress myProgress;
   private final SubstepsListenersNotifier myNotifier = new SubstepsListenersNotifier();
-  private final Animator myAnimator;
+  private TestsProgressAnimator myAnimator;
 
 
   private final SubstepsTestProxy myRoot;
@@ -49,7 +52,7 @@ public class SubstepsRunningModel implements TestFrameworkRunningModel {
         myNotifier.fireDisposed(SubstepsRunningModel.this);
       }
     });
-      myAnimator = new Animator(this);
+
   }
 
   @Override
@@ -150,7 +153,30 @@ public class SubstepsRunningModel implements TestFrameworkRunningModel {
   public void attachToTree(final SubstepsTestTreeView treeView) {
     myTreeBuilder = new SubstepsTestTreeBuilder(treeView, this, myProperties);
     Disposer.register(this, myTreeBuilder);
-    myAnimator.setModel(this);
+    myAnimator = new TestsProgressAnimator(myTreeBuilder);
+//    myAnimator.setModel(this);
+    addListener(new SubstepsAdapter() {
+      public void onTestChanged(final TestEvent event) {
+        if (event instanceof StateChangedEvent) {
+          final SubstepsTestProxy test = event.getSource();
+          if (test.isLeaf() && test.getState() == SubstepTestState.RUNNING) {
+            myAnimator.setCurrentTestCase(test);
+          }
+        }
+      }
+
+      public void onRunnerStateChanged(final StateEvent event) {
+        if (!event.isRunning()) {
+          myAnimator.stopMovie();
+        }
+      }
+
+      public void doDispose() {
+        dispose();
+      }
+    });
+
+
     myTreeView = treeView;
     selectTest(getRoot());
     myTreeListener.install();

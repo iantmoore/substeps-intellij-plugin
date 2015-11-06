@@ -282,8 +282,10 @@ public class SubstepsRunProfileState  extends CommandLineState {
 
             log.debug("params on the jdk is null");
 
-            params.setJdk(new JavaSdkImpl().createJdk(model.getVersionString(), model.getHomePath()));
+            params.setJdk(JavaSdkImpl.getInstance().createJdk(model.getVersionString(), model.getHomePath()));
 
+//            params.setJdk(new JavaSdkImpl().createJdk(model.getVersionString(), model.getHomePath()));
+//
 //            params.getClassPath().addAll(model.getClassPathList());
 
             params.getClassPath().add(model.getClassPathString());
@@ -297,7 +299,7 @@ public class SubstepsRunProfileState  extends CommandLineState {
 
         ParametersList vmParametersList = params.getVMParametersList();
 
-        String apiLibPath = "file:///home/ian/projects/intelliSubsteps/lib/substeps-core-api-1.1.3-SNAPSHOT-SKYBET1.jar";
+//        String apiLibPath = "file:///home/ian/projects/intelliSubsteps/lib/substeps-core-api-1.1.3-SNAPSHOT-SKYBET1.jar";
 
         vmParametersList.addParametersString("-Dfile.encoding=UTF-8");
         vmParametersList.addParametersString("-Dcom.sun.management.jmxremote.port=" + jmxPort);
@@ -444,9 +446,10 @@ public class SubstepsRunProfileState  extends CommandLineState {
 
             substepsExecutionConfig.setSubStepsFileName(model.getSubStepDefinitionDirectory());
             // TODO - step impl classnames in this project
+            substepsExecutionConfig.setScenarioName(model.getScenarioName());
 
-
-            log.debug("SubstepsExecutionConfig details\nFeature: " + model.getPathToFeature() + "\nsubstep dir: " + model.getSubStepDefinitionDirectory());
+            log.debug("SubstepsExecutionConfig details\nFeature: " + model.getPathToFeature() + "\nsubstep dir: " + model.getSubStepDefinitionDirectory() +
+                    " scenarioName: " + model.getScenarioName());
 
             for (String s : model.getStepImplentationClassNames()) {
                 log.debug("step impl classname: " + s);

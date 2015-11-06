@@ -12,7 +12,6 @@
 
 # Current Feature impls
 
-   # view settings filtering (check the show members flag ?)
 
 
  - https://github.com/joewalnes/idea-community/blob/master/java/java-impl/src/com/intellij/ide/projectView/impl/nodes/ClassTreeNode.java
@@ -21,8 +20,6 @@
  
 
 * outlines for substep defs too ?
-
-
 * parse / lexing - inline step table arguments
 
 

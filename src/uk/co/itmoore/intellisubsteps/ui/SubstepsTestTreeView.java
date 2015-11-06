@@ -33,8 +33,8 @@ public class SubstepsTestTreeView extends TestTreeView {
     //return "convertValueToText";//Formatters.printTest(TestProxyClient.from(value));
   }
 
-  @Override
-  protected int getSelectionMode() {
-    return TreeSelectionModel.DISCONTIGUOUS_TREE_SELECTION;
-  }
+//  @Override
+//  protected int getSelectionMode() {
+//    return TreeSelectionModel.DISCONTIGUOUS_TREE_SELECTION;
+//  }
 }

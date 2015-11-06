@@ -17,13 +17,15 @@ public class SubstepsConsoleProperties extends JavaAwareTestConsoleProperties {
   private final SubstepsRunConfiguration myConfiguration;
 
   public SubstepsConsoleProperties(@NotNull SubstepsRunConfiguration configuration, Executor executor) {
-    this(configuration, new Storage.PropertiesComponentStorage(GROUP_NAME, PropertiesComponent.getInstance()), executor);
+    super("Substeps", configuration, executor);
+    myConfiguration = configuration;
+//    this(configuration, new Storage.PropertiesComponentStorage(GROUP_NAME, PropertiesComponent.getInstance()), executor);
   }
 
-  public SubstepsConsoleProperties(@NotNull SubstepsRunConfiguration configuration, final Storage storage, Executor executor) {
-    super(storage, configuration.getProject(), executor);
-    myConfiguration = configuration;
-  }
+//  public SubstepsConsoleProperties(@NotNull SubstepsRunConfiguration configuration, final Storage storage, Executor executor) {
+//    super(storage, configuration.getProject(), executor);
+//    myConfiguration = configuration;
+//  }
 
   public SubstepsRunConfiguration getConfiguration() { return myConfiguration; }
 

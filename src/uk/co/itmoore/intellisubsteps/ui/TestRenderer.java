@@ -3,6 +3,7 @@ package uk.co.itmoore.intellisubsteps.ui;
 
 import com.intellij.execution.testframework.PoolOfTestIcons;
 import com.intellij.execution.testframework.TestsUIUtil;
+import com.intellij.execution.testframework.ui.TestsProgressAnimator;
 import com.intellij.icons.AllIcons;
 import com.intellij.rt.execution.junit.states.PoolOfTestStates;
 import com.intellij.ui.SimpleColoredComponent;
@@ -20,7 +21,7 @@ class TestRenderer {
     SubstepTestState state = testProxy.getState();
 
     if (state == SubstepTestState.RUNNING){
-      return isPaused ? AllIcons.RunConfigurations.TestPaused : Animator.getCurrentFrame();
+      return isPaused ? AllIcons.RunConfigurations.TestPaused : TestsProgressAnimator.getCurrentFrame();
     }
     else {
       return ourIcons.get(state);

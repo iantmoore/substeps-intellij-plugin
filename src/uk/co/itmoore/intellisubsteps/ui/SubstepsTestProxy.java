@@ -127,6 +127,11 @@ public class SubstepsTestProxy extends AbstractTestProxy {
     }
 
     @Override
+    public boolean hasPassedTests() {
+        return state == SubstepTestState.PASSED;
+    }
+
+    @Override
     public boolean isIgnored() {
         return false;
     }
@@ -139,6 +144,11 @@ public class SubstepsTestProxy extends AbstractTestProxy {
     @Override
     public String getName() {
         return name;
+    }
+
+    @Override
+    public boolean isConfig() {
+        return false;
     }
 
     @Override

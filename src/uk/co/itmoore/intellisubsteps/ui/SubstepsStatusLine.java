@@ -8,6 +8,7 @@ import com.intellij.execution.process.ProcessHandler;
 import com.intellij.execution.testframework.ui.TestStatusLine;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.progress.util.ColorProgressBar;
+import com.intellij.ui.SimpleColoredComponent;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import uk.co.itmoore.intellisubsteps.ui.events.NewChildEvent;
@@ -30,7 +31,7 @@ public class SubstepsStatusLine extends TestStatusLine {
 
     public void setModel(final SubstepsRunningModel model) {
         myTestsBuilt = true;
-        myProgressBar.setColor(ColorProgressBar.GREEN);
+        myProgressBar.setForeground(ColorProgressBar.GREEN);
         model.addListener(new TestProgressListener(model.getProgress()));
     }
 
@@ -44,10 +45,15 @@ public class SubstepsStatusLine extends TestStatusLine {
                     @Override
                     public void run() {
                         myStateInfo.setTerminated(myState);
-                        if (!myTestsBuilt && myProgressBar.getFraction() == 0.0) {
-                            myProgressBar.setColor(ColorProgressBar.RED);
-                            myProgressBar.setFraction(1.0);
-                            myState.setText(ExecutionBundle.message("junit.running.info.failed.to.start.error.message"));
+                        if (!myTestsBuilt && myProgressBar.getValue() == 0) {
+
+                            setStatusColor(ColorProgressBar.RED);
+                            setFraction(1.0);
+                            myState.append(ExecutionBundle.message("junit.running.info.failed.to.start.error.message"));
+
+//                            myProgressBar.setColor(ColorProgressBar.RED);
+//                            myProgressBar.setFraction(1.0);
+//                            myState.setText(ExecutionBundle.message("junit.running.info.failed.to.start.error.message"));
                         }
                     }
                 });
@@ -86,7 +92,7 @@ public class SubstepsStatusLine extends TestStatusLine {
             return (double)myCompleted/(double)myTotal;
         }
 
-        public void updateLabel(final JLabel label) {
+        public void updateLabel(final SimpleColoredComponent label) {
             final StringBuilder buffer = new StringBuilder();
             if (myDoneEvent != null && myTerminated) {
                 String termMessage = generateTermMessage(getTestCount(0));
@@ -98,7 +104,7 @@ public class SubstepsStatusLine extends TestStatusLine {
             } else {
                 buffer.append(ExecutionBundle.message("junit.running.info.status.running.number.with.name", getTestCount(myDoneEvent != null ? 0 : 1), myCurrentTestName));
             }
-            label.setText(buffer.toString());
+            label.append(buffer.toString());
         }
 
         private String getTestCount(int offset) {
@@ -117,7 +123,7 @@ public class SubstepsStatusLine extends TestStatusLine {
             }
         }
 
-        public void setTerminated(JLabel stateLabel) {
+        public void setTerminated(SimpleColoredComponent stateLabel) {
             myTerminated = true;
             updateLabel(stateLabel);
         }
@@ -144,7 +150,8 @@ public class SubstepsStatusLine extends TestStatusLine {
                 myStateInfo.setDone(completionEvent);
                 myProgress.setDone(completionEvent);
                 if (completionEvent.isTerminated() && !myProgress.hasDefects()) {
-                    myProgressBar.setColor(ColorProgressBar.YELLOW);
+                    //myProgressBar.setColor(ColorProgressBar.YELLOW);
+                    setStatusColor(ColorProgressBar.YELLOW);
                 }
                 updateCounters();
             }
@@ -166,11 +173,16 @@ public class SubstepsStatusLine extends TestStatusLine {
 
         private void updateCounters() {
             myStateInfo.updateCounters(myProgress);
-            myProgressBar.setFraction(myStateInfo.getCompletedPercents());
+
+            setFraction(myStateInfo.getCompletedPercents());
             if (myProgress.hasDefects()) {
-                myProgressBar.setColor(ColorProgressBar.RED);
+                setStatusColor(ColorProgressBar.RED);
             }
             myStateInfo.updateLabel(myState);
+//            myProgressBar.setFraction(myStateInfo.getCompletedPercents());
+//            if (myProgress.hasDefects()) {
+//                myProgressBar.setColor(ColorProgressBar.RED);
+//            }
         }
     }
 }

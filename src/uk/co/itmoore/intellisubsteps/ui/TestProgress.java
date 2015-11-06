@@ -129,7 +129,7 @@ public class TestProgress extends DefaultBoundedRangeModel implements Disposable
     LOG.debug("test progress set value: " + n);
 
     super.setValue(n);
-    TestsUIUtil.showIconProgress(myProject, n, getMaximum(), myProblemsCounter);
+    TestsUIUtil.showIconProgress(myProject, n, getMaximum(), myProblemsCounter, false);
   }
 
   public void dispose() {

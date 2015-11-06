@@ -47,7 +47,7 @@ public class ConsolePanel extends TestResultsPanel {
                         final SubstepsConsoleProperties properties,
                         final ExecutionEnvironment environment,
                         AnAction[] consoleActions) {
-        super(console, consoleActions, properties, environment, PROPORTION_PROPERTY, DEFAULT_PROPORTION);
+        super(console, consoleActions, properties, PROPORTION_PROPERTY, DEFAULT_PROPORTION);
         myPrinter = printer;
     }
 
