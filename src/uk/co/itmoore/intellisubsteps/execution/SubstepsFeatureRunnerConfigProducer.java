@@ -299,11 +299,39 @@ public class SubstepsFeatureRunnerConfigProducer extends RunConfigurationProduce
     @Override
     public boolean isConfigurationFromContext(SubstepsRunConfiguration substepsRunConfiguration, ConfigurationContext configurationContext) {
 
+        // return true, if this config was created from this context
+        boolean rtn = false;
 
-        log.debug("isConfigurationFromContext? path to feature");
+        log.debug("isConfigurationFromContext?");
 
-        // TODO how do we tell ??
+        SubstepsRunnerConfigurationModel model = substepsRunConfiguration.getModel();
 
-        return false;
+        String featureFilePath = configurationContext.getLocation().getVirtualFile().getPath();
+
+        if (model.getPathToFeature().equals(featureFilePath)){
+
+            // it might be the same...
+
+            PsiElement psiElement = configurationContext.getLocation().getPsiElement();
+            if (psiElement instanceof ScenarioImpl){
+
+                ScenarioImpl scenarioImpl = (ScenarioImpl)psiElement;
+
+                if (model.getScenarioName() != null && model.getScenarioName().equals(scenarioImpl.getScenarioName())){
+                    rtn = true;
+                }
+                else {
+                    log.debug("non matching scenario name model: " + model.getScenarioName() + " ctx: " + scenarioImpl.getScenarioName());
+                }
+            }
+            else {
+                log.debug("not a scenario impl psi element: " + psiElement.getClass());
+                if (model.getScenarioName() == null){
+                    rtn = true;
+                }
+            }
+        }
+        log.debug("isConfigurationFromContext? : " + rtn);
+        return rtn;
     }
 }

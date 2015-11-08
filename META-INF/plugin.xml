@@ -20,6 +20,16 @@
 
   <change-notes><![CDATA[
 
+    <h3>0.0.9</h3>
+    <ul>
+        <li>Scenarios in Structure view and in Project View if 'Show Members' selected</li>
+        <li>Run single scenarios via context menu</li>
+        <li>Run configs no longer duplicated</li>
+        <li>Improved parsing of scenarios</li>
+        <li>Upgrade to IntelliJ 15</li>
+    </ul>
+
+
     <h3>0.0.8</h3>
     <ul>
         <li>Run features</li>

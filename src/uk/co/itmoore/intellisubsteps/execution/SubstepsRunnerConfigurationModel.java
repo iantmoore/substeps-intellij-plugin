@@ -5,6 +5,7 @@ import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
 import com.intellij.util.PathsList;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
@@ -146,5 +147,23 @@ public class SubstepsRunnerConfigurationModel {
 
     public void setScenarioName(String scenarioName) {
         this.scenarioName = scenarioName;
+    }
+
+    @Override
+    public String toString() {
+        return "SubstepsRunnerConfigurationModel{" +
+                "pathToFeature='" + pathToFeature + '\'' +
+                ", tags='" + tags + '\'' +
+                ", scenarioName='" + scenarioName + '\'' +
+                ", strict=" + strict +
+                ", homePath='" + homePath + '\'' +
+                ", versionString='" + versionString + '\'' +
+                ", classPathString='" + classPathString + '\'' +
+                ", workingDir='" + workingDir + '\'' +
+                ", javaParameters=" + javaParameters +
+                ", subStepDefinitionDirectory='" + subStepDefinitionDirectory + '\'' +
+                ", stepImplentationClassNames=" + Arrays.toString(stepImplentationClassNames) +
+                ", nonStrictKeywordPrecedence='" + nonStrictKeywordPrecedence + '\'' +
+                '}';
     }
 }

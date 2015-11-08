@@ -61,7 +61,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * Created by ian on 04/08/15.
  */
 public class SubstepsRunProfileState  extends CommandLineState {
-        //extends JavaCommandLineState {
 
     private static final Logger log = LogManager.getLogger(SubstepsRunProfileState.class);
 
@@ -245,61 +244,28 @@ public class SubstepsRunProfileState  extends CommandLineState {
 
     }
 
-//    @Override
     protected JavaParameters createJavaParameters() throws ExecutionException {
-//        JavaParameters params = new JavaParameters();
-
-//        params.setMainClass("uk.co.itmoore.intellisubsteps.execution.MainExecutionNodeRunner");
-
-//        params.setMainClass("com.technophobia.substeps.runner.MainExecutionNodeRunner");
-//        params.setWorkingDirectory("");
-
-//        final String jdkHome = SystemProperties.getJavaHome();
-//        final String versionName = ProjectBundle.message("sdk.java.name.template", SystemProperties.getJavaVersion());
-//
-//        params.setJdk(new JavaSdkImpl().createJdk(versionName, jdkHome));
 
         SubstepsRunConfiguration runConfig = (SubstepsRunConfiguration)this.getEnvironment().getRunProfile();
-
-//        Module module = runConfig.getModel().getModule();
-
-//        params.configureByProject(this.getEnvironment().getProject(), JavaParameters.JDK_AND_CLASSES_AND_TESTS, );
-
-//        params.configureByModule(module, JavaParameters.JDK_AND_CLASSES_AND_TESTS);
-
 
         SubstepsRunnerConfigurationModel model = runConfig.getModel();
 
         JavaParameters params = model.getJavaParameters();
 
-
         params.setWorkingDirectory(model.getWorkingDir());
 
-
-
-        // need to set the SDK off the model
         if (params.getJdk() == null){
 
             log.debug("params on the jdk is null");
 
             params.setJdk(JavaSdkImpl.getInstance().createJdk(model.getVersionString(), model.getHomePath()));
 
-//            params.setJdk(new JavaSdkImpl().createJdk(model.getVersionString(), model.getHomePath()));
-//
-//            params.getClassPath().addAll(model.getClassPathList());
-
             params.getClassPath().add(model.getClassPathString());
-            //
         }
 
-
-
-                // TODO these are passed through to the main class args
         params.getProgramParametersList().add("prog-args-env", "prg-localhost");
 
         ParametersList vmParametersList = params.getVMParametersList();
-
-//        String apiLibPath = "file:///home/ian/projects/intelliSubsteps/lib/substeps-core-api-1.1.3-SNAPSHOT-SKYBET1.jar";
 
         vmParametersList.addParametersString("-Dfile.encoding=UTF-8");
         vmParametersList.addParametersString("-Dcom.sun.management.jmxremote.port=" + jmxPort);
@@ -317,32 +283,10 @@ public class SubstepsRunProfileState  extends CommandLineState {
 
         vmParametersList.addParametersString("-Dsun.io.serialization.extendedDebugInfo=true");
 
-//        SecurityManager sm = new SecurityManager();
-//        System.setSecurityManager(sm);
-
         System.setProperty("java.rmi.server.codebase", rmiClasspathString);
-
-        //    params.getVMParametersList().add("vmarg-environment", "vm-localhost");
-
-//        params.getVMParametersList().addProperty("vm-prop", "vm-prop-localhost");
-
 
         log.debug("launching substeps runner with classpath: " +
                 params.getClassPath().getPathsString() + "\njvm info: " + model.getHomePath() + " version: " + model.getVersionString());
-
-
-        // TODO this is the line that seems to start the process...  reinstate the execute method below to see if there's only one ?
-//        OSProcessHandler osProcessHandler = params.createOSProcessHandler();
-
-
-//        log.debug("about to call osprocessHandler start notify");
-//        osProcessHandler.startNotify();
-//        log.debug("osprocessHandler start notify called");
-
-
-//        params.addEnv("-Denvironment", "min-d-localhost");
-
-
 
         return params;
     }
@@ -367,11 +311,6 @@ public class SubstepsRunProfileState  extends CommandLineState {
 
 
         SubstepsRunConfiguration runConfig = (SubstepsRunConfiguration)this.getEnvironment().getRunProfile();
-
-
-
-//        final CountDownLatch processStarted = new CountDownLatch(1);
-//        final AtomicBoolean processStartedOk = new AtomicBoolean(false);
 
         boolean substepsServerLogsToConsole = true;
         if (substepsServerLogsToConsole){
@@ -419,12 +358,7 @@ public class SubstepsRunProfileState  extends CommandLineState {
 
         log.debug("startProcess called");
 
-
-      //  SubstepsRunConfiguration runConfig = (SubstepsRunConfiguration)this.getEnvironment().getRunProfile();
-
         SubstepsRunnerConfigurationModel model = runConfig.getModel();
-
-
 
         boolean actualRunnerStarted = false;
 
@@ -445,7 +379,7 @@ public class SubstepsRunProfileState  extends CommandLineState {
             substepsExecutionConfig.setStepImplementationClassNames(stepImplsArray);
 
             substepsExecutionConfig.setSubStepsFileName(model.getSubStepDefinitionDirectory());
-            // TODO - step impl classnames in this project
+
             substepsExecutionConfig.setScenarioName(model.getScenarioName());
 
             log.debug("SubstepsExecutionConfig details\nFeature: " + model.getPathToFeature() + "\nsubstep dir: " + model.getSubStepDefinitionDirectory() +
@@ -481,7 +415,6 @@ public class SubstepsRunProfileState  extends CommandLineState {
             log.debug("got root node description: " + rn.getDescription());
 
 
-            // ******  new stuff for building the UI
             final SubstepsTestProxy unboundOutputRoot = new SubstepsTestProxy(rn);
 
             final SubstepsConsoleProperties consoleProperties = new SubstepsConsoleProperties(runConfig, executor);
@@ -698,9 +631,6 @@ public class SubstepsRunProfileState  extends CommandLineState {
         }
         return rn;
     }
-
-
-    ///// NEW stuff if we'er extending from Commandline state
 
     @NotNull
     @Override

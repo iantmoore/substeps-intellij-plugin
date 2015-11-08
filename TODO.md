@@ -23,7 +23,6 @@
 * parse / lexing - inline step table arguments
 
 
-* Run configs - reuse existing configs rather than duplicating
 
 
 
@@ -72,6 +71,7 @@ https://confluence.jetbrains.com/display/IDEADEV/Run+Configurations
 
 # Run configs
 
+# ability to pass in environment props ?  (use -D override ?)
 
 
 https://confluence.jetbrains.com/display/IDEADEV/Run+Configurations

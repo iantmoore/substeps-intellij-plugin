@@ -179,4 +179,11 @@ public class SubstepsRunConfiguration extends ModuleBasedConfiguration {
 //        PathMacroManager.getInstance(getProject()).collapsePathsRecursively(element);
 //    }
 
+
+    @Override
+    public String toString() {
+        return "SubstepsRunConfiguration{" +
+                "model=" + model +
+                '}';
+    }
 }
