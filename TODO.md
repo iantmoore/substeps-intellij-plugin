@@ -10,7 +10,49 @@
 - just try using the substeps ff parser and map onto the tokentypes ??
 
 
-# Current Feature impls
+# Debug configs - how ?
+http://www.jetbrains.org/intellij/sdk/docs/tutorials/run_configurations.html
+
+https://devnet.jetbrains.com/message/5522503#5522503 - some hints here maybe
+
+add     <programRunner implementation="com.intellij.execution.junit.JUnitDebuggerRunner"/>
+
+have a look at JavaTestFrameworkDebuggerRunner
+implement something like that, override the 
+
+see also:
+public class JUnitDebuggerRunner extends JavaTestFrameworkDebuggerRunner {
+  @Override
+  protected boolean validForProfile(@NotNull RunProfile profile) {
+    return profile instanceof JUnitConfiguration;
+  }
+
+  @NotNull
+  @Override
+  protected String getThreadName() {
+    return "junit";
+  }
+
+  @NotNull
+  @Override
+  public String getRunnerId() {
+    return "JUnitDebug";
+  }
+  
+  
+  then :
+
+public boolean canRun(@NotNull String executorId, @NotNull RunProfile profile)
+
+- check for yr configuration instance
+and
+protected RunContentDescriptor createContentDescriptor(Project project, RunProfileState state, RunContentDescriptor contentToReuse, ExecutionEnvironment env) throws ExecutionException
+attaching debugger to vm, with method attachVirtualMachine
+  
+see the link for more details  
+
+
+
 
 
 
