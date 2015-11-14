@@ -3,7 +3,7 @@
 <idea-plugin version="2">
   <id>uk.co.itmoore.intellisubsteps</id>
   <name>Substeps IntelliJ Plugin</name>
-  <version>0.0.9</version>
+  <version>0.0.10-SNAPSHOT</version>
   <vendor email="ian@itmoore.co.uk" url="n/a">Substeps</vendor>
 
   <description><![CDATA[
@@ -14,11 +14,14 @@
     ]]></description>
 
 
-    <!--      Enter short description for your plugin here.<br>
-      <em>most HTML tags may be used</em> -->
-
 
   <change-notes><![CDATA[
+
+    <h3>0.0.10</h3>
+    <ul>
+        <li>Debug support</li>
+    </ul>
+
 
     <h3>0.0.9</h3>
     <ul>
@@ -66,7 +69,7 @@
   </change-notes>
 
   <!-- please see http://confluence.jetbrains.com/display/IDEADEV/Build+Number+Ranges for description -->
-  <idea-version since-build="136.0"/>
+  <idea-version since-build="143.0"/>
 
   <!-- please see http://confluence.jetbrains.com/display/IDEADEV/Plugin+Compatibility+with+IntelliJ+Platform+Products
        on how to target different products -->
@@ -137,11 +140,9 @@
       <!--
         SubstepsFeature and SubstepStepDefinition
 
-
-
-
       -->
 
+    <programRunner implementation="uk.co.itmoore.intellisubsteps.execution.SubstepsDebugRunner"/>
 
 
   </extensions>

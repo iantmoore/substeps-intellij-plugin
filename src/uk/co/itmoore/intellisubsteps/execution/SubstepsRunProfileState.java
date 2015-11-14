@@ -6,7 +6,9 @@ import com.intellij.execution.ExecutionResult;
 import com.intellij.execution.configurations.*;
 import com.intellij.execution.filters.TextConsoleBuilderFactory;
 import com.intellij.execution.process.OSProcessHandler;
+import com.intellij.execution.process.ProcessEvent;
 import com.intellij.execution.process.ProcessHandler;
+import com.intellij.execution.process.ProcessListener;
 import com.intellij.execution.runners.ExecutionEnvironment;
 import com.intellij.execution.runners.ProgramRunner;
 import com.intellij.execution.ui.ConsoleView;
@@ -24,9 +26,11 @@ import com.intellij.openapi.projectRoots.SdkTypeId;
 import com.intellij.openapi.projectRoots.impl.JavaSdkImpl;
 import com.intellij.openapi.util.Computable;
 import com.intellij.openapi.util.Disposer;
+import com.intellij.openapi.util.Key;
 import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.openapi.util.text.StringUtilRt;
 import com.intellij.openapi.vfs.encoding.EncodingManager;
+import com.intellij.rt.execution.testFrameworks.ForkedDebuggerHelper;
 import com.intellij.util.PathUtil;
 import com.intellij.util.SystemProperties;
 import com.intellij.util.lang.UrlClassLoader;
@@ -45,6 +49,8 @@ import uk.co.itmoore.intellisubsteps.ui.actions.RunningTestTracker;
 import uk.co.itmoore.intellisubsteps.ui.events.StateChangedEvent;
 
 import java.io.*;
+import java.net.InetAddress;
+import java.net.ServerSocket;
 import java.nio.charset.Charset;
 import java.nio.charset.IllegalCharsetNameException;
 import java.nio.charset.UnsupportedCharsetException;
@@ -60,11 +66,17 @@ import java.util.concurrent.atomic.AtomicBoolean;
 /**
  * Created by ian on 04/08/15.
  */
-public class SubstepsRunProfileState  extends CommandLineState {
+public class SubstepsRunProfileState  extends CommandLineState{
 
     private static final Logger log = LogManager.getLogger(SubstepsRunProfileState.class);
 
     int jmxPort = 45133;
+    private  OSProcessHandler processHandler = null;
+
+
+//    public ServerSocket getDebugSocket() {
+//        return myServerSocket;
+//    }
 
 
     class WaitingInputStreamConsumer extends InputStreamConsumer {
@@ -243,8 +255,22 @@ public class SubstepsRunProfileState  extends CommandLineState {
         super(environment);
 
     }
+//    protected ServerSocket myServerSocket;
+//
+//    protected void createServerSocket(JavaParameters javaParameters) {
+//        try {
+//            myServerSocket = new ServerSocket(0, 0, InetAddress.getByName("127.0.0.1"));
+//            javaParameters.getProgramParametersList().add("-socket" + myServerSocket.getLocalPort());
+//        }
+//        catch (IOException e) {
+//            //LOG.error(e);
+//        }
+//    }
 
     protected JavaParameters createJavaParameters() throws ExecutionException {
+
+        log.debug("createJavaParameters");
+
 
         SubstepsRunConfiguration runConfig = (SubstepsRunConfiguration)this.getEnvironment().getRunProfile();
 
@@ -274,19 +300,28 @@ public class SubstepsRunProfileState  extends CommandLineState {
         vmParametersList.addParametersString("-Djava.rmi.server.hostname=localhost");
 
 
-        String rmiClasspathString = "\"file://" + model.getClassPathString().replaceAll(File.pathSeparator, " file://") + "\"";
-        // TODO - space seperated list of urls
+//        String rmiClasspathString = "\"file://" + model.getClassPathString().replaceAll(File.pathSeparator, " file://") + "\"";
 
-        log.debug("rmi classpath: " + rmiClasspathString);
+//        log.debug("rmi classpath: " + rmiClasspathString);
 
-        vmParametersList.addParametersString("-Djava.rmi.server.codebase=" + rmiClasspathString);
+//        vmParametersList.addParametersString("-Djava.rmi.server.codebase=" + rmiClasspathString);
 
         vmParametersList.addParametersString("-Dsun.io.serialization.extendedDebugInfo=true");
 
-        System.setProperty("java.rmi.server.codebase", rmiClasspathString);
+//        System.setProperty("java.rmi.server.codebase", rmiClasspathString);
+
+//        createServerSocket(params);
+//
+//
+//        if (myServerSocket != null) {
+//            params.getProgramParametersList().add(ForkedDebuggerHelper.DEBUG_SOCKET + myServerSocket.getLocalPort());
+//        }
+//
 
         log.debug("launching substeps runner with classpath: " +
                 params.getClassPath().getPathsString() + "\njvm info: " + model.getHomePath() + " version: " + model.getVersionString());
+
+
 
         return params;
     }
@@ -366,7 +401,13 @@ public class SubstepsRunProfileState  extends CommandLineState {
         SubstepsJMXClient jmxClient = null;
         try {
             jmxClient = new SubstepsJMXClient();
-            jmxClient.init(jmxPort);
+
+            if (!jmxClient.init(jmxPort)){
+                log.error("jmx init failed");
+                processHandler.destroyProcess();
+                return  new DefaultExecutionResult();
+
+            }
 
             SubstepsExecutionConfig substepsExecutionConfig = new SubstepsExecutionConfig();
 
@@ -635,9 +676,43 @@ public class SubstepsRunProfileState  extends CommandLineState {
     @NotNull
     @Override
     protected OSProcessHandler startProcess() throws ExecutionException {
-        return JavaCommandLineStateUtil.startProcess(createCommandLine(), false);//ansiColoringEnabled());
+
+        if (processHandler != null && !processHandler.isProcessTerminated()){
+            log.debug("existing running process found");
+
+            processHandler.addProcessListener(new ProcessListener() {
+                @Override
+                public void startNotified(ProcessEvent event) {}
+
+                @Override
+                public void processTerminated(ProcessEvent event) {
+                    log.debug("existing process terminated");
+                }
+
+                @Override
+                public void processWillTerminate(ProcessEvent event, boolean willBeDestroyed) {}
+
+                @Override
+                public void onTextAvailable(ProcessEvent event, Key outputType) {}
+            });
+
+            processHandler.destroyProcess();
+
+        }
+
+        processHandler = JavaCommandLineStateUtil.startProcess(createCommandLine(), true); //ansiColoringEnabled());
+
+        return processHandler;
     }
 
+    public OSProcessHandler getProcess(){
+
+        if (processHandler.isProcessTerminated()){
+            log.warn("returning terminated process");
+        }
+
+        return processHandler;
+    }
 
     protected GeneralCommandLine createCommandLine() throws ExecutionException {
 

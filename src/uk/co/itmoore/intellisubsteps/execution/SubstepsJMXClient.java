@@ -44,34 +44,39 @@ public class SubstepsJMXClient implements SubstepsRunner, NotificationListener {
 
     private ExecutionNodeResultNotificationHandler notificiationHandler = null;
 
-    public void init(final int portNumber) { //throws MojoExecutionException {
+    public boolean init(final int portNumber) { //throws MojoExecutionException {
 
         final String url = "service:jmx:rmi:///jndi/rmi://:" + portNumber + "/jmxrmi";
 
         // The address of the connector server
-
+        boolean rtn = false;
         try {
             final JMXServiceURL serviceURL = new JMXServiceURL(url);
 
             final Map<String, ?> environment = null;
             this.cntor = getConnector(serviceURL, environment);
 
+            if (this.cntor != null){
 
-            // Obtain a "stub" for the remote MBeanServer
-            mbsc = this.cntor.getMBeanServerConnection();
+                // Obtain a "stub" for the remote MBeanServer
+                mbsc = this.cntor.getMBeanServerConnection();
 
-            final ObjectName objectName = new ObjectName(SubstepsServerMBean.SUBSTEPS_JMX_MBEAN_NAME);
-            this.mbean = MBeanServerInvocationHandler.newProxyInstance(mbsc, objectName, SubstepsServerMBean.class,
-                    false);
+                final ObjectName objectName = new ObjectName(SubstepsServerMBean.SUBSTEPS_JMX_MBEAN_NAME);
+                this.mbean = MBeanServerInvocationHandler.newProxyInstance(mbsc, objectName, SubstepsServerMBean.class,
+                        false);
 
-            addNotificationListener(objectName);
+                addNotificationListener(objectName);
+                rtn = true;
+            }
 
         } catch (final IOException e) {
 
             log.error("IOException", e);
+
         } catch (final MalformedObjectNameException e) {
             log.error("MalformedObjectNameException", e);
         }
+        return rtn;
     }
 
     protected void addNotificationListener(ObjectName objectName) throws IOException {
@@ -203,9 +208,10 @@ public class SubstepsJMXClient implements SubstepsRunner, NotificationListener {
 
         boolean successfulShutdown = false;
         try {
-
-            this.mbean.shutdown();
-            successfulShutdown = true;
+            if (this.mbean != null) {
+                this.mbean.shutdown();
+            }
+                successfulShutdown = true;
 
         } catch (final RuntimeException re) {
 
