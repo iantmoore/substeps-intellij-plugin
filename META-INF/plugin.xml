@@ -17,7 +17,7 @@
 <idea-plugin version="2">
   <id>uk.co.itmoore.intellisubsteps</id>
   <name>Substeps IntelliJ Plugin</name>
-  <version>0.0.11</version>
+  <version>0.0.12-SNAPSHOT</version>
   <vendor email="ian@itmoore.co.uk" url="n/a">Substeps</vendor>
 
   <description><![CDATA[
@@ -30,6 +30,10 @@
 
 
   <change-notes><![CDATA[
+    <h3>0.0.12</h3>
+    <ul>
+        <li>improved finding of substep definitions</li>
+    </ul>
 
     <h3>0.0.11</h3>
     <ul>

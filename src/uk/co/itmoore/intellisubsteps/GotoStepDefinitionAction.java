@@ -77,12 +77,6 @@ public class GotoStepDefinitionAction extends AnAction {
 
             final Project project = getProject(anActionEvent);
 
-//            GlobalSearchScope scope = GlobalSearchScope.allScope(project);
-            //PsiClass psiClass = JavaPsiFacade.getInstance(project).findClass("im.StepImplentations", scope);
-
-            // this works loading up a class via the decompiler
-//        PsiClass psiClass = JavaPsiFacade.getInstance(project).findClass("com.technophobia.webdriver.substeps.impl.ActionWebDriverSubStepImplementations", scope);
-
             List<PsiClassAndExpression> matchingProjectFiles = getMatchingProjectFiles(stepText, project);
 
             if (!matchingProjectFiles.isEmpty()) {
@@ -111,30 +105,6 @@ public class GotoStepDefinitionAction extends AnAction {
     }
 
     // get a vfile:   https://confluence.jetbrains.com/display/IDEADEV/IntelliJ+IDEA+Architectural+Overview
-
-
-        // TODO accessing a substep file...
-
-//            VirtualFile vFile = LocalFileSystem.getInstance().findFileByIoFile(new File("/home/ian/projects/IdeaProjects/untitled/src/y.substeps"));
-//            int logicalLine = 2;
-//            int logicalColumn = 2;
-//            int offset = 2;
-//            boolean persistent = true;
-//
-//            OpenFileDescriptor od = new OpenFileDescriptor(project, vFile, logicalLine, logicalColumn);
-//
-//        List<FileEditor> fileEditors = fileEditorManager.openEditor(od, true);
-//
-//        for (FileEditor fe : fileEditors){
-//            log.debug("file editor name: " +
-//            fe.getName());
-//
-//        }
-//
-
-//        } else {
-//            //handle the class not found
-//        }
 
 
     // if only java had tuples :-)
@@ -182,7 +152,6 @@ public class GotoStepDefinitionAction extends AnAction {
 
     private String getMatchingSubstepDefExpression(PsiFile file, String text) {
 
-        // TODO take parameters into account
 
         String[] lines = file.getText().split("\n");
 
@@ -194,11 +163,10 @@ public class GotoStepDefinitionAction extends AnAction {
                 // does this def match the text
                 Pattern stepDefPattern = Pattern.compile(def.replaceAll("(<[^>]*>)", "\"?([^\"]*)\"?"));
                 if (stepDefPattern.matcher(text).matches()){
-                    return def;
+                    return line;
                 }
             }
         }
-
 
         return null;
     }
