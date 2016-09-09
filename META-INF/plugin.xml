@@ -17,7 +17,7 @@
 <idea-plugin version="2">
   <id>uk.co.itmoore.intellisubsteps</id>
   <name>Substeps IntelliJ Plugin</name>
-  <version>1.0.0</version>
+  <version>1.0.1</version>
   <vendor email="ian@itmoore.co.uk" url="n/a">Substeps</vendor>
 
   <description><![CDATA[
@@ -30,6 +30,14 @@
 
 
   <change-notes><![CDATA[
+    <h3>1.0.1</h3>
+    <ul>
+        <li>Updated to version 1.0.3 of substeps</li>
+        <li>Updated to IU-162.1447.26 version of IntelliJ</li>
+        <li>Fixed <a href="https://github.com/iantmoore/substeps-intellij-plugin/issues/3>Issue #3</a> as part of the IntelliJ upgrade</li>
+    </ul>
+
+
     <h3>1.0.0</h3>
     <ul>
         <li>Switched dependency to 1.0.x version of org.substeps fork of Substeps</li>
@@ -99,7 +107,7 @@
   </change-notes>
 
   <!-- please see http://confluence.jetbrains.com/display/IDEADEV/Build+Number+Ranges for description -->
-  <idea-version since-build="143.0"/>
+  <idea-version since-build="162.1"/>
 
   <!-- please see http://confluence.jetbrains.com/display/IDEADEV/Plugin+Compatibility+with+IntelliJ+Platform+Products
        on how to target different products -->

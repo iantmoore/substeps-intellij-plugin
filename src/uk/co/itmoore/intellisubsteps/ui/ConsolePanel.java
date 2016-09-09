@@ -37,7 +37,7 @@ public class ConsolePanel extends TestResultsPanel {
     private static final float DEFAULT_PROPORTION = 0.2f;
 
     private SubstepsStatusLine myStatusLine;
-    private StatisticsPanel myStatisticsPanel;
+//    private StatisticsPanel myStatisticsPanel;
     private SubstepsTestTreeView myTreeView;
     private TestsOutputConsolePrinter myPrinter;
     private StartingProgress myStartingProgress;
@@ -57,11 +57,11 @@ public class ConsolePanel extends TestResultsPanel {
         myStartingProgress = new StartingProgress(myTreeView);
     }
 
-    @Override
-    protected JComponent createStatisticsPanel() {
-        myStatisticsPanel = new StatisticsPanel();
-        return myStatisticsPanel;
-    }
+//    @Override
+//    protected JComponent createStatisticsPanel() {
+//        myStatisticsPanel = new StatisticsPanel();
+//        return myStatisticsPanel;
+//    }
 
 //    @Override
 //    protected ToolbarPanel createToolbarPanel() {
@@ -107,7 +107,7 @@ public class ConsolePanel extends TestResultsPanel {
 
 
 
-        myStatisticsPanel.attachTo(model);
+//        myStatisticsPanel.attachTo(model);
     }
 
     private void stopStartingProgress() {
