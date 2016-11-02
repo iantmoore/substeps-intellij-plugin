@@ -97,7 +97,7 @@ public class SubstepDefinitionParser implements PsiParser {
 
                 builder.advanceLexer(); // to the end of the line
 
-                substepDefinitionMarker.done(SubstepDefinitionElementTypes.SUBSTEP_DEFINITION_ELEMENT_TYPE);
+                substepDefinitionMarker.done(SubstepDefinitionElementTypes.SUBSTEP_DEFINITION_NAME_ELEMENT_TYPE);
 
             }
             else if (tokenType == SubstepDefinitionElementTypes.SUBSTEP_DEFINITION_STEP_ELEMENT_TYPE){

@@ -17,8 +17,8 @@
 <idea-plugin version="2">
   <id>uk.co.itmoore.intellisubsteps</id>
   <name>Substeps IntelliJ Plugin</name>
-  <version>1.0.1</version>
-  <vendor email="ian@itmoore.co.uk" url="n/a">Substeps</vendor>
+  <version>1.0.2</version>
+  <vendor email="ian@itmoore.co.uk" url="http://substeps.github.io">Substeps</vendor>
 
   <description><![CDATA[
       <h2>A plugin to help write and execute Substep features and compose substeps</h2>
@@ -30,6 +30,11 @@
 
 
   <change-notes><![CDATA[
+    <h3>1.0.2</h3>
+    <ul>
+        <li>Find callers of steps</li>
+
+    </ul>
     <h3>1.0.1</h3>
     <ul>
         <li>Updated to version 1.0.3 of substeps</li>
@@ -124,10 +129,10 @@
 
     <fileTypeFactory implementation="uk.co.itmoore.intellisubsteps.psi.stepdefinition.SubstepsStepDefinitionFileTypeFactory"/>
 
-    <lang.syntaxHighlighterFactory key="SubstepStepDefinition"
+    <lang.syntaxHighlighterFactory key="SubstepStepDefinition" language="SubstepStepDefinition"
          implementationClass="uk.co.itmoore.intellisubsteps.psi.stepdefinition.SubstepStepDefinitionSyntaxHighlighterFactory"/>
 
-    <lang.syntaxHighlighterFactory key="SubstepsFeature"
+    <lang.syntaxHighlighterFactory key="SubstepsFeature" language="SubstepsFeature"
          implementationClass="uk.co.itmoore.intellisubsteps.psi.feature.FeatureSyntaxHighlighterFactory"/>
 
       <colorSettingsPage implementation="uk.co.itmoore.intellisubsteps.SubstepsColourSettingsPage"/>
@@ -159,7 +164,13 @@
 
       <lang.documentationProvider language="SubstepsFeature" implementationClass="uk.co.itmoore.intellisubsteps.SubstepsDocumentationProvider"/>
 
+      <!--<lang.findUsagesProvider language="SubstepStepDefinition"-->
+                               <!--implementationClass="uk.co.itmoore.intellisubsteps.SubstepsFindUsagesProvider"/>-->
 
+    <!--<lang.findUsagesProvider language="SubstepsFeature"-->
+                             <!--implementationClass="uk.co.itmoore.intellisubsteps.SubstepsFindUsagesProvider"/>-->
+
+      <fileBasedIndex implementation="uk.co.itmoore.intellisubsteps.SubstepsFileBasedIndexExtension"/>
 
       <configurationType implementation="uk.co.itmoore.intellisubsteps.execution.FeatureRunnerConfigurationType"/>
 
@@ -196,13 +207,17 @@
 
   <actions>
 
-      <action id="Go to step definition" class="uk.co.itmoore.intellisubsteps.GotoStepDefinitionAction"
-              text="Go to Step definition" description="A test menu item" >
-          <add-to-group anchor="last" group-id="EditorPopupMenu"/>
-              </action>
+      <action id="go-to-step-definition" class="uk.co.itmoore.intellisubsteps.GotoStepDefinitionAction"
+              text="Go to Step definition" description="go to the step definition in a substeps file" >
+           <add-to-group anchor="last" group-id="EditorPopupMenu"/>
+      </action>
+
+    <action id="find-substep-usages" class="uk.co.itmoore.intellisubsteps.FindSubstepUsagesAction"
+            text="Find substep usages" description="Find uses of substep definitions" >
+      <add-to-group anchor="last" group-id="EditorPopupMenu"/>
+    </action>
 
 
-
-  </actions>
+ </actions>
 
 </idea-plugin>

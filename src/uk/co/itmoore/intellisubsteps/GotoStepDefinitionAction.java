@@ -25,34 +25,10 @@ import java.util.regex.Pattern;
 /**
  * Created by ian on 25/07/15.
  */
-public class GotoStepDefinitionAction extends AnAction {
+public class GotoStepDefinitionAction extends BaseSubstepsEditorAction {
 
     private static final Logger log = LogManager.getLogger(GotoStepDefinitionAction.class);
 
-    public static Project getProject(AnActionEvent event)
-    {
-        return PlatformDataKeys.PROJECT.getData(event.getDataContext());
-    }
-
-    public static PsiElement getPsiElement(AnActionEvent event)
-    {
-        return LangDataKeys.PSI_ELEMENT.getData(event.getDataContext());
-    }
-
-    public static Editor getEditor(AnActionEvent event)
-    {
-        return PlatformDataKeys.EDITOR.getData(event.getDataContext());
-    }
-
-    public static PsiFile getPsiFile(AnActionEvent event)
-    {
-        return LangDataKeys.PSI_FILE.getData(event.getDataContext());
-    }
-
-    public static VirtualFile getVirtualFile(AnActionEvent event)
-    {
-        return PlatformDataKeys.VIRTUAL_FILE.getData(event.getDataContext());
-    }
 
     @Override
     public void actionPerformed(AnActionEvent anActionEvent) {

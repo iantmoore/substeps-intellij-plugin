@@ -89,7 +89,7 @@ public class FeatureLexer extends LexerBase {
         bufString = buffer.toString();
 
 //        String sample = buffer.toString().substring(0, buffer.length() > 20 ? 20 : buffer.length());
-        log.debug("start buffer: " +
+        log.trace("start buffer: " +
                 buffer + " ....startOffset: " +
                 startOffset + " endOffset: " + endOffset + " initialState: " + initialState);
 
@@ -134,7 +134,7 @@ public class FeatureLexer extends LexerBase {
     @Override
     public void advance() {
 
-        log.debug("advance");
+        log.trace("advance");
 
         if (myPosition > 0){
 
@@ -155,7 +155,7 @@ public class FeatureLexer extends LexerBase {
         myCurrentTokenStart = myPosition;
         char c = myBuffer.charAt(myPosition);
 
-        log.debug("char: [" + c + "] @ " + myPosition);
+        log.trace("char: [" + c + "] @ " + myPosition);
 
         if (Character.isWhitespace(c)) {
 //            log.debug("whitespace");
@@ -189,7 +189,7 @@ public class FeatureLexer extends LexerBase {
             myPosition++;
         }
         else {
-            log.debug("current state = " + myState + " myPosition: " + myPosition + " myEndOffset: " +  myEndOffset);
+            log.trace("current state = " + myState + " myPosition: " + myPosition + " myEndOffset: " +  myEndOffset);
 
 
             if (myState == FeatureLexerState.STATE_DEFAULT || myState == FeatureLexerState.STATE_AFTER_FEATURE_NAME) {
@@ -210,7 +210,7 @@ public class FeatureLexer extends LexerBase {
                         return;
                     }
                 }
-                log.debug("in default state, falling through..");
+                log.trace("in default state, falling through..");
             }
 
 
@@ -357,7 +357,7 @@ public class FeatureLexer extends LexerBase {
                 if (myPosition < myBuffer.length()) {
                     c = myBuffer.charAt(myPosition);
                 } else {
-                    log.debug("hopefully bailing out here: myBuffer.length(): " + myBuffer.length() + " myEndOffset: " + myEndOffset);
+                    log.trace("hopefully bailing out here: myBuffer.length(): " + myBuffer.length() + " myEndOffset: " + myEndOffset);
                 }
             }
             returnWhitespace(mark);
@@ -443,7 +443,7 @@ public class FeatureLexer extends LexerBase {
 //                    String nextLine = bufString.substring(myPosition + 1, nextLineEnd);
                     // if the nextLine is empty, then reset
 //                    if (nextLine.trim().isEmpty()) {
-                        log.debug("next content line contains a keyword, resetting state");
+                        log.trace("next content line contains a keyword, resetting state");
                         myState = FeatureLexerState.STATE_DEFAULT;
                     }
 //                    else {

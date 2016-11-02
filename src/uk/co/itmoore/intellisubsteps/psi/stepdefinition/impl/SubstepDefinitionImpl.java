@@ -16,7 +16,7 @@ import uk.co.itmoore.intellisubsteps.psi.stepdefinition.psi.SubstepDefinition;
  * Created by ian on 05/07/15.
  */
 
-// represents a define: block with steps
+// represents the substep def - named by the string that follows the define:
 
 public class SubstepDefinitionImpl extends SubstepsPsiElementBase implements SubstepDefinition {
 
@@ -39,6 +39,8 @@ public class SubstepDefinitionImpl extends SubstepsPsiElementBase implements Sub
 
         name =node.getText();
     }
+
+
 
     @Override
     protected void acceptSubstepDefinition(SubstepsDefinitionElementVisitor visitor) {

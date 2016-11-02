@@ -1,8 +1,15 @@
 package uk.co.itmoore.intellisubsteps.test;
 
 import com.intellij.psi.tree.IElementType;
+import org.junit.Assert;
 import org.junit.Test;
+import uk.co.itmoore.intellisubsteps.psi.feature.FeatureLexer;
 import uk.co.itmoore.intellisubsteps.psi.stepdefinition.SubstepStepDefinitionLexer;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.hamcrest.Matchers.is;
 
 /**
  * Created by ian on 05/07/15.
@@ -41,12 +48,14 @@ public class SubstepDefinitionLexerTest {
 
 
     private String printState(SubstepStepDefinitionLexer lexer ){
-        return
-                "[" + lexer.getTokenText() + "]" +
-                "\nstate: " +  lexer.getState() +
+        return "\nstate: " +  lexer.getState() +
                 " tokentype: " +  lexer.getTokenType()+
         " token start: " +  lexer.getTokenStart()+
         " token end: " +  lexer.getTokenEnd()+
-        " buf end: " +  lexer.getBufferEnd();
+        " buf end: " +  lexer.getBufferEnd() + "::" + "[" + lexer.getTokenText() + "]";
     }
+
+
+
+
 }
