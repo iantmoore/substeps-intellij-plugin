@@ -21,6 +21,7 @@ import static com.intellij.util.indexing.ScalarIndexExtension.VOID_DATA_EXTERNAL
 public class SubstepsFileBasedIndexExtension extends FileBasedIndexExtension {
 
     private static final Logger log = LogManager.getLogger(SubstepsFileBasedIndexExtension.class);
+
     public static final @NonNls ID<String, Void> NAME = ID.create("SubstepsIndex");
 
     private final MyDataIndexer myDataIndexer = new MyDataIndexer();
@@ -61,6 +62,12 @@ public class SubstepsFileBasedIndexExtension extends FileBasedIndexExtension {
     }
 
 
+    /**
+     * TODO - how to access this index
+     *
+     * http://www.jetbrains.org/intellij/sdk/docs/basics/indexing_and_psi_stubs/file_based_indexes.html
+     */
+
     private static class MyDataIndexer implements DataIndexer<String, Void, FileContent> {
 
         private static final Logger log = LogManager.getLogger(MyDataIndexer.class);
@@ -69,6 +76,7 @@ public class SubstepsFileBasedIndexExtension extends FileBasedIndexExtension {
         @Override
         @NotNull
         public Map<String, Void> map(@NotNull final FileContent inputData) {
+
 
             log.debug("mapping data: " + inputData.getFileName());
 

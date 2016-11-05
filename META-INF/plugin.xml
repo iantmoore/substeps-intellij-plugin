@@ -32,7 +32,7 @@
   <change-notes><![CDATA[
     <h3>1.0.2</h3>
     <ul>
-        <li>Find callers of steps</li>
+        <li>Initial implementation of find usages of steps</li>
 
     </ul>
     <h3>1.0.1</h3>
@@ -170,7 +170,9 @@
     <!--<lang.findUsagesProvider language="SubstepsFeature"-->
                              <!--implementationClass="uk.co.itmoore.intellisubsteps.SubstepsFindUsagesProvider"/>-->
 
+<!--
       <fileBasedIndex implementation="uk.co.itmoore.intellisubsteps.SubstepsFileBasedIndexExtension"/>
+-->
 
       <configurationType implementation="uk.co.itmoore.intellisubsteps.execution.FeatureRunnerConfigurationType"/>
 

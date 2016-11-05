@@ -31,4 +31,8 @@ public abstract class SubstepsDefinitionElementVisitor extends PsiElementVisitor
     public void visitSubstepDefinitionName(SubstepDefinitionNameImpl substepDefinitionName) {
         visitElement(substepDefinitionName);
     }
+
+    public void visitSubstepDefinitionParameter(SubstepDefinitionParameterImpl substepDefinitionParameter) {
+        visitElement(substepDefinitionParameter);
+    }
 }
