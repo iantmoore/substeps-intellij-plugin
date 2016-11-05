@@ -228,7 +228,7 @@ public class FeatureParser implements PsiParser {
                     break;
                 }
                 else if (builder.eof()){
-                    log.debug("breaking out of parseScenario outline");
+                    log.trace("breaking out of parseScenario outline");
                     break;
                 } else {
                     log.trace("parseScenario outline tokenType == " + tokenType.toString());
@@ -239,7 +239,7 @@ public class FeatureParser implements PsiParser {
                     }
                     else if (tokenType == FeatureElementTypes.SCENARIO_OUTLINE_NAME_ELEMENT_TYPE){
 
-                        log.debug("scenario outline name element");
+                        log.trace("scenario outline name element");
 
                         final PsiBuilder.Marker scenarioNameMarker = builder.mark();
 
@@ -250,7 +250,7 @@ public class FeatureParser implements PsiParser {
                     }
                     else if (tokenType == FeatureElementTypes.STEP_ELEMENT_TYPE){
 
-                        log.debug("scenario outline step element start");
+                        log.trace("scenario outline step element start");
 
                         final PsiBuilder.Marker step = builder.mark();
 
@@ -264,7 +264,7 @@ public class FeatureParser implements PsiParser {
                     }
 
                     else {
-                        log.debug("parse scenario outline fell through..");
+                        log.trace("parse scenario outline fell through..");
                         advanceLexer(builder, "parse scenario outline advancing  lexer");
                     }
                 }
@@ -287,7 +287,7 @@ public class FeatureParser implements PsiParser {
             log.trace("going round the parse loop, offset: " + builder.getCurrentOffset());
 
             if (tokenType == null ) {
-                log.debug("breaking out of parseScenario because token is null");
+                log.trace("breaking out of parseScenario because token is null");
                 break;
             }
             else {
@@ -295,11 +295,11 @@ public class FeatureParser implements PsiParser {
                 log.trace("token: " + tokenType.toString() + " text: " + builder.getTokenText());
 
                 if (endOfScenarioTokens.contains(tokenType) || (tokenType == FeatureTokenTypes.SCENARIO_KEYWORD_TOKEN && builder.getCurrentOffset() > start)){
-                    log.debug("breaking out of parseScenario because end of scenario token");
+                    log.trace("breaking out of parseScenario because end of scenario token");
                     break;
                 }
                 else if (builder.eof()){
-                    log.debug("breaking out of parseScenario");
+                    log.trace("breaking out of parseScenario");
                     break;
                 } else {
                     log.trace("parseScenario tokenType == " + tokenType.toString());
@@ -309,7 +309,7 @@ public class FeatureParser implements PsiParser {
                         advanceLexer(builder, "parsed colon");
                     } else if (tokenType == FeatureElementTypes.SCENARIO_NAME_ELEMENT_TYPE) {
 
-                        log.debug("scenario name element");
+                        log.trace("scenario name element");
 
                         final PsiBuilder.Marker scenarioNameMarker = builder.mark();
 
@@ -319,7 +319,7 @@ public class FeatureParser implements PsiParser {
 
                     } else if (tokenType == FeatureElementTypes.STEP_ELEMENT_TYPE) {
 
-                        log.debug("scenario step element start");
+                        log.trace("scenario step element start");
 
                         final PsiBuilder.Marker step = builder.mark();
 
@@ -327,7 +327,7 @@ public class FeatureParser implements PsiParser {
 
                         step.done(FeatureElementTypes.STEP_ELEMENT_TYPE);
 
-                        log.debug("scenario step element complete");
+                        log.trace("scenario step element complete");
 
 
                     } else {

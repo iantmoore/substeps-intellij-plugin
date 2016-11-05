@@ -1,11 +1,10 @@
 package uk.co.itmoore.intellisubsteps.psi.stepdefinition.psi;
 
-import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiNamedElement;
 
 /**
- * Created by ian on 19/07/15.
+ * Created by ian on 02/11/16.
  */
-public interface SubstepDefinition extends PsiElement {
+public interface SubstepDefinitionParameter extends PsiNamedElement {
     String getName();
 }

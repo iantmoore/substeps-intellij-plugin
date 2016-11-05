@@ -37,28 +37,28 @@ public class SubstepDefinitionParser implements PsiParser {
 
     private static void parseFileTopLevel(PsiBuilder builder) {
 
-        log.debug("parse file top level");
+        log.trace("parse file top level");
 
         while(!builder.eof()) {
             final IElementType tokenType = builder.getTokenType();
 
-            log.debug("tokenType: " + tokenType.toString());
+            log.trace("tokenType: " + tokenType.toString());
 
             if (tokenType == SubstepDefinitionTokenTypes.DEFINE_KEYWORD_TOKEN) {
                 parseSubstepDefinition(builder);
             }
             else {
-                log.debug("advancing");
+                log.trace("advancing");
                 builder.advanceLexer();
             }
         }
-        log.debug("parse file top level - done");
+        log.trace("parse file top level - done");
 
     }
 
     private static void parseSubstepDefinition(PsiBuilder builder) {
 
-        log.debug("parseSubstepDefinition");
+        log.trace("parseSubstepDefinition");
 
         final PsiBuilder.Marker substepDefineMarker = builder.mark();
 
@@ -82,12 +82,12 @@ public class SubstepDefinitionParser implements PsiParser {
             final IElementType tokenType = builder.getTokenType();
 
             if (tokenType != null){
-                log.debug("round the parse loop, got token: " + tokenType.toString());
+                log.trace("round the parse loop, got token: " + tokenType.toString());
             }
 
             if (tokenType == SubstepDefinitionTokenTypes.COLON_TOKEN){
                 // nop
-                log.debug("parsed colon");
+                log.trace("parsed colon");
                 builder.advanceLexer();
             }
             else if (tokenType == SubstepDefinitionTokenTypes.SUBSTEP_DEFINITION_TOKEN){
@@ -95,9 +95,9 @@ public class SubstepDefinitionParser implements PsiParser {
 
                 final PsiBuilder.Marker substepDefinitionMarker = builder.mark();
 
-                builder.advanceLexer(); // to the end of the line
+                parseSubstepDefinitionName(builder);
 
-                substepDefinitionMarker.done(SubstepDefinitionElementTypes.SUBSTEP_DEFINITION_ELEMENT_TYPE);
+                substepDefinitionMarker.done(SubstepDefinitionElementTypes.SUBSTEP_DEFINITION_NAME_ELEMENT_TYPE);
 
             }
             else if (tokenType == SubstepDefinitionElementTypes.SUBSTEP_DEFINITION_STEP_ELEMENT_TYPE){
@@ -123,12 +123,12 @@ public class SubstepDefinitionParser implements PsiParser {
 
 
                     // TODO end this marker and bail
-                    log.debug("got another DEFINE keyword with LineBreaksBefore");
+                    log.trace("got another DEFINE keyword with LineBreaksBefore");
                     break;
 //                    descMarker = builder.mark();
                 }
                 else {
-                    log.debug("define keyword no line break before");
+                    log.trace("define keyword no line break before");
                     builder.advanceLexer();
                 }
 
@@ -138,6 +138,31 @@ public class SubstepDefinitionParser implements PsiParser {
             }
         }
 
+    }
+
+    private static void parseSubstepDefinitionName(PsiBuilder builder) {
+
+        builder.advanceLexer(); // to the end of the line
+
+        // TODO - placeholder to parse out parameteres ?
+//        int start = builder.getCurrentOffset();
+//        log.trace("parseSubstepDefinitionName @" + start);
+//
+//        while(true) {
+//            final IElementType tokenType = builder.getTokenType();
+//
+//            log.trace("going round the parse loop, offset: " + builder.getCurrentOffset());
+//
+//            if (tokenType == null) {
+//                log.trace("breaking out of parseSubstepDefinitionName because token is null");
+//                break;
+//            } else {
+//                log.trace("token: " + tokenType.toString() + " text: " + builder.getTokenText());
+//
+//                builder.advanceLexer(); // to the end of the line
+//            }
+//
+//        }
     }
 
     private static boolean hadLineBreakBefore(PsiBuilder builder, int prevTokenEnd) {

@@ -5,12 +5,14 @@ package uk.co.itmoore.intellisubsteps.test;
  */
 
 import com.intellij.testFramework.ParsingTestCase;
+import org.junit.Test;
 import uk.co.itmoore.intellisubsteps.psi.stepdefinition.SubstepDefinitionParserDefinition;
 
 public class SubstepDefinitionParsingTest extends ParsingTestCase {
     public SubstepDefinitionParsingTest() {
         super("", "substeps", new SubstepDefinitionParserDefinition());
     }
+
 
     public void testParsingTestData() {
         doTest(true);

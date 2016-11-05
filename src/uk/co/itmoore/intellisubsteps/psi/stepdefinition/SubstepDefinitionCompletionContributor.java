@@ -1,51 +1,15 @@
 package uk.co.itmoore.intellisubsteps.psi.stepdefinition;
 
-import com.google.common.base.Strings;
-import com.google.common.io.CharStreams;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.reflect.TypeToken;
-import com.intellij.analysis.AnalysisScope;
-import com.intellij.codeInsight.completion.*;
-import com.intellij.codeInsight.lookup.LookupElement;
-import com.intellij.codeInsight.lookup.LookupElementBuilder;
-import com.intellij.openapi.module.Module;
-import com.intellij.openapi.module.ModuleManager;
-import com.intellij.openapi.module.ModuleUtil;
-import com.intellij.openapi.project.Project;
-import com.intellij.openapi.roots.ContentIterator;
-import com.intellij.openapi.roots.ModuleRootManager;
-import com.intellij.openapi.roots.OrderRootType;
-import com.intellij.openapi.roots.libraries.LibrariesHelper;
-import com.intellij.openapi.roots.libraries.Library;
-import com.intellij.openapi.roots.ui.configuration.libraryEditor.LibraryRootsComponent;
-
-
-import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.codeInsight.completion.CompletionParameters;
+import com.intellij.codeInsight.completion.CompletionProvider;
+import com.intellij.codeInsight.completion.CompletionResultSet;
+import com.intellij.codeInsight.completion.CompletionType;
 import com.intellij.patterns.PlatformPatterns;
-import com.intellij.psi.*;
 import com.intellij.util.ProcessingContext;
-import com.intellij.util.Processor;
-import com.technophobia.substeps.glossary.StepDescriptor;
-import com.technophobia.substeps.glossary.StepImplementationsDescriptor;
-import com.technophobia.substeps.glossary.XMLSubstepsGlossarySerializer;
-import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
-import uk.co.itmoore.intellisubsteps.SubstepsIcons;
 import uk.co.itmoore.intellisubsteps.psi.SubstepsCompletionContributor;
-import uk.co.itmoore.intellisubsteps.psi.stepdefinition.psi.SubstepDefinition;
-import uk.co.itmoore.intellisubsteps.psi.stepdefinition.psi.SubstepsDefinitionFile;
-
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.lang.reflect.Type;
-import java.util.*;
-import java.util.jar.JarFile;
-import java.util.zip.ZipEntry;
 
 /**
  * Created by ian on 04/07/15.

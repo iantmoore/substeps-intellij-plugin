@@ -27,6 +27,8 @@ public interface SubstepDefinitionTokenTypes extends SubstepTokenTypes {
     SubstepDefinitionElementType SUBSTEP_DEFINITION_TOKEN = new SubstepDefinitionElementType("SUBSTEP_DEFINITION_TOKEN");
     SubstepDefinitionElementType SUBSTEP_STEP_TOKEN = new SubstepDefinitionElementType("SUBSTEP_STEP_TOKEN");
 
+    SubstepDefinitionElementType SUBSTEP_PARAMETER_START_TOKEN = new SubstepDefinitionElementType("SUBSTEP_PARAMETER_START_TOKEN");
+    SubstepDefinitionElementType SUBSTEP_PARAMETER_CLOSE_TOKEN = new SubstepDefinitionElementType("SUBSTEP_PARAMETER_CLOSE_TOKEN");
 
 
     TokenSet KEYWORDS = TokenSet.create(DEFINE_KEYWORD_TOKEN, SUBSTEP_DEFINITION_TOKEN, SUBSTEP_STEP_TOKEN);

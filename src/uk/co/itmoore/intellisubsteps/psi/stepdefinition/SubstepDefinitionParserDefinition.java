@@ -16,10 +16,7 @@ import com.intellij.psi.util.PsiUtilCore;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
-import uk.co.itmoore.intellisubsteps.psi.stepdefinition.impl.SubstepDefinitionDefineBlockImpl;
-import uk.co.itmoore.intellisubsteps.psi.stepdefinition.impl.SubstepDefinitionImpl;
-import uk.co.itmoore.intellisubsteps.psi.stepdefinition.impl.SubstepDefinitionStepImpl;
-import uk.co.itmoore.intellisubsteps.psi.stepdefinition.impl.SubstepDefinitionsFileImpl;
+import uk.co.itmoore.intellisubsteps.psi.stepdefinition.impl.*;
 
 /**
  * Created by ian on 05/07/15.
@@ -36,7 +33,7 @@ public class SubstepDefinitionParserDefinition implements ParserDefinition {
     @NotNull
     @Override
     public Lexer createLexer(Project project) {
-        return new SubstepStepDefinitionLexer();
+        return new SubstepDefinitionLexer2();
     }
 
     @Override
@@ -71,23 +68,17 @@ public class SubstepDefinitionParserDefinition implements ParserDefinition {
     @Override
     public PsiElement createElement(ASTNode astNode) {
 
-        if (astNode.getElementType() == SubstepDefinitionElementTypes.SUBSTEP_DEFINITION_ELEMENT_TYPE) return new SubstepDefinitionImpl(astNode);
-        if (astNode.getElementType() == SubstepDefinitionElementTypes.SUBSTEP_DEFINITION_STEP_ELEMENT_TYPE) return new SubstepDefinitionStepImpl(astNode);
-        if (astNode.getElementType() == SubstepDefinitionElementTypes.SUBSTEP_DEFINITION_DEFINE_BLOCK_ELEMENT_TYPE) return new SubstepDefinitionDefineBlockImpl(astNode);
+        // original pre 29.10.2016
+//        if (astNode.getElementType() == SubstepDefinitionElementTypes.SUBSTEP_DEFINITION_ELEMENT_TYPE) return new SubstepDefinitionImpl(astNode);
+//        if (astNode.getElementType() == SubstepDefinitionElementTypes.SUBSTEP_DEFINITION_STEP_ELEMENT_TYPE) return new SubstepDefinitionStepImpl(astNode);
+//        if (astNode.getElementType() == SubstepDefinitionElementTypes.SUBSTEP_DEFINITION_DEFINE_BLOCK_ELEMENT_TYPE) return new SubstepDefinitionDefineBlockImpl(astNode);
 
-//        if (node.getElementType() == GherkinElementTypes.FEATURE) return new GherkinFeatureImpl(node);
-//        if (node.getElementType() == GherkinElementTypes.FEATURE_HEADER) return new GherkinFeatureHeaderImpl(node);
-//        if (node.getElementType() == GherkinElementTypes.SCENARIO) return new GherkinScenarioImpl(node);
-//        if (node.getElementType() == GherkinElementTypes.STEP) return new GherkinStepImpl(node);
-//        if (node.getElementType() == GherkinElementTypes.SCENARIO_OUTLINE) return new GherkinScenarioOutlineImpl(node);
-//        if (node.getElementType() == GherkinElementTypes.EXAMPLES_BLOCK) return new GherkinExamplesBlockImpl(node);
-//        if (node.getElementType() == GherkinElementTypes.TABLE) return new GherkinTableImpl(node);
-//        if (node.getElementType() == GherkinElementTypes.TABLE_ROW) return new GherkinTableRowImpl(node);
-//        if (node.getElementType() == GherkinElementTypes.TABLE_CELL) return new GherkinTableCellImpl(node);
-//        if (node.getElementType() == GherkinElementTypes.TABLE_HEADER_ROW) return new GherkinTableHeaderRowImpl(node);
-//        if (node.getElementType() == GherkinElementTypes.TAG) return new GherkinTagImpl(node);
-//        if (node.getElementType() == GherkinElementTypes.STEP_PARAMETER) return new GherkinStepParameterImpl(node);
-//        if (node.getElementType() == GherkinElementTypes.PYSTRING) return new GherkinPystringImpl(node);
+//        if (astNode.getElementType() == SubstepDefinitionElementTypes.SUBSTEP_DEFINITION_ELEMENT_TYPE) return new SubstepDefinitionImpl(astNode);
+        if (astNode.getElementType() == SubstepDefinitionElementTypes.SUBSTEP_DEFINITION_NAME_ELEMENT_TYPE) return new SubstepDefinitionNameImpl(astNode);
+        if (astNode.getElementType() == SubstepDefinitionElementTypes.SUBSTEP_DEFINITION_STEP_ELEMENT_TYPE) return new SubstepStep2Impl(astNode);
+        if (astNode.getElementType() == SubstepDefinitionElementTypes.SUBSTEP_DEFINITION_DEFINE_BLOCK_ELEMENT_TYPE) return new SubstepDefinition2Impl(astNode);
+
+
         return PsiUtilCore.NULL_PSI_ELEMENT;
     }
 

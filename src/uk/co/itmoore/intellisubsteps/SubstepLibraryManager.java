@@ -97,7 +97,7 @@ public class SubstepLibraryManager {
 
 
         for (Library lib : libraries){
-            logger.debug("looking for stepImplementations in " + lib.getName());
+            logger.trace("looking for stepImplementations in " + lib.getName());
 
             VirtualFile[] vLibFiles = lib.getFiles(OrderRootType.CLASSES);
 
@@ -242,7 +242,7 @@ public class SubstepLibraryManager {
 
                         for (PsiElement e : descriptionElements){
 
-                            logger.debug("descriptionElement: class " + e.getClass() + " text: " + e.getText());
+                            logger.trace("descriptionElement: class " + e.getClass() + " text: " + e.getText());
 
                             if (e instanceof PsiDocToken){
                                 PsiDocToken docs = (PsiDocToken)e;
@@ -303,7 +303,7 @@ public class SubstepLibraryManager {
 
 
 
-                                logger.debug("psidoctag tagName: " + tagName + " tagVal: " + tagVal );
+                                logger.trace("psidoctag tagName: " + tagName + " tagVal: " + tagVal );
 
 
                             }

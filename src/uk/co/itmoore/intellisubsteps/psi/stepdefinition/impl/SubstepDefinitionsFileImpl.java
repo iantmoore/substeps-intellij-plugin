@@ -1,13 +1,12 @@
 package uk.co.itmoore.intellisubsteps.psi.stepdefinition.impl;
 
 import com.intellij.extapi.psi.PsiFileBase;
-import com.intellij.lang.Language;
 import com.intellij.openapi.fileTypes.FileType;
 import com.intellij.psi.FileViewProvider;
 import org.jetbrains.annotations.NotNull;
 import uk.co.itmoore.intellisubsteps.psi.stepdefinition.SubstepsStepDefinitionFileType;
 import uk.co.itmoore.intellisubsteps.psi.stepdefinition.SubstepsStepDefinitionLanguage;
-import uk.co.itmoore.intellisubsteps.psi.stepdefinition.psi.SubstepDefinition;
+import uk.co.itmoore.intellisubsteps.psi.stepdefinition.psi.SubstepDefinition2;
 import uk.co.itmoore.intellisubsteps.psi.stepdefinition.psi.SubstepsDefinitionFile;
 
 /**
@@ -28,8 +27,8 @@ public class SubstepDefinitionsFileImpl extends PsiFileBase implements SubstepsD
 
 
     @Override
-    public SubstepDefinition[] getSubstepDefinitions() {
+    public SubstepDefinition2[] getSubstepDefinitions() {
 
-        return findChildrenByClass(SubstepDefinition.class);
+        return findChildrenByClass(SubstepDefinition2.class);
     }
 }

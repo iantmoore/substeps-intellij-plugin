@@ -48,7 +48,7 @@ public class SubstepsFeatureRunnerConfigProducer extends RunConfigurationProduce
 
         if (ref != null) {
 
-            log.debug("ref: " + ref.toString());
+            log.trace("ref: " + ref.toString());
 
             // TODO in the project view, a feature is IFileElementType: FeatureElementTypes.FEATURE_FILE
             // structure view on a scenario, the ref: ScenarioImpl(SCENARIO_BLOCK_ELEMENT_TYPE)
@@ -117,7 +117,7 @@ public class SubstepsFeatureRunnerConfigProducer extends RunConfigurationProduce
 
                                     String common = current.substring(0, commonLength);
 
-                                    log.debug("current path for substeps: " + current + " got this time: " + parentPath + " common: " + common);
+                                    log.trace("current path for substeps: " + current + " got this time: " + parentPath + " common: " + common);
 
                                     substepDefDirectory.add(common);
 
@@ -302,7 +302,7 @@ public class SubstepsFeatureRunnerConfigProducer extends RunConfigurationProduce
         // return true, if this config was created from this context
         boolean rtn = false;
 
-        log.debug("isConfigurationFromContext?");
+        log.trace("isConfigurationFromContext?");
 
         SubstepsRunnerConfigurationModel model = substepsRunConfiguration.getModel();
 
@@ -321,17 +321,17 @@ public class SubstepsFeatureRunnerConfigProducer extends RunConfigurationProduce
                     rtn = true;
                 }
                 else {
-                    log.debug("non matching scenario name model: " + model.getScenarioName() + " ctx: " + scenarioImpl.getScenarioName());
+                    log.trace("non matching scenario name model: " + model.getScenarioName() + " ctx: " + scenarioImpl.getScenarioName());
                 }
             }
             else {
-                log.debug("not a scenario impl psi element: " + psiElement.getClass());
+                log.trace("not a scenario impl psi element: " + psiElement.getClass());
                 if (model.getScenarioName() == null){
                     rtn = true;
                 }
             }
         }
-        log.debug("isConfigurationFromContext? : " + rtn);
+        log.trace("isConfigurationFromContext? : " + rtn);
         return rtn;
     }
 }

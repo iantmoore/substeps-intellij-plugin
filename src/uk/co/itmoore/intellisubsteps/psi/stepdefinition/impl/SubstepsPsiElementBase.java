@@ -49,7 +49,7 @@ public abstract class SubstepsPsiElementBase extends ASTWrapperPsiElement {
     public ItemPresentation getPresentation() {
         return new ItemPresentation() {
             public String getPresentableText() {
-                return this.getPresentableText();
+                return SubstepsPsiElementBase.this.getPresentableText();
             }
 
             public String getLocationString() {

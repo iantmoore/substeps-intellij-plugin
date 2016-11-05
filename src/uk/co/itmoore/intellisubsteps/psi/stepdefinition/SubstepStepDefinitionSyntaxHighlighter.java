@@ -33,7 +33,7 @@ public class SubstepStepDefinitionSyntaxHighlighter extends SyntaxHighlighterBas
     @NotNull
     @Override
     public Lexer getHighlightingLexer() {
-        return new SubstepStepDefinitionLexer();
+        return new SubstepDefinitionLexer2();
     }
 
     @NotNull
