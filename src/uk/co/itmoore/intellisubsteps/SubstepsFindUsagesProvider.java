@@ -1,21 +1,13 @@
 package uk.co.itmoore.intellisubsteps;
 
 
-import com.intellij.lang.cacheBuilder.*;
+import com.intellij.lang.cacheBuilder.WordsScanner;
 import com.intellij.lang.findUsages.FindUsagesProvider;
-import com.intellij.psi.*;
-import com.intellij.psi.tree.TokenSet;
-
+import com.intellij.psi.PsiElement;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
-import org.jetbrains.annotations.*;
-import uk.co.itmoore.intellisubsteps.psi.SubstepTokenTypes;
-import uk.co.itmoore.intellisubsteps.psi.stepdefinition.SubstepDefinitionElementTypes;
-import uk.co.itmoore.intellisubsteps.psi.stepdefinition.SubstepDefinitionLexer2;
-import uk.co.itmoore.intellisubsteps.psi.stepdefinition.SubstepDefinitionTokenTypes;
-import uk.co.itmoore.intellisubsteps.psi.stepdefinition.SubstepStepDefinitionLexer;
-import uk.co.itmoore.intellisubsteps.psi.stepdefinition.impl.SubstepDefinitionImpl;
-import uk.co.itmoore.intellisubsteps.psi.stepdefinition.psi.SubstepDefinition;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import uk.co.itmoore.intellisubsteps.psi.stepdefinition.psi.SubstepDefinitionName;
 
 /**

@@ -10,15 +10,8 @@ import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Test;
-import uk.co.itmoore.intellisubsteps.psi.feature.FeatureElementTypes;
 import uk.co.itmoore.intellisubsteps.psi.feature.FeatureLexer;
 import uk.co.itmoore.intellisubsteps.psi.feature.FeatureTokenTypes;
-
-import static uk.co.itmoore.intellisubsteps.psi.feature.FeatureTokenTypes.*;
-import static uk.co.itmoore.intellisubsteps.psi.feature.FeatureElementTypes.*;
-import static uk.co.itmoore.intellisubsteps.psi.feature.FeatureLexer.FeatureLexerState.*;
-
-import uk.co.itmoore.intellisubsteps.psi.stepdefinition.SubstepStepDefinitionLexer;
 
 import java.io.File;
 import java.io.IOException;
@@ -26,7 +19,10 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.is;
+import static uk.co.itmoore.intellisubsteps.psi.feature.FeatureElementTypes.*;
+import static uk.co.itmoore.intellisubsteps.psi.feature.FeatureLexer.FeatureLexerState.*;
+import static uk.co.itmoore.intellisubsteps.psi.feature.FeatureTokenTypes.*;
 
 /**
  * Created by ian on 05/07/15.

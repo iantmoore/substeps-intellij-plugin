@@ -7,14 +7,14 @@ import uk.co.itmoore.intellisubsteps.psi.stepdefinition.impl.*;
  * Created by ian on 05/07/15.
  */
 public abstract class SubstepsDefinitionElementVisitor extends PsiElementVisitor {
-    public void visitSubstepDefinition(SubstepDefinitionImpl substepDefinition) {
-        visitElement(substepDefinition);
-    }
+//    public void visitSubstepDefinition(SubstepDefinitionImpl substepDefinition) {
+//        visitElement(substepDefinition);
+//    }
 
-    public void visitSubstepDefinitionStep(SubstepDefinitionStepImpl substepDefinitionStep) {
-        visitElement(substepDefinitionStep);
-
-    }
+//    public void visitSubstepDefinitionStep(SubstepDefinitionStepImpl substepDefinitionStep) {
+//        visitElement(substepDefinitionStep);
+//
+//    }
 
     public void visitSubstepDefinitionDefineBlock(SubstepDefinitionDefineBlockImpl substepDefinitionDefineBlock) {
         visitElement(substepDefinitionDefineBlock);
