@@ -1,35 +1,18 @@
 package uk.co.itmoore.intellisubsteps.psi.feature;
 
-import com.intellij.lexer.LexerBase;
 import com.intellij.psi.TokenType;
 import com.intellij.psi.tree.IElementType;
-import com.intellij.util.ArrayUtil;
-import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
-import uk.co.itmoore.intellisubsteps.psi.stepdefinition.SubstepDefinitionTokenTypes;
-
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.List;
+import uk.co.itmoore.intellisubsteps.psi.AbstractSubstepsLexer;
 
 /**
  * Created by ian on 04/07/15.
  */
-public class FeatureLexer extends LexerBase {
+public class FeatureLexer extends AbstractSubstepsLexer {
 
     private static final Logger log = LogManager.getLogger(FeatureLexer.class);
-
-//    if (myState != STATE_AFTER_FEATURE_NAME
-//    && myState != STATE_AFTER_BACKGROUND_KEYWORD &&
-//    myState != STATE_AFTER_EXAMPLES_KEYWORD &&
-//    myState != STATE_AFTER_SCENARIO_NAME
-//    ) {
-//        // because feature descriptions can span multiple lines
-//
-//    }
-
 
     public enum FeatureLexerState{
         STATE_DEFAULT (true),
@@ -59,16 +42,8 @@ public class FeatureLexer extends LexerBase {
         public final boolean resetStateOnNewLine;
     }
 
-
-    private String bufString = null;
-    protected CharSequence myBuffer = ArrayUtil.EMPTY_CHAR_SEQUENCE;
-
-    protected int myStartOffset = 0;
-    protected int myEndOffset = 0;
-
-//    private ArrayDeque<Integer> positionHistory = new ArrayDeque<Integer>();
     private int previousPosition = -1;
-    private int myPosition;
+
     private IElementType myCurrentToken;
     private int myCurrentTokenStart;
 
@@ -82,25 +57,8 @@ public class FeatureLexer extends LexerBase {
 
 
 
-    @Override
-    public void start(CharSequence buffer, int startOffset, int endOffset, int initialState) {
-
-        // initially called with 0, end and 0
-        bufString = buffer.toString();
-
-//        String sample = buffer.toString().substring(0, buffer.length() > 20 ? 20 : buffer.length());
-        log.trace("start buffer: " +
-                buffer + " ....startOffset: " +
-                startOffset + " endOffset: " + endOffset + " initialState: " + initialState);
-
-        myBuffer = buffer;
-        myStartOffset = startOffset;
-        myEndOffset = endOffset;
-        myPosition = startOffset;
-        myState = FeatureLexerState.values()[initialState];
-
-        advance();
-//        previousPosition = myPosition;
+    protected void setStartState(int initialState){
+        myState = FeatureLexer.FeatureLexerState.values()[initialState];
     }
 
     public int getState() {
@@ -158,7 +116,6 @@ public class FeatureLexer extends LexerBase {
         log.trace("char: [" + c + "] @ " + myPosition);
 
         if (Character.isWhitespace(c)) {
-//            log.debug("whitespace");
             advanceOverWhitespace();
             myCurrentToken = TokenType.WHITE_SPACE;
             while (myPosition < myEndOffset && Character.isWhitespace(myBuffer.charAt(myPosition))) {
@@ -180,9 +137,6 @@ public class FeatureLexer extends LexerBase {
             if (myState == FeatureLexerState.STATE_AFTER_EXAMPLES_KEYWORD ) {
                 myState = FeatureLexerState.STATE_IN_TABLE_HEADER_ROW;
             }
-//            else {
-//                myState = FeatureLexerState.STATE_IN_TABLE_VALUE_ROWS;
-//            }
         }
         else if (c == ':') {
             myCurrentToken = FeatureTokenTypes.COLON_TOKEN;
@@ -219,68 +173,46 @@ public class FeatureLexer extends LexerBase {
                 if (myState == FeatureLexerState.STATE_IN_TABLE_HEADER_ROW) {
 
                     myCurrentToken = FeatureElementTypes.TABLE_HEADER_VALUE;
-                    //advanceToTableCellBoundary();
-                    //return;
                 } else if (myState == FeatureLexerState.STATE_IN_TABLE_VALUE_ROWS) {
 
                     myCurrentToken = FeatureElementTypes.TABLE_ROW_VALUE;
-                    //advanceToTableCellBoundary();
-                    //return;
                 }
                 advanceToTableCellBoundary();
             }
             else {
                 if (myState == FeatureLexerState.STATE_AFTER_EXAMPLES_KEYWORD) {
-                    //advanceToEOL();
-                    //   return;
                 } else if (myState == FeatureLexerState.STATE_AFTER_FEATURE_KEYWORD) {
                     myCurrentToken = FeatureElementTypes.FEATURE_NAME_ELEMENT_TYPE;
-                    //advanceToEOL();
                     myState = FeatureLexerState.STATE_AFTER_FEATURE_NAME;
-                    //  return;
                 } else if (myState == FeatureLexerState.STATE_AFTER_FEATURE_NAME) {
                     myCurrentToken = FeatureElementTypes.FEATURE_DESCRIPTION_ELEMENT_TYPE;
-                    //advanceToEOL();
                     myState = FeatureLexerState.STATE_AFTER_FEATURE_NAME;
-                    //  return;
                 } else if (myState == FeatureLexerState.STATE_AFTER_BACKGROUND_KEYWORD
                         || myState == FeatureLexerState.STATE_IN_BACKGROUND_STEPS) {
 
                     myCurrentToken = FeatureElementTypes.BACKGROUND_STEP_ELEMENT_TYPE;
-                    //advanceToEOL();
                     myState = FeatureLexerState.STATE_IN_BACKGROUND_STEPS;
-                    //    return;
                 } else if (myState == FeatureLexerState.STATE_AFTER_SCENARIO_KEYWORD) {
 
                     myCurrentToken = FeatureElementTypes.SCENARIO_NAME_ELEMENT_TYPE;
-                    //advanceToEOL();
                     myState = FeatureLexerState.STATE_AFTER_SCENARIO_NAME;
-                    // return;
 
                 } else if (myState == FeatureLexerState.STATE_AFTER_SCENARIO_NAME || myState == FeatureLexerState.STATE_IN_SCENARIO_STEPS) {
 
                     myCurrentToken = FeatureElementTypes.STEP_ELEMENT_TYPE;
-                    //advanceToEOL();
                     myState = FeatureLexerState.STATE_IN_SCENARIO_STEPS;
-                    //return;
                 } else if (myState == FeatureLexerState.STATE_AFTER_TAGS_KEYWORD) {
 
                     myCurrentToken = FeatureElementTypes.TAG_ELEMENT_TYPE;
-                    //advanceToEOL();
                     myState = FeatureLexerState.STATE_DEFAULT;
-                    //return;
                 } else if (myState == FeatureLexerState.STATE_AFTER_SCENARIO_OUTLINE_KEYWORD) {
 
                     myCurrentToken = FeatureElementTypes.SCENARIO_OUTLINE_NAME_ELEMENT_TYPE;
-                    //advanceToEOL();
                     myState = FeatureLexerState.STATE_AFTER_SCENARIO_OUTLINE_NAME;
-                    //return;
                 } else if (myState == FeatureLexerState.STATE_AFTER_SCENARIO_OUTLINE_NAME || myState == FeatureLexerState.STATE_IN_SCENARIO_OUTLINE_STEPS) {
 
                     myCurrentToken = FeatureElementTypes.STEP_ELEMENT_TYPE;
-                    //advanceToEOL();
                     myState = FeatureLexerState.STATE_IN_SCENARIO_OUTLINE_STEPS;
-                    //return;
                 } else {
                     log.error("advance fell through");
                 }
@@ -364,37 +296,6 @@ public class FeatureLexer extends LexerBase {
         }
     }
 
-    private void advanceToEOL() {
-        log.trace("advanceToEOL");
-        myPosition++;
-        int mark = myPosition;
-
-        // TODO - stop if you reach a comment character that's not quoted...
-
-        // TODO - sometimes get an array idx out of bounds here...???
-
-        while (myPosition < myEndOffset && myPosition < myBuffer.length() && myBuffer.charAt(myPosition) != '\n') {
-            myPosition++;
-        }
-        returnWhitespace(mark);
-        //myState = FeatureLexerState.STATE_DEFAULT;
-    }
-
-    private void returnWhitespace(int mark) {
-        while(myPosition > mark && Character.isWhitespace(myBuffer.charAt(myPosition - 1))) {
-
-            log.trace("returnWhitespace re-winding");
-            myPosition--;
-        }
-    }
-
-//    private void advanceOntoNextLine(){
-//        myCurrentToken = TokenType.WHITE_SPACE;
-//        while (myPosition < myEndOffset && Character.isWhitespace(myBuffer.charAt(myPosition))) {
-//            advanceOverWhitespace();
-//        }
-//
-//    }
 
     private void advanceOverWhitespace() {
         if (myBuffer.charAt(myPosition) == '\n') {
@@ -409,29 +310,10 @@ public class FeatureLexer extends LexerBase {
             }
             else {
 
-//            if (myState.resetStateOnNewLine){
-
-                // TODO, might not want to reset state - peek ahead, if the line ahead is blank
-//                int nextLineEnd = bufString.indexOf('\n', myPosition + 1);
-
                 // reset state if it's blank up to the next keyword, otherwise, we're still in the thing we were in
 
                 String nextContent = bufString.substring(myPosition + 1).trim();
                 int nextLineEnd = nextContent.indexOf('\n');
-
-
-//                if (lines != null) {
-//
-//
-//                }
-
-//                log.debug("nextLineEnd: " + nextLineEnd);
-
-//                if (nextLineEnd == -1) {
-//                    myState = FeatureLexerState.STATE_DEFAULT;
-//
-//                }
-//                else
                 if (nextLineEnd != -1) {
 
                     String nextLine = nextContent.substring(0, nextLineEnd);
@@ -440,22 +322,11 @@ public class FeatureLexer extends LexerBase {
                             nextLine.startsWith("Scenario Outline:") ||
                             nextLine.startsWith("Background:") || nextLine.startsWith("Examples:")){
 
-//                    String nextLine = bufString.substring(myPosition + 1, nextLineEnd);
-                    // if the nextLine is empty, then reset
-//                    if (nextLine.trim().isEmpty()) {
                         log.trace("next content line contains a keyword, resetting state");
                         myState = FeatureLexerState.STATE_DEFAULT;
                     }
-//                    else {
-//                        log.debug("next line not empty, doesn't start with a keyword, not resetting state");
-//                    }
                 }
             }
-//                myState = FeatureLexerState.STATE_DEFAULT;
-//            }
-//            else {
-//                log.trace("not resetting state, in state: " + myState);
-//            }
         }
         myPosition++;
     }

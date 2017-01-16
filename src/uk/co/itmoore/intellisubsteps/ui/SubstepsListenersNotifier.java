@@ -1,7 +1,6 @@
 
 package uk.co.itmoore.intellisubsteps.ui;
 
-import com.intellij.execution.junit2.segments.DispatchListener;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.ModalityState;
 import com.intellij.openapi.diagnostic.Logger;

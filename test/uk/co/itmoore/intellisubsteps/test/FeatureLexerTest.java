@@ -110,6 +110,104 @@ public class FeatureLexerTest {
 
         LexingResults expected = new LexingResults();
 
+        expected.states.add(STATE_AFTER_TAGS_KEYWORD);
+        expected.states.add(STATE_AFTER_TAGS_KEYWORD);
+        expected.states.add(STATE_AFTER_TAGS_KEYWORD);
+        expected.states.add(STATE_DEFAULT);
+        expected.states.add(STATE_DEFAULT);
+        expected.states.add(STATE_AFTER_FEATURE_KEYWORD);
+        expected.states.add(STATE_AFTER_FEATURE_KEYWORD);
+        expected.states.add(STATE_AFTER_FEATURE_KEYWORD);
+        expected.states.add(STATE_AFTER_FEATURE_NAME);
+        expected.states.add(STATE_AFTER_FEATURE_NAME);
+        expected.states.add(STATE_AFTER_FEATURE_NAME);
+        expected.states.add(STATE_AFTER_FEATURE_NAME);
+        expected.states.add(STATE_AFTER_FEATURE_NAME);
+        expected.states.add(STATE_AFTER_FEATURE_NAME);
+        expected.states.add(STATE_AFTER_BACKGROUND_KEYWORD);
+        expected.states.add(STATE_AFTER_BACKGROUND_KEYWORD);
+        expected.states.add(STATE_AFTER_BACKGROUND_KEYWORD);
+        expected.states.add(STATE_IN_BACKGROUND_STEPS);
+        expected.states.add(STATE_DEFAULT);
+        expected.states.add(STATE_AFTER_SCENARIO_KEYWORD);
+        expected.states.add(STATE_AFTER_SCENARIO_KEYWORD);
+        expected.states.add(STATE_AFTER_SCENARIO_KEYWORD);
+        expected.states.add(STATE_AFTER_SCENARIO_NAME);
+        expected.states.add(STATE_AFTER_SCENARIO_NAME);
+        expected.states.add(STATE_IN_SCENARIO_STEPS);
+        expected.states.add(STATE_IN_SCENARIO_STEPS);
+        expected.states.add(STATE_IN_SCENARIO_STEPS);
+        expected.states.add(STATE_IN_SCENARIO_STEPS);
+        expected.states.add(STATE_DEFAULT);
+        expected.states.add(STATE_AFTER_TAGS_KEYWORD);
+        expected.states.add(STATE_AFTER_TAGS_KEYWORD);
+        expected.states.add(STATE_AFTER_TAGS_KEYWORD);
+        expected.states.add(STATE_DEFAULT);
+        expected.states.add(STATE_DEFAULT);
+        expected.states.add(STATE_AFTER_SCENARIO_OUTLINE_KEYWORD);
+        expected.states.add(STATE_AFTER_SCENARIO_OUTLINE_KEYWORD);
+        expected.states.add(STATE_AFTER_SCENARIO_OUTLINE_KEYWORD);
+        expected.states.add(STATE_AFTER_SCENARIO_OUTLINE_NAME);
+        expected.states.add(STATE_AFTER_SCENARIO_OUTLINE_NAME);
+        expected.states.add(STATE_IN_SCENARIO_OUTLINE_STEPS);
+        expected.states.add(STATE_IN_SCENARIO_OUTLINE_STEPS);
+        expected.states.add(STATE_IN_SCENARIO_OUTLINE_STEPS);
+        expected.states.add(STATE_DEFAULT);
+        expected.states.add(STATE_AFTER_EXAMPLES_KEYWORD);
+        expected.states.add(STATE_AFTER_EXAMPLES_KEYWORD);
+        expected.states.add(STATE_AFTER_EXAMPLES_KEYWORD);
+        expected.states.add(STATE_IN_TABLE_HEADER_ROW);
+        expected.states.add(STATE_IN_TABLE_HEADER_ROW);
+        expected.states.add(STATE_IN_TABLE_HEADER_ROW);
+        expected.states.add(STATE_IN_TABLE_HEADER_ROW);
+        expected.states.add(STATE_IN_TABLE_HEADER_ROW);
+        expected.states.add(STATE_IN_TABLE_HEADER_ROW);
+        expected.states.add(STATE_IN_TABLE_HEADER_ROW);
+        expected.states.add(STATE_IN_TABLE_HEADER_ROW);
+        expected.states.add(STATE_IN_TABLE_VALUE_ROWS);
+        expected.states.add(STATE_IN_TABLE_VALUE_ROWS);
+        expected.states.add(STATE_IN_TABLE_VALUE_ROWS);
+        expected.states.add(STATE_IN_TABLE_VALUE_ROWS);
+        expected.states.add(STATE_IN_TABLE_VALUE_ROWS);
+        expected.states.add(STATE_IN_TABLE_VALUE_ROWS);
+        expected.states.add(STATE_IN_TABLE_VALUE_ROWS);
+        expected.states.add(STATE_IN_TABLE_VALUE_ROWS);
+        expected.states.add(STATE_IN_TABLE_VALUE_ROWS);
+        expected.states.add(STATE_IN_TABLE_VALUE_ROWS);
+        expected.states.add(STATE_DEFAULT);
+        expected.states.add(STATE_AFTER_SCENARIO_OUTLINE_KEYWORD);
+        expected.states.add(STATE_AFTER_SCENARIO_OUTLINE_KEYWORD);
+        expected.states.add(STATE_AFTER_SCENARIO_OUTLINE_KEYWORD);
+        expected.states.add(STATE_AFTER_SCENARIO_OUTLINE_NAME);
+        expected.states.add(STATE_AFTER_SCENARIO_OUTLINE_NAME);
+        expected.states.add(STATE_IN_SCENARIO_OUTLINE_STEPS);
+        expected.states.add(STATE_IN_SCENARIO_OUTLINE_STEPS);
+        expected.states.add(STATE_IN_SCENARIO_OUTLINE_STEPS);
+        expected.states.add(STATE_DEFAULT);
+        expected.states.add(STATE_AFTER_EXAMPLES_KEYWORD);
+        expected.states.add(STATE_AFTER_EXAMPLES_KEYWORD);
+        expected.states.add(STATE_AFTER_EXAMPLES_KEYWORD);
+        expected.states.add(STATE_IN_TABLE_HEADER_ROW);
+        expected.states.add(STATE_IN_TABLE_HEADER_ROW);
+        expected.states.add(STATE_IN_TABLE_HEADER_ROW);
+        expected.states.add(STATE_IN_TABLE_HEADER_ROW);
+        expected.states.add(STATE_IN_TABLE_HEADER_ROW);
+        expected.states.add(STATE_IN_TABLE_HEADER_ROW);
+        expected.states.add(STATE_IN_TABLE_HEADER_ROW);
+        expected.states.add(STATE_IN_TABLE_HEADER_ROW);
+        expected.states.add(STATE_IN_TABLE_VALUE_ROWS);
+        expected.states.add(STATE_IN_TABLE_VALUE_ROWS);
+        expected.states.add(STATE_IN_TABLE_VALUE_ROWS);
+        expected.states.add(STATE_IN_TABLE_VALUE_ROWS);
+        expected.states.add(STATE_IN_TABLE_VALUE_ROWS);
+        expected.states.add(STATE_IN_TABLE_VALUE_ROWS);
+        expected.states.add(STATE_IN_TABLE_VALUE_ROWS);
+        expected.states.add(STATE_IN_TABLE_VALUE_ROWS);
+        expected.states.add(STATE_IN_TABLE_VALUE_ROWS);
+        expected.states.add(STATE_IN_TABLE_VALUE_ROWS);
+        expected.states.add(STATE_IN_TABLE_VALUE_ROWS);
+
+
         expected.tokens.add(TAGS_KEYWORD_TOKEN);
         expected.tokens.add(COLON_TOKEN);
         expected.tokens.add(TAG_ELEMENT_TYPE);
@@ -117,25 +215,30 @@ public class FeatureLexerTest {
         expected.tokens.add(COLON_TOKEN);
         expected.tokens.add(FEATURE_NAME_ELEMENT_TYPE);
         expected.tokens.add(FEATURE_DESCRIPTION_ELEMENT_TYPE);
-
-
-
+        expected.tokens.add(COMMENT_TOKEN);
         expected.tokens.add(BACKGROUND_KEYWORD_TOKEN);
         expected.tokens.add(COLON_TOKEN);
         expected.tokens.add(BACKGROUND_STEP_ELEMENT_TYPE);
-
         expected.tokens.add(SCENARIO_KEYWORD_TOKEN);
         expected.tokens.add(COLON_TOKEN);
         expected.tokens.add(SCENARIO_NAME_ELEMENT_TYPE);
         expected.tokens.add(STEP_ELEMENT_TYPE);
+        expected.tokens.add(COMMENT_TOKEN);
         expected.tokens.add(STEP_ELEMENT_TYPE);
-
         expected.tokens.add(TAGS_KEYWORD_TOKEN);
         expected.tokens.add(COLON_TOKEN);
         expected.tokens.add(TAG_ELEMENT_TYPE);
-
-
-
+        expected.tokens.add(SCENARIO_OUTLINE_KEYWORD_TOKEN);
+        expected.tokens.add(COLON_TOKEN);
+        expected.tokens.add(SCENARIO_OUTLINE_NAME_ELEMENT_TYPE);
+        expected.tokens.add(STEP_ELEMENT_TYPE);
+        expected.tokens.add(STEP_ELEMENT_TYPE);
+        expected.tokens.add(EXAMPLES_KEYWORD_TOKEN);
+        expected.tokens.add(COLON_TOKEN);
+        expected.tokens.add(TABLE_HEADER_VALUE);
+        expected.tokens.add(TABLE_HEADER_VALUE);
+        expected.tokens.add(TABLE_ROW_VALUE);
+        expected.tokens.add(TABLE_ROW_VALUE);
         expected.tokens.add(SCENARIO_OUTLINE_KEYWORD_TOKEN);
         expected.tokens.add(COLON_TOKEN);
         expected.tokens.add(SCENARIO_OUTLINE_NAME_ELEMENT_TYPE);
@@ -150,51 +253,13 @@ public class FeatureLexerTest {
 
 
 
-        expected.states.add(STATE_AFTER_TAGS_KEYWORD);
-        expected.states.add(STATE_AFTER_TAGS_KEYWORD);
-        expected.states.add(STATE_DEFAULT);
-        expected.states.add(STATE_AFTER_FEATURE_KEYWORD);
-        expected.states.add(STATE_AFTER_FEATURE_KEYWORD);
-        expected.states.add(STATE_AFTER_FEATURE_NAME);
-        expected.states.add(STATE_AFTER_FEATURE_NAME);
-
-        expected.states.add(STATE_AFTER_BACKGROUND_KEYWORD);
-        expected.states.add(STATE_AFTER_BACKGROUND_KEYWORD);
-
-        expected.states.add(STATE_IN_BACKGROUND_STEPS);
-
-        expected.states.add(STATE_AFTER_SCENARIO_KEYWORD);
-        expected.states.add(STATE_AFTER_SCENARIO_KEYWORD);
-        expected.states.add(STATE_AFTER_SCENARIO_NAME);
-        expected.states.add(STATE_IN_SCENARIO_STEPS);
-        expected.states.add(STATE_IN_SCENARIO_STEPS);
-
-        expected.states.add(STATE_AFTER_TAGS_KEYWORD);
-        expected.states.add(STATE_AFTER_TAGS_KEYWORD);
-        expected.states.add(STATE_DEFAULT);
-
-
-        expected.states.add(STATE_AFTER_SCENARIO_OUTLINE_KEYWORD);
-        expected.states.add(STATE_AFTER_SCENARIO_OUTLINE_KEYWORD);
-        expected.states.add(STATE_AFTER_SCENARIO_OUTLINE_NAME);
-        expected.states.add(STATE_IN_SCENARIO_OUTLINE_STEPS);
-        expected.states.add(STATE_IN_SCENARIO_OUTLINE_STEPS);
-
-        expected.states.add(STATE_AFTER_EXAMPLES_KEYWORD);
-        expected.states.add(STATE_AFTER_EXAMPLES_KEYWORD);
-        expected.states.add(STATE_IN_TABLE_HEADER_ROW);
-        expected.states.add(STATE_IN_TABLE_HEADER_ROW);
-
-        expected.states.add(STATE_IN_TABLE_VALUE_ROWS);
-        expected.states.add(STATE_IN_TABLE_VALUE_ROWS);
-
         LexingResults results = lexFeatureFile(new File(file));
 
 
         List<IElementType>  skipTokens = new ArrayList<>();
 
         skipTokens.add(TokenType.WHITE_SPACE);
-        skipTokens.add(FeatureTokenTypes.COMMENT_TOKEN);
+       // skipTokens.add(FeatureTokenTypes.COMMENT_TOKEN);
         skipTokens.add(TABLE_SEPARATOR_TOKEN);
 
         System.out.println(results.print(skipTokens));
@@ -251,26 +316,29 @@ public class FeatureLexerTest {
             StringBuilder buf = new StringBuilder();
 
             for (int i = 0; i < states.size(); i++){
+                buf.append(" state: ").append(states.get(i)).append("\n");
+            }
 
-                if (!skipTokens.contains(tokens.get(i))) {
-                    buf.append("token: ").append(tokens.get(i)).append(" state: ").append(states.get(i)).append("\n");
+            for (IElementType t : tokens){
+                if (!skipTokens.contains(t)) {
+                    buf.append("token: ").append(t).append("\n");
                 }
             }
+
             return buf.toString();
         }
 
-        public void compareToIgnoringTokens(LexingResults other, List<IElementType> skipTokens){
+        public void compareToIgnoringTokens(LexingResults expected, List<IElementType> skipTokens){
 
-            int otherI = 0;
             for (int thisi = 0; thisi < states.size(); thisi++){
+                    Assert.assertThat("incorrect state @ " + thisi, states.get(thisi), is(expected.states.get(thisi)));
+            }
 
-                if (!skipTokens.contains(tokens.get(thisi))) {
-
-                    Assert.assertThat("incorrect token", tokens.get(thisi), is(other.tokens.get(otherI)));
-                    Assert.assertThat("incorrect state", states.get(thisi), is(other.states.get(otherI)));
-
-                    otherI++;
-
+            int i = 0;
+            for (IElementType t : tokens){
+                if (!skipTokens.contains(t)) {
+                    Assert.assertThat("incorrect token @ " + i, t, is(expected.tokens.get(i)));
+                    i++;
                 }
             }
 
