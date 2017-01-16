@@ -9,6 +9,8 @@ import com.google.common.collect.FluentIterable;
 import com.google.common.collect.TreeTraverser;
 import com.google.common.io.Files;
 import com.intellij.openapi.fileEditor.impl.LoadTextUtil;
+import com.intellij.openapi.util.io.FileUtil;
+import com.intellij.openapi.vfs.CharsetToolkit;
 import com.intellij.testFramework.LightVirtualFile;
 import com.intellij.testFramework.ParsingTestCase;
 import org.junit.Test;
@@ -17,6 +19,8 @@ import uk.co.itmoore.intellisubsteps.psi.feature.FeatureParserDefinition;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+
+import static org.junit.Assert.assertEquals;
 
 public class FeatureParsingScenario2 {
 
@@ -38,7 +42,8 @@ public static class FeatureParsingTest2 extends ParsingTestCase {
         return this.dataPath + "/" + name;
     }
 
-    public void runTest() throws Exception{
+
+    public void runTest(String contents) throws Exception{
 
         String featureFileName = this.dataPath + "/" + name;
         boolean checkResult = false;
@@ -46,13 +51,13 @@ public static class FeatureParsingTest2 extends ParsingTestCase {
         this.setUp();
 
         try {
-            String var3 = this.loadFile(featureFileName + "." + this.myFileExt);
-            this.myFile = this.createPsiFile(featureFileName , var3);
+
+            this.myFile = this.createPsiFile(featureFileName , contents);
             ensureParsed(this.myFile);
-            assertEquals("light virtual file text mismatch", var3, ((LightVirtualFile)this.myFile.getVirtualFile()).getContent().toString());
-            assertEquals("virtual file text mismatch", var3, LoadTextUtil.loadText(this.myFile.getVirtualFile()));
-            assertEquals("doc text mismatch", var3, this.myFile.getViewProvider().getDocument().getText());
-            assertEquals("psi text mismatch", var3, this.myFile.getText());
+            assertEquals("light virtual file text mismatch", contents, ((LightVirtualFile)this.myFile.getVirtualFile()).getContent().toString());
+            assertEquals("virtual file text mismatch", contents, LoadTextUtil.loadText(this.myFile.getVirtualFile()));
+            assertEquals("doc text mismatch", contents, this.myFile.getViewProvider().getDocument().getText());
+            assertEquals("psi text mismatch", contents, this.myFile.getText());
             if(checkResult) {
                 this.checkResult(featureFileName, this.myFile);
             } else {
@@ -123,7 +128,10 @@ public static class FeatureParsingTest2 extends ParsingTestCase {
             FeatureParsingTest2 fp2 = new FeatureParsingTest2(featureName, feature.getParent());
 //
             System.out.println("running tests for feature: " + featureName);
-              fp2.runTest();
+            String featureFileName = feature.getParent() + "/" + featureName;
+            String contents = FileUtil.loadFile(feature, CharsetToolkit.UTF8, true).trim();
+
+              fp2.runTest(contents);
 
         }
 

@@ -17,7 +17,7 @@ Features
 - Run individual features or scenarios (using default configurations) including display of the steps, scenarios etc passed
 - Debug features or scenarios (NB. breakpoints and stepping capability only in Java code, not at the feature / step level)
 - Comment toggle over multiple lines
-- Quick Documentation - bring up the javadocs and example usage for step implementations (if present)
+- Quick Documentation (Ctrl+Q)- bring up the javadocs and example usage for step implementations (if present)
 
 
 

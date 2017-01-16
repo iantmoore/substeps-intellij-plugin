@@ -5,7 +5,6 @@ import com.intellij.execution.testframework.PoolOfTestIcons;
 import com.intellij.execution.testframework.TestsUIUtil;
 import com.intellij.execution.testframework.ui.TestsProgressAnimator;
 import com.intellij.icons.AllIcons;
-import com.intellij.rt.execution.junit.states.PoolOfTestStates;
 import com.intellij.ui.SimpleColoredComponent;
 import com.intellij.ui.SimpleTextAttributes;
 import com.intellij.util.containers.HashMap;

@@ -9,8 +9,9 @@ Feature: A feature to self test the webdriver substeps implementations
    Given stuff that happens first
 
   Scenario: a scenario
-    Given I go to the self test page
+    Given I go to the self test page   # an end of line comment
     Then I can see "Hello Self Test page"
+    Then I can see "#not a comment"
 
  Tags: another
   Scenario Outline: a scenario

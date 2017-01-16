@@ -17,7 +17,7 @@
 <idea-plugin version="2">
   <id>uk.co.itmoore.intellisubsteps</id>
   <name>Substeps IntelliJ Plugin</name>
-  <version>1.0.2</version>
+  <version>1.0.3</version>
   <vendor email="ian@itmoore.co.uk" url="http://substeps.github.io">Substeps</vendor>
 
   <description><![CDATA[
@@ -30,11 +30,17 @@
 
 
   <change-notes><![CDATA[
+    <h3>1.0.3</h3>
+    <ul>
+        <li></li>
+    </ul>
+
+
     <h3>1.0.2</h3>
     <ul>
         <li>Initial implementation of find usages of steps</li>
-
     </ul>
+
     <h3>1.0.1</h3>
     <ul>
         <li>Updated to version 1.0.3 of substeps</li>
@@ -112,7 +118,7 @@
   </change-notes>
 
   <!-- please see http://confluence.jetbrains.com/display/IDEADEV/Build+Number+Ranges for description -->
-  <idea-version since-build="162.1"/>
+  <idea-version since-build="163.7"/>
 
   <!-- please see http://confluence.jetbrains.com/display/IDEADEV/Plugin+Compatibility+with+IntelliJ+Platform+Products
        on how to target different products -->
