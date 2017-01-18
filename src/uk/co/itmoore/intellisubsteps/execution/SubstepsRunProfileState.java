@@ -1,6 +1,7 @@
 package uk.co.itmoore.intellisubsteps.execution;
 
 import com.google.common.base.Strings;
+import com.intellij.analysis.AnalysisScope;
 import com.intellij.execution.*;
 import com.intellij.execution.ExecutionResult;
 import com.intellij.execution.configurations.*;
@@ -17,6 +18,7 @@ import com.intellij.ide.DataManager;
 import com.intellij.openapi.actionSystem.CommonDataKeys;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.module.Module;
+import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectBundle;
 import com.intellij.openapi.projectRoots.JavaSdkType;
@@ -30,6 +32,10 @@ import com.intellij.openapi.util.Key;
 import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.openapi.util.text.StringUtilRt;
 import com.intellij.openapi.vfs.encoding.EncodingManager;
+import com.intellij.psi.PsiClass;
+import com.intellij.psi.PsiFile;
+import com.intellij.psi.PsiJavaFile;
+import com.intellij.psi.PsiRecursiveElementVisitor;
 import com.intellij.rt.execution.testFrameworks.ForkedDebuggerHelper;
 import com.intellij.util.PathUtil;
 import com.intellij.util.SystemProperties;
@@ -40,10 +46,13 @@ import com.technophobia.substeps.execution.node.RootNode;
 import com.technophobia.substeps.runner.IExecutionListener;
 import com.technophobia.substeps.runner.SubstepsExecutionConfig;
 import gnu.trove.THashMap;
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import uk.co.itmoore.intellisubsteps.SubstepLibraryManager;
+import uk.co.itmoore.intellisubsteps.psi.SubstepsCompletionContributor;
+import uk.co.itmoore.intellisubsteps.psi.stepdefinition.psi.SubstepsDefinitionFile;
 import uk.co.itmoore.intellisubsteps.ui.*;
 import uk.co.itmoore.intellisubsteps.ui.actions.RunningTestTracker;
 import uk.co.itmoore.intellisubsteps.ui.events.StateChangedEvent;
@@ -55,9 +64,7 @@ import java.nio.charset.Charset;
 import java.nio.charset.IllegalCharsetNameException;
 import java.nio.charset.UnsupportedCharsetException;
 import java.rmi.RMISecurityManager;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
@@ -73,51 +80,6 @@ public class SubstepsRunProfileState  extends CommandLineState{
     int jmxPort = 45133;
     private  OSProcessHandler processHandler = null;
 
-
-//    public ServerSocket getDebugSocket() {
-//        return myServerSocket;
-//    }
-
-
-    class WaitingInputStreamConsumer extends InputStreamConsumer {
-
-        private final CountDownLatch processStarted;
-        private final AtomicBoolean processStartedOk;
-        private boolean doChecks = true;
-
-        public WaitingInputStreamConsumer(InputStream stderr, Logger logger, boolean isError,  final CountDownLatch processStarted,
-                                   final AtomicBoolean processStartedOk, ConsoleView consoleView) {
-            super(stderr, logger, isError, consoleView, null);
-            this.processStarted = processStarted;
-            this.processStartedOk = processStartedOk;
-
-
-        }
-
-        protected void checkLine(String line){
-
-            if (doChecks && line.contains("awaiting the shutdown notification...")) {
-                this.logger.info("mbean server process started");
-                this.processStartedOk.set(true);
-                this.processStarted.countDown();
-                doChecks = false;
-            } else if (doChecks &&  !this.processStartedOk.get()) {
-                this.logger.info("line received but this was not the correct line: " + line);
-            }
-
-        }
-
-        protected void doFinalCheck(){
-            if (this.processStarted.getCount() > 0) {
-                this.logger
-                        .info("spawned process didn't start fully, no further output, an error is assumed and the process will terminate");
-                this.processStarted.countDown();
-            }
-        }
-
-
-
-    }
 
     class InputStreamConsumer implements Runnable {
 
@@ -181,7 +143,6 @@ public class SubstepsRunProfileState  extends CommandLineState{
                 while ((c = this.stderr.read()) != -1){
 
                     String s = String.valueOf((char) c);
-//                    consoleView.print(s, ConsoleViewContentType.NORMAL_OUTPUT);
 
                     if ((char)c == '\n'){
                         line = buf.toString();
@@ -212,29 +173,6 @@ public class SubstepsRunProfileState  extends CommandLineState{
                     }
                 }
 
-
-//                this.isr = new InputStreamReader(this.stderr);
-//                this.br = new BufferedReader(this.isr);
-//
-//                log.debug("awaiting input...");
-//
-//                while ((line = this.br.readLine()) != null) {
-//
-//                    consoleView.print(line + "\n", ConsoleViewContentType.NORMAL_OUTPUT);
-//                    // NB. this is not a logger as we don't want to be able to turn
-//                    // this off
-//                    // If the level of logging from the child process is verbose,
-//                    // change the logging level of the spawned process.
-//
-//                    if (isError){
-//                        log.error("*\t" + line);
-//                    }
-//                    else {
-//                        log.debug("*\t" + line);
-//                    }
-//                    checkLine(line);
-//
-//                }
             } catch (final IOException e) {
 
                 e.printStackTrace();
@@ -255,17 +193,6 @@ public class SubstepsRunProfileState  extends CommandLineState{
         super(environment);
 
     }
-//    protected ServerSocket myServerSocket;
-//
-//    protected void createServerSocket(JavaParameters javaParameters) {
-//        try {
-//            myServerSocket = new ServerSocket(0, 0, InetAddress.getByName("127.0.0.1"));
-//            javaParameters.getProgramParametersList().add("-socket" + myServerSocket.getLocalPort());
-//        }
-//        catch (IOException e) {
-//            //LOG.error(e);
-//        }
-//    }
 
     protected JavaParameters createJavaParameters() throws ExecutionException {
 
@@ -276,7 +203,77 @@ public class SubstepsRunProfileState  extends CommandLineState{
 
         SubstepsRunnerConfigurationModel model = runConfig.getModel();
 
-        JavaParameters params = model.getJavaParameters();
+        JavaParameters params = new JavaParameters();
+        params.setMainClass(SubstepsRunnerConfigurationModel.mainClass);
+
+
+        Project project = this.getEnvironment().getProject();
+        ModuleManager moduleManager = ModuleManager.getInstance(project);
+
+        Module module = null;
+        for (Module m : moduleManager.getModules()){
+            if(m.getModuleFilePath().equals(model.getModulePath())){
+                module = m;
+            }
+        }
+
+        final Set<String> stepImplClassNames = SubstepLibraryManager.INSTANCE.getStepImplClassNamesFromProjectLibraries(module);
+
+        final Set<String> substepDefDirectory = new HashSet<>();
+
+        AnalysisScope moduleScope = new AnalysisScope(module);
+        moduleScope.accept(new PsiRecursiveElementVisitor() {
+            @Override
+            public void visitFile(final PsiFile file) {
+
+                if (file instanceof PsiJavaFile) {
+
+                    PsiJavaFile psiJavaFile = (PsiJavaFile) file;
+                    final PsiClass[] psiClasses = psiJavaFile.getClasses();
+                    for (PsiClass psiClass : psiClasses) {
+
+                        if (SubstepsCompletionContributor.isStepImplementationsClass(psiClass)) {
+                            stepImplClassNames.add(psiClass.getQualifiedName());
+                        }
+                    }
+                } else if (file instanceof SubstepsDefinitionFile) {
+
+                    String parentPath = file.getParent().getVirtualFile().getPath();
+
+                    if (substepDefDirectory.isEmpty()) {
+                        substepDefDirectory.add(parentPath);
+                    } else if (!substepDefDirectory.contains(parentPath)) {
+                        // find the common ancestor between what's already in and this parent
+                        String current = substepDefDirectory.iterator().next();
+
+                        int commonLength = StringUtils.indexOfDifference(current, parentPath);
+                        substepDefDirectory.remove(current);
+
+                        String common = current.substring(0, commonLength);
+
+                        log.trace("current path for substeps: " + current + " got this time: " + parentPath + " common: " + common);
+
+                        substepDefDirectory.add(common);
+
+                    }
+                }
+            }
+        });
+
+        model.setStepImplentationClassNames(stepImplClassNames.toArray(new String[stepImplClassNames.size()]));
+
+        model.setSubStepDefinitionDirectory(substepDefDirectory.iterator().next());
+
+        params.configureByModule(module, JavaParameters.JDK_AND_CLASSES_AND_TESTS);
+
+        Sdk jdk = params.getJdk();
+
+        model.setHomePath(jdk.getHomePath());
+        model.setVersionString(jdk.getVersionString());
+
+        log.debug("configuring substeps runtime with classpath:\n" + params.getClassPath().getPathsString());
+
+        model.setClassPathString(params.getClassPath().getPathsString());
 
         params.setWorkingDirectory(model.getWorkingDir());
 
@@ -299,29 +296,10 @@ public class SubstepsRunProfileState  extends CommandLineState{
         vmParametersList.addParametersString("-Dcom.sun.management.jmxremote.ssl=false");
         vmParametersList.addParametersString("-Djava.rmi.server.hostname=localhost");
 
-
-//        String rmiClasspathString = "\"file://" + model.getClassPathString().replaceAll(File.pathSeparator, " file://") + "\"";
-
-//        log.debug("rmi classpath: " + rmiClasspathString);
-
-//        vmParametersList.addParametersString("-Djava.rmi.server.codebase=" + rmiClasspathString);
-
         vmParametersList.addParametersString("-Dsun.io.serialization.extendedDebugInfo=true");
-
-//        System.setProperty("java.rmi.server.codebase", rmiClasspathString);
-
-//        createServerSocket(params);
-//
-//
-//        if (myServerSocket != null) {
-//            params.getProgramParametersList().add(ForkedDebuggerHelper.DEBUG_SOCKET + myServerSocket.getLocalPort());
-//        }
-//
 
         log.debug("launching substeps runner with classpath: " +
                 params.getClassPath().getPathsString() + "\njvm info: " + model.getHomePath() + " version: " + model.getVersionString());
-
-
 
         return params;
     }
@@ -333,19 +311,19 @@ public class SubstepsRunProfileState  extends CommandLineState{
     @NotNull
     public ExecutionResult execute(@NotNull final Executor executor, @NotNull final ProgramRunner runner) throws ExecutionException {
 
+        log.debug("execute called");
+
+        SubstepsRunConfiguration runConfig = (SubstepsRunConfiguration)this.getEnvironment().getRunProfile();
+
+        SubstepsRunnerConfigurationModel model = runConfig.getModel();
+
         log.debug("execute: about to call startProcess");
 
         OSProcessHandler processHandler = startProcess();
 
-
-
         ConsoleView consoleView = TextConsoleBuilderFactory.getInstance().createBuilder(this.getEnvironment().getProject()).getConsole();
 
-      consoleView.print("Starting substeps test...", ConsoleViewContentType.NORMAL_OUTPUT);
-
-
-
-        SubstepsRunConfiguration runConfig = (SubstepsRunConfiguration)this.getEnvironment().getRunProfile();
+        consoleView.print("Starting substeps test...", ConsoleViewContentType.NORMAL_OUTPUT);
 
         boolean substepsServerLogsToConsole = true;
         if (substepsServerLogsToConsole){
@@ -363,37 +341,9 @@ public class SubstepsRunProfileState  extends CommandLineState{
             t2.start();
         }
         processHandler.startNotify();
-//
-//
-//
-//        boolean exceptionThrown = false;
-//        try {
-//            this.log.info("waiting for process to start...");
-//            processStarted.await(30, TimeUnit.SECONDS);
-//
-//            this.log.info("waited..");
-//
-//            if (!processStartedOk.get()) {
-//                exceptionThrown = true;
-//                throw new ExecutionException("Unable to launch VM process");
-//            }
-//
-//            this.log.info("process started");
-//        } catch (final InterruptedException e) {
-//
-//            e.printStackTrace();
-//        }
-
-//        try {
-//            Thread.currentThread().sleep(5000);
-//        } catch (InterruptedException e) {
-//            e.printStackTrace();
-//        }
-
 
         log.debug("startProcess called");
 
-        SubstepsRunnerConfigurationModel model = runConfig.getModel();
 
         boolean actualRunnerStarted = false;
 
@@ -429,22 +379,6 @@ public class SubstepsRunProfileState  extends CommandLineState{
             for (String s : model.getStepImplentationClassNames()) {
                 log.debug("step impl classname: " + s);
             }
-            /*
-        private String description;
-        private String tags;
-        private String nonFatalTags;
-        private String subStepsFileName;
-        private boolean strict = true;
-        private boolean fastFailParseErrors = true;
-        private Properties systemProperties;
-        private String[] nonStrictKeywordPrecedence;
-        private String[] stepImplementationClassNames;
-        private String[] initialisationClass;
-        private List<Class<?>> stepImplementationClasses;
-        private Class<?>[] initialisationClasses;
-        private String[] executionListeners;
-             */
-
 
             log.debug("preparing config");
 
@@ -716,7 +650,7 @@ public class SubstepsRunProfileState  extends CommandLineState{
 
     protected GeneralCommandLine createCommandLine() throws ExecutionException {
 
-        return createFromJavaParameters(getJavaParameters(), CommonDataKeys.PROJECT
+        return createFromJavaParameters(createJavaParameters(), CommonDataKeys.PROJECT
                 .getData(DataManager.getInstance().getDataContext()), true);
     }
 

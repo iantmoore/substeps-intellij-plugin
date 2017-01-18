@@ -16,6 +16,8 @@ import com.intellij.openapi.util.DefaultJDOMExternalizer;
 import com.intellij.openapi.util.InvalidDataException;
 import com.intellij.openapi.util.WriteExternalException;
 import com.intellij.util.xmlb.XmlSerializer;
+import org.apache.log4j.LogManager;
+import org.apache.log4j.Logger;
 import org.jdom.Element;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -33,11 +35,16 @@ import java.util.LinkedHashSet;
  */
 public class SubstepsRunConfiguration extends ModuleBasedConfiguration {
 
+    private static final Logger log = LogManager.getLogger(SubstepsRunConfiguration.class);
+
+
     public SubstepsRunnerConfigurationModel getModel() {
         return model;
     }
 
     public void setModel(SubstepsRunnerConfigurationModel model) {
+
+        log.debug("setting model");
         this.model = model;
     }
 
@@ -73,6 +80,7 @@ public class SubstepsRunConfiguration extends ModuleBasedConfiguration {
     @Override
     public RunProfileState getState(@NotNull Executor executor, @NotNull ExecutionEnvironment executionEnvironment) throws ExecutionException {
 
+        log.debug("getState");
         SubstepsRunProfileState runProfileState = new SubstepsRunProfileState(executionEnvironment);
         return runProfileState;
     }
@@ -84,7 +92,7 @@ public class SubstepsRunConfiguration extends ModuleBasedConfiguration {
     @Override
     public void readExternal(final Element element) throws InvalidDataException {
 
-
+        log.debug("readExternal");
         //      PathMacroManager.getInstance(getProject()).expandPaths(element);
         super.readExternal(element);
         JavaRunConfigurationExtensionManager.getInstance().readExternal(this, element);
@@ -133,6 +141,9 @@ public class SubstepsRunConfiguration extends ModuleBasedConfiguration {
 
     @Override
     public void writeExternal(final Element element) throws WriteExternalException {
+
+        log.debug("write external");
+
         super.writeExternal(element);
         JavaRunConfigurationExtensionManager.getInstance().writeExternal(this, element);
         writeModule(element);

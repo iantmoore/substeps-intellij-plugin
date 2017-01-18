@@ -21,13 +21,20 @@ public class SubstepsRunnerConfigurationModel {
     private boolean strict = false;
     private String homePath;
     private String versionString;
-    private String classPathString;
+    private transient String classPathString;
     private String workingDir;
-    private JavaParameters javaParameters;
+//    private JavaParameters javaParameters;
     private String subStepDefinitionDirectory;
 
-    private String[] stepImplentationClassNames;
+    private transient String[] stepImplentationClassNames;
 
+    public static final String mainClass = "com.technophobia.substeps.jmx.SubstepsJMXServer";
+
+    public void setModulePath(String modulePath) {
+        this.modulePath = modulePath;
+    }
+
+    private String modulePath;
 
     public String getWorkingDir() {
         return workingDir;
@@ -45,7 +52,7 @@ public class SubstepsRunnerConfigurationModel {
         this.versionString = versionString;
     }
 
-    public JavaParameters getJavaParameters() { return javaParameters;}
+//    public JavaParameters getJavaParameters() { return javaParameters;}
 
     public String getPathToFeature() {
         return pathToFeature;
@@ -94,12 +101,12 @@ public class SubstepsRunnerConfigurationModel {
 
     public SubstepsRunnerConfigurationModel() {
 
-        javaParameters = new JavaParameters();
-//        javaParameters.setMainClass("com.technophobia.substeps.runner.MainExecutionNodeRunner");
-//        javaParameters.setPassParentEnvs(false);
-
-
-        javaParameters.setMainClass("com.technophobia.substeps.jmx.SubstepsJMXServer");
+//        javaParameters = new JavaParameters();
+////        javaParameters.setMainClass("com.technophobia.substeps.runner.MainExecutionNodeRunner");
+////        javaParameters.setPassParentEnvs(false);
+//
+//
+//        javaParameters.setMainClass("com.technophobia.substeps.jmx.SubstepsJMXServer");
 
     }
 
@@ -158,12 +165,16 @@ public class SubstepsRunnerConfigurationModel {
                 ", strict=" + strict +
                 ", homePath='" + homePath + '\'' +
                 ", versionString='" + versionString + '\'' +
-                ", classPathString='" + classPathString + '\'' +
+//                ", classPathString='" + classPathString + '\'' +
                 ", workingDir='" + workingDir + '\'' +
-                ", javaParameters=" + javaParameters +
+//                ", javaParameters=" + javaParameters +
                 ", subStepDefinitionDirectory='" + subStepDefinitionDirectory + '\'' +
-                ", stepImplentationClassNames=" + Arrays.toString(stepImplentationClassNames) +
+//                ", stepImplentationClassNames=" + Arrays.toString(stepImplentationClassNames) +
                 ", nonStrictKeywordPrecedence='" + nonStrictKeywordPrecedence + '\'' +
                 '}';
+    }
+
+    public String getModulePath() {
+        return modulePath;
     }
 }
