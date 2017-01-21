@@ -33,6 +33,7 @@
     <h3>1.0.4</h3>
     <ul>
         <li>Improved run configurations so that they pick up new classes and substep def files.  Existing Substep run configs will need to be deleted and re-created</li>
+        <li>Substep definition and Feature file templates</li>
     </ul>
 
 
