@@ -279,14 +279,14 @@ public abstract class SubstepsCompletionContributor extends CompletionContributo
 
         final List<StepImplementationsDescriptor> stepImplsInScope = new ArrayList<>();
 
-        ModuleRootManager moduleRootManager = ModuleRootManager.getInstance(module);
+//        ModuleRootManager moduleRootManager = ModuleRootManager.getInstance(module);
 
-        VirtualFile[] srcRoots = moduleRootManager.getSourceRoots(true);
-
-        for (VirtualFile vf : srcRoots) {
-            logger.debug("src root: " + vf.getCanonicalPath());
-
-        }
+//        VirtualFile[] srcRoots = moduleRootManager.getSourceRoots(true);
+//
+//        for (VirtualFile vf : srcRoots) {
+//            logger.debug("src root: " + vf.getCanonicalPath());
+//
+//        }
         buildSuggestionsFromProjectSource(module, stepImplsInScope, resultSet);
 
         stepImplsInScope.addAll(SubstepLibraryManager.INSTANCE.getDescriptorsForProjectFromLibraries(module));

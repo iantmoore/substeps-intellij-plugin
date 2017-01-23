@@ -34,6 +34,7 @@
     <ul>
         <li>Improved run configurations so that they pick up new classes and substep def files.  Existing Substep run configs will need to be deleted and re-created</li>
         <li>Substep definition and Feature file templates</li>
+        <li>Error highlighting in features and substep files</li>
     </ul>
 
 
@@ -208,6 +209,9 @@
 
     <programRunner implementation="uk.co.itmoore.intellisubsteps.execution.SubstepsDebugRunner"/>
 
+    <annotator language="SubstepsFeature" implementationClass="uk.co.itmoore.intellisubsteps.StepValidatorAnnotator"/>
+
+    <annotator language="SubstepStepDefinition" implementationClass="uk.co.itmoore.intellisubsteps.StepValidatorAnnotator"/>
 
   </extensions>
 
