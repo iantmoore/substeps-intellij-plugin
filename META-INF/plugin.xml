@@ -17,7 +17,7 @@
 <idea-plugin version="2">
   <id>uk.co.itmoore.intellisubsteps</id>
   <name>Substeps IntelliJ Plugin</name>
-  <version>1.0.4</version>
+  <version>1.0.5</version>
   <vendor email="ian@itmoore.co.uk" url="http://substeps.github.io">Substeps</vendor>
 
   <description><![CDATA[
@@ -30,11 +30,16 @@
 
 
   <change-notes><![CDATA[
+    <h3>1.0.5</h3>
+    <ul>
+        <li>Substep definition and Feature file templates</li>
+        <li>Error highlighting in features and substep files</li>
+    </ul>
+
+
     <h3>1.0.4</h3>
     <ul>
         <li>Improved run configurations so that they pick up new classes and substep def files.  Existing Substep run configs will need to be deleted and re-created</li>
-        <li>Substep definition and Feature file templates</li>
-        <li>Error highlighting in features and substep files</li>
     </ul>
 
 
