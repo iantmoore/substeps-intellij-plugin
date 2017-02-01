@@ -13,6 +13,8 @@ import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.*;
 import com.technophobia.substeps.glossary.StepDescriptor;
 import com.technophobia.substeps.glossary.StepImplementationsDescriptor;
+import com.technophobia.substeps.model.SubSteps;
+import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
@@ -22,7 +24,9 @@ import uk.co.itmoore.intellisubsteps.psi.stepdefinition.impl.SubstepDefinitionNa
 import uk.co.itmoore.intellisubsteps.psi.stepdefinition.impl.SubstepStep2Impl;
 import uk.co.itmoore.intellisubsteps.psi.stepdefinition.psi.SubstepsDefinitionFile;
 
+import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -34,12 +38,14 @@ import static uk.co.itmoore.intellisubsteps.psi.SubstepsCompletionContributor.is
  */
 public class StepValidatorAnnotator implements Annotator {
 
-    private static final Logger logger = LogManager.getLogger(StepValidatorAnnotator.class);
+    private static final Logger log = LogManager.getLogger(StepValidatorAnnotator.class);
 
     public ErrorAnnotation validate(String text, List<String> substepDefinitions, List<StepImplementationsDescriptor> stepImplsInScope){
 
         // TODO - check for exact matches, if fuzzy match, add a highlight ?
-
+        if (text.startsWith("FindByXpath")){
+            log.debug("stop");
+        }
 
         List<String> matchingSubstepDefs = new ArrayList<>();
         for (String stepDef : substepDefinitions){
@@ -57,17 +63,25 @@ public class StepValidatorAnnotator implements Annotator {
 
 
         List<StepDescriptor> matchingStepDescriptors = new ArrayList<>();
+
+        log.debug("matching against java source files");
         for (StepImplementationsDescriptor stepImplDescriptor : stepImplsInScope){
 
             for (StepDescriptor sd : stepImplDescriptor.getExpressions()){
 
-                String regEx = sd.getExpression();
+                String regEx = sd.getRegex();
+                if (regEx == null){
+                    log.warn("no regex in step descriptor, use substep libraries built with Substeps >= 1.0.4");
+                    return null;
+                }
+
                 if (Pattern.matches("(Given|When|Then|And) .*", regEx)){
                     regEx = regEx.replaceFirst("(Given|When|Then|And)", "(Given|When|Then|And)");
                 }
-
+                log.debug("using regex[" + regEx + "] to test against string: " + text);
 
                 if (Pattern.matches(regEx, text)){
+                    log.debug("regEx added");
                     matchingStepDescriptors.add(sd);
                 }
             }
@@ -82,12 +96,11 @@ public class StepValidatorAnnotator implements Annotator {
 
 
         if (matchingSubstepDefs.isEmpty() && matchingStepDescriptors.isEmpty()){
-
+            log.debug("not found");
             return new ErrorAnnotation(new CreateSubstepDefinitionQuickFix(text), "Unimplemented substep definition");
-//            holder.createErrorAnnotation(range, "Unimplemented substep definition").
-//                    registerFix(new CreateSubstepDefinitionQuickFix(text));
         }
         else {
+            log.debug("multiple potential matches");
 
             List<String> dupes = new ArrayList<>();
             HashSet<String> uniques = new HashSet<>();
@@ -107,8 +120,6 @@ public class StepValidatorAnnotator implements Annotator {
             // only report the error if there is an exact duplicate
 
             if (dupes.size() > 0) {
-//                holder.createErrorAnnotation(range, "Duplicated substep definition").
-//                        registerFix(new CreateSubstepDefinitionQuickFix(text));
 
                 return new ErrorAnnotation(new CreateSubstepDefinitionQuickFix(text), "Duplicated substep definition");
 
@@ -140,9 +151,7 @@ public class StepValidatorAnnotator implements Annotator {
             ASTDelegatePsiElement astElement = (ASTDelegatePsiElement) element;
 
             String text = astElement.getText();
-
-            // TODO is this string defined in either Substep defs or step impls in scope ?
-            Project project = element.getProject();
+            log.debug("validate text: " + text);
 
             Module module = ModuleUtil.findModuleForPsiElement(element);
             final List<StepImplementationsDescriptor> stepImplsInScope = new ArrayList<>();
@@ -150,61 +159,29 @@ public class StepValidatorAnnotator implements Annotator {
 
             buildSuggestionsFromProjectSource(module, stepImplsInScope, substepDefinitions);
 
-            stepImplsInScope.addAll(SubstepLibraryManager.INSTANCE.getDescriptorsForProjectFromLibraries(module));
+            List<StepImplementationsDescriptor> descriptorsForProjectFromLibraries = SubstepLibraryManager.INSTANCE.getDescriptorsForProjectFromLibraries(module);
 
-
-
-            // this copies over the stepimpls in scope into the resultset completion constribution
-            //buildSuggestionsFromStepDescriptions(stepImplsInScope, resultSet);
-
-
-            stepImplsInScope.addAll(SubstepLibraryManager.INSTANCE.getDescriptorsForProjectFromLibraries(module));
+            stepImplsInScope.addAll(descriptorsForProjectFromLibraries);
 
             // we should now have loaded all the step impls in scope
 
+            ErrorAnnotation errorAnnotation;
+                    try {
+                        errorAnnotation = validate(text, substepDefinitions, stepImplsInScope);
+                    }
+                    catch (Exception e){
+                        log.error("Exception performing validation", e);
+                        errorAnnotation = new ErrorAnnotation(null, "Unknown error");
+                    }
+            if (errorAnnotation != null){
+                TextRange range = new TextRange(element.getTextRange().getStartOffset() ,
+                        element.getTextRange().getEndOffset());
 
-
-//            int totalMatches = matchingSubstepDefs.size() + matchingStepDescriptors.size();
-//            if (totalMatches == 1){
-//                // we're all good! fuzzy matching or otherwise
-//            }
-//            else {
-                // either too many matches or none
-
-                ErrorAnnotation errorAnnotation = validate(text, substepDefinitions, stepImplsInScope);
-
-                if (errorAnnotation != null){
-                    TextRange range = new TextRange(element.getTextRange().getStartOffset() ,
-                            element.getTextRange().getEndOffset());
-
-
-                    holder.createErrorAnnotation(range, errorAnnotation.msg).registerFix(errorAnnotation.intentionAction);
-
+                Annotation eAnnotation = holder.createErrorAnnotation(range, errorAnnotation.msg);
+                if (errorAnnotation.intentionAction != null) {
+                    eAnnotation.registerFix(errorAnnotation.intentionAction);
                 }
-
-//            }
-
-
-
-
-
-
-//            if (value != null && value.startsWith("simple" + ":")) {
-//                Project project = element.getProject();
-//                String key = value.substring(7);
-//                List<SimpleProperty> properties = SimpleUtil.findProperties(project, key);
-//                if (properties.size() == 1) {
-//                    TextRange range = new TextRange(element.getTextRange().getStartOffset() + 7,
-//                            element.getTextRange().getStartOffset() + 7);
-//                    Annotation annotation = holder.createInfoAnnotation(range, null);
-//                    annotation.setTextAttributes(DefaultLanguageHighlighterColors.LINE_COMMENT);
-//                } else if (properties.size() == 0) {
-//                    TextRange range = new TextRange(element.getTextRange().getStartOffset() + 8,
-//                            element.getTextRange().getEndOffset());
-//                    holder.createErrorAnnotation(range, "Unresolved property").
-//                            registerFix(new CreateSubstepDefinitionQuickFix(key));
-//                }
-//            }
+            }
         }
     }
 
@@ -225,8 +202,6 @@ public class StepValidatorAnnotator implements Annotator {
             @Override
             public void visitFile(final PsiFile file) {
 
-//                logger.debug("got src file: " + file.getName() + " filetype: " + file.getFileType());
-
                 if (file instanceof PsiJavaFile) {
                     buildSuggestionsFromJavaSource((PsiJavaFile) file, stepImplsInScope);
                 } else if (file instanceof SubstepsDefinitionFile) {
@@ -239,13 +214,9 @@ public class StepValidatorAnnotator implements Annotator {
 
             }
         });
-//        long duration = System.currentTimeMillis() - start;
-//        logger.debug("step implementation descriptors built from code in " + duration + " msecs");
     }
 
     protected void buildSuggestionsFromSubstepsSource(SubstepsDefinitionFile substepsDefFile, final List<String> substepDefinitions) {
-
-        logger.debug("buildSuggestionsFromSubstepsSource for file: " + substepsDefFile.getName());
 
 
         // TODO - think this is probably the way it *should* be done - but not implemented the psi classes correctly so that it actually works :-(
@@ -267,8 +238,8 @@ public class StepValidatorAnnotator implements Annotator {
 
     protected void buildSuggestionsFromJavaSource(PsiJavaFile psiJavaFile, List<StepImplementationsDescriptor> stepImplsInScope) {
 
-        logger.trace("looking at java source file: " + psiJavaFile.getName());
-        // logger.debug("psiJavaFile: "  psiJavaFile.getName() + "\n" + psiJavaFile.getText());
+//        logger.trace("looking at java source file: " + psiJavaFile.getName());
+        log.debug("psiJavaFile: " + psiJavaFile.getName());
 
         final PsiClass[] psiClasses = psiJavaFile.getClasses();
 
@@ -291,9 +262,13 @@ public class StepValidatorAnnotator implements Annotator {
         }
     }
 
-    protected void addStepDescriptorIfApplicable(PsiMethod method, StepImplementationsDescriptor stepClassDescriptor) {
+    // TODO - need to wrap some tests around this
+    // not working for using regex[FindByXpath with token replacement $x<xpath>")<tokens>$]
+
+    public static void addStepDescriptorIfApplicable(PsiMethod method, StepImplementationsDescriptor stepClassDescriptor) {
 
         PsiAnnotation[] methodAnnotations = method.getModifierList().getAnnotations();
+
         for (PsiAnnotation a : methodAnnotations) {
             if (a.getQualifiedName().equals(com.technophobia.substeps.model.SubSteps.Step.class.getCanonicalName())){
 
@@ -302,26 +277,44 @@ public class StepValidatorAnnotator implements Annotator {
                 PsiNameValuePair[] attributes = parameterList.getAttributes();
                 if (attributes != null) {
                     String src = attributes[0].getValue().getText();
-
-                    String  stepExpression = src.substring(1, src.length() -1);
-
-                    StepDescriptor sd = new StepDescriptor();
-
                     PsiParameter[] parameters = method.getParameterList().getParameters();
-                    if (parameters != null){
+
+                    List<String> parameterNames = new ArrayList<>();
+                    List<String> parameterTypes = new ArrayList<>();
+                    if (parameters != null) {
                         for (PsiParameter p : parameters){
-                            stepExpression = stepExpression.replaceFirst("\\([^\\)]*\\)", "<" + p.getName() + ">");
+                            parameterNames.add(p.getName());
+                            parameterTypes.add(p.getType().toString());
                         }
                     }
-                    stepExpression = stepExpression.replaceAll("\\?", "");
-                    stepExpression = stepExpression.replaceAll("\\\\", "");
-
-                    sd.setExpression(stepExpression);
+                    StepDescriptor sd = buildStepDescriptor(src, parameterNames, parameterTypes);
                     stepClassDescriptor.addStepTags(sd);
                     break;
                 }
             }
         }
+    }
+
+    @NotNull
+    public static StepDescriptor buildStepDescriptor(String src, List<String> parameterNames, List<String> parameterTypes) {
+        // NB. we need to unescape the java string liternal that comes through from PSI
+        String  regEx = StringEscapeUtils.unescapeJava(src.substring(1, src.length() -1));
+
+        StepDescriptor sd = new StepDescriptor();
+        String stepExpression = regEx;
+        for (String paramName : parameterNames){
+            stepExpression = stepExpression.replaceFirst("\\([^\\)]*\\)", "<" + paramName + ">");
+        }
+
+        stepExpression = stepExpression.replaceAll("\\?", "");
+        stepExpression = stepExpression.replaceAll("\\\\", "");
+        if (parameterNames != null && !parameterNames.isEmpty()) {
+            sd.setParameterNames(parameterNames.toArray(new String[parameterNames.size()]));
+            sd.setParameterClassNames(parameterTypes.toArray(new String[parameterTypes.size()]));
+        }
+        sd.setExpression(stepExpression);
+        sd.setRegex(regEx);
+        return sd;
     }
 
 }

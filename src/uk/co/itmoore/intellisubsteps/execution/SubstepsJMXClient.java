@@ -150,7 +150,7 @@ public class SubstepsJMXClient implements SubstepsRunner, NotificationListener {
     // TODO - only called in tests
     public RootNode prepareExecutionConfig(final SubstepsExecutionConfig cfg) {
 
-        RootNode rn = new RootNode("dummy", Collections.<FeatureNode>emptyList());
+        RootNode rn = new RootNode("dummy", Collections.<FeatureNode>emptyList(), "env", "tags", "nonFatalTags");
 
         try {
             final ObjectName objectName = new ObjectName(SubstepsServerMBean.SUBSTEPS_JMX_MBEAN_NAME);

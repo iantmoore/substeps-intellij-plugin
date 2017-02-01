@@ -1,10 +1,13 @@
-package uk.co.itmoore.intellisubsteps.test
+package uk.co.itmoore.intellisubsteps
 
 import java.util
+import java.util.regex.Pattern
 
 import com.technophobia.substeps.glossary.{StepDescriptor, StepImplementationsDescriptor}
+import org.apache.commons.lang3.StringEscapeUtils
 import org.scalatest.{FlatSpec, Matchers}
-import uk.co.itmoore.intellisubsteps.StepValidatorAnnotator
+
+import scala.collection.JavaConverters._
 
 /**
   * Created by ian on 23/01/17.

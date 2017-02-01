@@ -12,6 +12,7 @@ import com.technophobia.substeps.model.PatternMap;
 import com.technophobia.substeps.parser.FileContents;
 import com.technophobia.substeps.runner.syntax.DefaultSyntaxErrorReporter;
 import com.technophobia.substeps.runner.syntax.SubStepDefinitionParser;
+import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import uk.co.itmoore.intellisubsteps.psi.stepdefinition.psi.SubstepsDefinitionFile;
@@ -119,9 +120,6 @@ public class SubstepsSyntaxBuilder {
         return matchingMethods;
     }
 
-    public void resolveToProjectLibs(String text){
-
-    }
 
 
 
@@ -136,7 +134,6 @@ public class SubstepsSyntaxBuilder {
             if (file instanceof PsiJavaFile) {
 
                 buildSuggestionsFromJavaSource((PsiJavaFile)file, projectJavaStepImplementations);
-                //     references.addAll(getReferencesFromPsiJavaFile((PsiJavaFile) file, text));
 
             } else if (file instanceof SubstepsDefinitionFile) {
 
@@ -168,8 +165,6 @@ public class SubstepsSyntaxBuilder {
         // logger.debug("psiJavaFile: "  psiJavaFile.getName() + "\n" + psiJavaFile.getText());
 
         final PsiClass[] psiClasses = psiJavaFile.getClasses();
-
-        //final PsiClass psiClass = JavaPsiFacade.getInstance(thisProject).findClass(fqn, psiJavaFile.getResolveScope());
 
         for (PsiClass psiClass : psiClasses) {
 
@@ -215,9 +210,13 @@ public class SubstepsSyntaxBuilder {
                 if (attributes != null) {
                     String src = attributes[0].getValue().getText();
 
-                    String  stepExpression = src.substring(1, src.length() -1);
 
-                    PsiStepImplementationMethodDescriptor sd = new PsiStepImplementationMethodDescriptor(method, stepExpression);
+                    String  regEx = StringEscapeUtils.unescapeJava(src.substring(1, src.length() -1));
+
+                    String  stepExpression = regEx;
+
+
+                    PsiStepImplementationMethodDescriptor sd = new PsiStepImplementationMethodDescriptor(method, regEx);
 
 
                     PsiParameter[] parameters = method.getParameterList().getParameters();
