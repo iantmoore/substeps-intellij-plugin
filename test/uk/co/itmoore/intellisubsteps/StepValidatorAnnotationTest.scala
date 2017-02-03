@@ -116,4 +116,15 @@ class StepValidatorAnnotationTest extends FlatSpec with Matchers{
 
   }
 
+  it should "remove trailing comments" in {
+
+    StepValidatorAnnotator.trimTrailingComments("No comment") should be ("No comment")
+
+    StepValidatorAnnotator.trimTrailingComments("something # a comment") should be ("something")
+
+    StepValidatorAnnotator.trimTrailingComments("""a quoted has '#' not a comment""") should be ("""a quoted has '#' not a comment""")
+
+    StepValidatorAnnotator.trimTrailingComments("""something like this "#id-not-a-comment" # but this is a comment""") should be ("""something like this "#id-not-a-comment"""")
+
+  }
 }

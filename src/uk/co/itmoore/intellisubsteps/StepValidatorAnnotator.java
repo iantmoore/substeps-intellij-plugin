@@ -144,13 +144,46 @@ public class StepValidatorAnnotator implements Annotator {
         public final String msg;
     }
 
+    public static String trimTrailingComments(String text){
+
+        String rtn = text;
+        int hashIndex = text.indexOf('#');
+        if (hashIndex > 0){
+
+            boolean inQuotes = false;
+            boolean commentFound = false;
+            // where is the # and is it in quotes..
+            int i = 0;
+            for (char c : text.toCharArray()){
+
+                if (c == '\'' || c == '"') {
+                    if (inQuotes) {
+                        inQuotes = false;
+                    }
+                    else {
+                        inQuotes = true;
+                    }
+                }
+                if (c == '#' && !inQuotes){
+                    commentFound = true;
+                    break;
+                }
+                i++;
+            }
+            if (commentFound){
+                rtn = text.substring(0, i).trim();
+            }
+        }
+        return rtn;
+    }
+
     @Override
     public void annotate(@NotNull PsiElement element, @NotNull AnnotationHolder holder) {
 
         if (element instanceof ScenarioStepImpl || element instanceof SubstepDefinitionNameImpl || element instanceof SubstepStep2Impl) {
             ASTDelegatePsiElement astElement = (ASTDelegatePsiElement) element;
 
-            String text = astElement.getText();
+            String text = trimTrailingComments(astElement.getText());
             log.debug("validate text: " + text);
 
             Module module = ModuleUtil.findModuleForPsiElement(element);

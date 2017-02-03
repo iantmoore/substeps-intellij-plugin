@@ -17,7 +17,7 @@
 <idea-plugin version="2">
   <id>uk.co.itmoore.intellisubsteps</id>
   <name>Substeps IntelliJ Plugin</name>
-  <version>1.0.6</version>
+  <version>1.0.7</version>
   <vendor email="ian@itmoore.co.uk" url="http://substeps.github.io">Substeps</vendor>
 
   <description><![CDATA[
@@ -30,6 +30,14 @@
 
 
   <change-notes><![CDATA[
+    <h3>1.0.7</h3>
+    <ul>
+        <li>Error highlighting when the step has a comment on the end of the line</li>
+
+    </ul>
+
+
+
     <h3>1.0.6</h3>
     <ul>
         <li>Improvements and fixes around the error highlighting</li>
