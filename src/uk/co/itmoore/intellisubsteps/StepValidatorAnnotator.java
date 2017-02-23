@@ -42,11 +42,6 @@ public class StepValidatorAnnotator implements Annotator {
 
     public ErrorAnnotation validate(String text, List<String> substepDefinitions, List<StepImplementationsDescriptor> stepImplsInScope){
 
-        // TODO - check for exact matches, if fuzzy match, add a highlight ?
-        if (text.startsWith("FindByXpath")){
-            log.debug("stop");
-        }
-
         List<String> matchingSubstepDefs = new ArrayList<>();
         for (String stepDef : substepDefinitions){
 
@@ -64,7 +59,7 @@ public class StepValidatorAnnotator implements Annotator {
 
         List<StepDescriptor> matchingStepDescriptors = new ArrayList<>();
 
-        log.debug("matching against java source files");
+//        log.debug("matching against java source files");
         for (StepImplementationsDescriptor stepImplDescriptor : stepImplsInScope){
 
             for (StepDescriptor sd : stepImplDescriptor.getExpressions()){
@@ -78,10 +73,10 @@ public class StepValidatorAnnotator implements Annotator {
                 if (Pattern.matches("(Given|When|Then|And) .*", regEx)){
                     regEx = regEx.replaceFirst("(Given|When|Then|And)", "(Given|When|Then|And)");
                 }
-                log.debug("using regex[" + regEx + "] to test against string: " + text);
+//                log.debug("using regex[" + regEx + "] to test against string: " + text);
 
                 if (Pattern.matches(regEx, text)){
-                    log.debug("regEx added");
+//                    log.debug("regEx added");
                     matchingStepDescriptors.add(sd);
                 }
             }
@@ -96,7 +91,7 @@ public class StepValidatorAnnotator implements Annotator {
 
 
         if (matchingSubstepDefs.isEmpty() && matchingStepDescriptors.isEmpty()){
-            log.debug("not found");
+//            log.debug("not found");
             return new ErrorAnnotation(new CreateSubstepDefinitionQuickFix(text), "Unimplemented substep definition");
         }
         else {
@@ -183,8 +178,8 @@ public class StepValidatorAnnotator implements Annotator {
         if (element instanceof ScenarioStepImpl || element instanceof SubstepDefinitionNameImpl || element instanceof SubstepStep2Impl) {
             ASTDelegatePsiElement astElement = (ASTDelegatePsiElement) element;
 
-            String text = trimTrailingComments(astElement.getText());
-            log.debug("validate text: " + text);
+            String text = trimTrailingComments(astElement.getText().trim());
+            log.trace("validate text: [" + text +"]");
 
             Module module = ModuleUtil.findModuleForPsiElement(element);
             final List<StepImplementationsDescriptor> stepImplsInScope = new ArrayList<>();
@@ -192,7 +187,11 @@ public class StepValidatorAnnotator implements Annotator {
 
             buildSuggestionsFromProjectSource(module, stepImplsInScope, substepDefinitions);
 
+//            log.trace("validate against " + stepImplsInScope.size() + " stepimpls in scope from project src");
+
             List<StepImplementationsDescriptor> descriptorsForProjectFromLibraries = SubstepLibraryManager.INSTANCE.getDescriptorsForProjectFromLibraries(module);
+
+//            log.debug("got " + descriptorsForProjectFromLibraries.size() + " stepimpl descriptors from project libs");
 
             stepImplsInScope.addAll(descriptorsForProjectFromLibraries);
 
@@ -272,7 +271,7 @@ public class StepValidatorAnnotator implements Annotator {
     protected void buildSuggestionsFromJavaSource(PsiJavaFile psiJavaFile, List<StepImplementationsDescriptor> stepImplsInScope) {
 
 //        logger.trace("looking at java source file: " + psiJavaFile.getName());
-        log.debug("psiJavaFile: " + psiJavaFile.getName());
+//        log.debug("psiJavaFile: " + psiJavaFile.getName());
 
         final PsiClass[] psiClasses = psiJavaFile.getClasses();
 

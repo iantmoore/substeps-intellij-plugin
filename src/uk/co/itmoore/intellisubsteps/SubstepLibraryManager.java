@@ -1,5 +1,8 @@
 package uk.co.itmoore.intellisubsteps;
 
+import com.google.common.base.Predicates;
+import com.google.common.collect.Collections2;
+import com.google.common.collect.Lists;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
@@ -54,16 +57,22 @@ public class SubstepLibraryManager {
 
     public List<StepImplementationsDescriptor> getDescriptorsForProjectFromLibraries(Module module){
 
-        List<StepImplementationsDescriptor> stepImplementationsDescriptors = descriptorCache.get(module.getModuleFilePath());
+        List<Library> newLibraries = getNewLibraries(ModuleRootManager.getInstance(module));
+        List<StepImplementationsDescriptor> stepImplementationsDescriptors;
 
-        if (stepImplementationsDescriptors != null){
-            return stepImplementationsDescriptors;
+        if (newLibraries != null){
+//            logger.debug("newLibraries or first time building..");
+
+            stepImplementationsDescriptors = getStepImplementationsFromModuleLibraries(newLibraries);
+            descriptorCache.put(module.getModuleFilePath(), stepImplementationsDescriptors);
+
         }
         else {
-            // go off and build
-            stepImplementationsDescriptors = getStepImplementationsFromModuleLibraries(ModuleRootManager.getInstance(module));
-            descriptorCache.put(module.getModuleFilePath(), stepImplementationsDescriptors);
+            stepImplementationsDescriptors = descriptorCache.get(module.getModuleFilePath());
+//            logger.debug("return step impl descriptors from libs from cache");
+
         }
+
         return stepImplementationsDescriptors;
     }
 
@@ -79,31 +88,44 @@ public class SubstepLibraryManager {
         return classNames;
     }
 
+    private List<String> currentLibs = new ArrayList<>();
 
-    protected List<StepImplementationsDescriptor> getStepImplementationsFromModuleLibraries(ModuleRootManager moduleRootManager) {
+    private List<Library> getNewLibraries(ModuleRootManager moduleRootManager){
+        final List<Library> libs = new ArrayList<>();
 
-        List<StepImplementationsDescriptor> stepImplsInScope = new ArrayList<>();
-
-        final List<Library> libraries = new ArrayList<>();
+        List<String> latestLibs = new ArrayList<>();
 
         moduleRootManager.orderEntries().forEachLibrary(new Processor<Library>() {
             @Override
             public boolean process(Library library) {
 
-                libraries.add(library);
+                libs.add(library);
+                latestLibs.add(library.getName());
                 return true;
             }
         });
 
+        Collection<String> difference = Collections2.filter(latestLibs, Predicates.not(Predicates.in(currentLibs)));
+
+        if (difference.isEmpty()){
+            return null;
+        }
+        else {
+            currentLibs = latestLibs;
+            return libs;
+        }
+
+    }
+
+    protected List<StepImplementationsDescriptor> getStepImplementationsFromModuleLibraries(List<Library> libraries) {
+
+        List<StepImplementationsDescriptor> stepImplsInScope = new ArrayList<>();
 
         for (Library lib : libraries){
-            logger.trace("looking for stepImplementations in " + lib.getName());
+//            logger.trace("looking for stepImplementations in " + lib.getName());
 
             VirtualFile[] vLibFiles = lib.getFiles(OrderRootType.CLASSES);
 
-//            for (VirtualFile vf  : vLibFiles){
-//                logger.debug("virtual file canonical path: " + vf.getCanonicalPath() + " path: " + vf.getPath());
-//            }
             String libraryPath = StringUtils.substringBefore(vLibFiles[0].getPath(), "!/");
             stepImplsInScope.addAll(findStepImplementationDescriptorsForDependency(libraryPath));
         }
@@ -160,10 +182,6 @@ public class SubstepLibraryManager {
                 logger.error("Error loading from jarfile: ", e);
             }
         }
-//        else {
-//            logger.error("couldn't locate file in jar: " + STEPIMPLEMENTATIONS_JSON_FILENAME);
-//        }
-
         return classStepTagList;
 
     }
