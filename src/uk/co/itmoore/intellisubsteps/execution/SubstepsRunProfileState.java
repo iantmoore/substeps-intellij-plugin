@@ -45,11 +45,16 @@ import com.technophobia.substeps.execution.node.IExecutionNode;
 import com.technophobia.substeps.execution.node.RootNode;
 import com.technophobia.substeps.runner.IExecutionListener;
 import com.technophobia.substeps.runner.SubstepsExecutionConfig;
+import com.typesafe.config.Config;
+import com.typesafe.config.ConfigFactory;
+import com.typesafe.config.ConfigValueFactory;
 import gnu.trove.THashMap;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
+import org.substeps.config.SubstepsConfigLoader;
+import org.substeps.runner.NewSubstepsExecutionConfig;
 import uk.co.itmoore.intellisubsteps.SubstepLibraryManager;
 import uk.co.itmoore.intellisubsteps.psi.SubstepsCompletionContributor;
 import uk.co.itmoore.intellisubsteps.psi.stepdefinition.psi.SubstepsDefinitionFile;
@@ -301,6 +306,8 @@ public class SubstepsRunProfileState  extends CommandLineState{
         log.debug("launching substeps runner with classpath: " +
                 params.getClassPath().getPathsString() + "\njvm info: " + model.getHomePath() + " version: " + model.getVersionString());
 
+        myParams = params;
+
         return params;
     }
 
@@ -365,8 +372,13 @@ public class SubstepsRunProfileState  extends CommandLineState{
 
             String[] stepImplsArray = model.getStepImplentationClassNames();//.toArray(new String[model.getStepImplentationClassNames().size()]);
 
-            substepsExecutionConfig.setDescription("Substeps Tests");
+            log.debug("found step impls class names");
 
+            for (String s : stepImplsArray){
+                log.debug("step impl: " + s);
+            }
+
+            substepsExecutionConfig.setDescription("Substeps Tests");
             substepsExecutionConfig.setStepImplementationClassNames(stepImplsArray);
 
             substepsExecutionConfig.setSubStepsFileName(model.getSubStepDefinitionDirectory());
@@ -380,15 +392,25 @@ public class SubstepsRunProfileState  extends CommandLineState{
                 log.debug("step impl classname: " + s);
             }
 
-            log.debug("preparing config");
+            byte[] bytes;
+            String projectSubstepsVersion = jmxClient.getProjectSubstepsVersion();
+            log.debug("project has api version: " + projectSubstepsVersion);
 
-            byte[] bytes = jmxClient.prepareExecutionConfigAsBytes(substepsExecutionConfig);
+            if ("SUBSTEPS_1.1".equals(projectSubstepsVersion) ){
+
+                Config mavenConfigSettings = buildMavenFallbackConfig(model);
+
+                bytes = jmxClient.prepareRemoteExecutionConfig(mavenConfigSettings.root().render(), model.getPathToFeature(), model.getScenarioName());
+            }
+            else   {
+                log.warn("Project is using older version of substeps, please upgrade ASAP");
+                bytes = jmxClient.prepareExecutionConfigAsBytes(substepsExecutionConfig);
+            }
+
 
             RootNode rn = getRootNodeFromBytes(bytes);
 
-
             log.debug("got root node description: " + rn.getDescription());
-
 
             final SubstepsTestProxy unboundOutputRoot = new SubstepsTestProxy(rn);
 
@@ -457,6 +479,33 @@ public class SubstepsRunProfileState  extends CommandLineState{
         }
     }
 
+
+    private Config buildMavenFallbackConfig(SubstepsRunnerConfigurationModel model){
+
+        // might be able to use myParams to get hold of these...
+        String[] classpathElems = model.getClassPathString().split((File.pathSeparator));
+        String buildDir = null;
+        String testOutputDir = null;
+        String workingDir = model.getWorkingDir();
+
+        for (String e : classpathElems){
+            if(e.startsWith(workingDir)){
+                if (e.contains("test-classes")){
+                    testOutputDir = e;
+                }
+                else if (e.contains("classes")){
+                    buildDir = e;
+                }
+            }
+            if (testOutputDir != null && buildDir != null){
+                break;
+            }
+        }
+        Config cfg = SubstepsConfigLoader.buildMavenFallbackConfig(buildDir,
+                workingDir,
+                testOutputDir);
+        return cfg;
+    }
 
     private static class ActualRunner implements Runnable, Serializable, ExecutionNodeResultNotificationHandler {
 
@@ -657,12 +706,13 @@ public class SubstepsRunProfileState  extends CommandLineState{
     private JavaParameters myParams;
 
 
-    public JavaParameters getJavaParameters() throws ExecutionException {
-        if (myParams == null) {
-            myParams = createJavaParameters();
-        }
-        return myParams;
-    }
+//    public JavaParameters getJavaParameters() throws ExecutionException {
+//        if (myParams == null) {
+//            myParams = createJavaParameters();
+//        }
+//
+//        return myParams;
+//    }
 
 
 

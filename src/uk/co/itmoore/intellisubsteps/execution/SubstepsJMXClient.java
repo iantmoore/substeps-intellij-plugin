@@ -9,6 +9,7 @@ import com.technophobia.substeps.runner.IExecutionListener;
 import com.technophobia.substeps.runner.SubstepExecutionFailure;
 import com.technophobia.substeps.runner.SubstepsExecutionConfig;
 import com.technophobia.substeps.runner.SubstepsRunner;
+import com.typesafe.config.Config;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 
@@ -23,6 +24,7 @@ import java.io.ObjectInputStream;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Created by ian on 26/08/15.
@@ -37,6 +39,18 @@ public class SubstepsJMXClient implements SubstepsRunner, NotificationListener {
 
     private JMXConnector cntor = null;
     private MBeanServerConnection mbsc = null;
+
+    private String projectSubstepsVersion = null;
+    private ObjectName objectName = null;
+
+    public SubstepsJMXClient(){
+        try {
+            objectName = new ObjectName(SubstepsServerMBean.SUBSTEPS_JMX_MBEAN_NAME);
+        } catch (MalformedObjectNameException e) {
+            log.error("error creating object name", e);
+            objectName = null;
+        }
+    }
 
     public void setNotificiationHandler(ExecutionNodeResultNotificationHandler notificiationHandler) {
         this.notificiationHandler = notificiationHandler;
@@ -61,9 +75,64 @@ public class SubstepsJMXClient implements SubstepsRunner, NotificationListener {
                 // Obtain a "stub" for the remote MBeanServer
                 mbsc = this.cntor.getMBeanServerConnection();
 
-                final ObjectName objectName = new ObjectName(SubstepsServerMBean.SUBSTEPS_JMX_MBEAN_NAME);
-                this.mbean = MBeanServerInvocationHandler.newProxyInstance(mbsc, objectName, SubstepsServerMBean.class,
-                        false);
+//                this.mbean = MBeanServerInvocationHandler.newProxyInstance(mbsc, objectName, SubstepsServerMBean.class,
+//                        false);
+                log.debug("canonical objectName: " + objectName.getCanonicalName());
+
+
+                this.mbean = JMX.newMBeanProxy(mbsc, objectName, SubstepsServerMBean.class);
+
+                try {
+                    Set<ObjectName> objectNames = mbsc.queryNames(null, null);
+
+                    for (ObjectName objName : objectNames){
+
+                        log.debug("canonical objname: " + objName.getCanonicalName());
+
+                        MBeanOperationInfo[] operations = mbsc.getMBeanInfo(objName).getOperations();
+                        for (MBeanOperationInfo info : operations){
+                            log.debug("operation info: " +
+                                    info.getName() + " : desc: " +
+                                    info.getDescription());
+
+                        }
+                    }
+
+
+                    MBeanOperationInfo[] operations = mbsc.getMBeanInfo(objectName).getOperations();
+                    for (MBeanOperationInfo info : operations){
+                        log.debug("** operation info: " +
+                        info.getName() + " : desc: " +
+                        info.getDescription());
+
+                        MBeanParameterInfo[] signature = info.getSignature();
+                        for (MBeanParameterInfo sig : signature){
+                            log.debug("signature: " + sig.getType());
+                        }
+
+
+                    }
+
+                }
+                catch (Exception e){
+                    log.debug("exception thrown getting mbean info", e);
+                }
+
+                try {
+                    projectSubstepsVersion = String.valueOf(mbsc.getAttribute(objectName, "ProjectSubstepsVersion"));
+                } catch (MBeanException e) {
+                    log.error("MBeanException", e);
+
+                } catch (AttributeNotFoundException e) {
+                    log.error("AttributeNotFoundException", e);
+
+                } catch (InstanceNotFoundException e) {
+                    log.error("InstanceNotFoundException", e);
+
+                } catch (ReflectionException e) {
+                    log.error("ReflectionException", e);
+                }
+
 
                 addNotificationListener(objectName);
                 rtn = true;
@@ -73,9 +142,21 @@ public class SubstepsJMXClient implements SubstepsRunner, NotificationListener {
 
             log.error("IOException", e);
 
-        } catch (final MalformedObjectNameException e) {
-            log.error("MalformedObjectNameException", e);
         }
+//        catch (final MalformedObjectNameException e) {
+//            log.error("MalformedObjectNameException", e);
+//        }
+//        catch (ReflectionException e) {
+//            log.error("ReflectionException: ", e);
+//
+//        } catch (IntrospectionException e) {
+//            log.error("IntrospectionException: ", e);
+//        } catch (InstanceNotFoundException e) {
+//            log.error("InstanceNotFoundException: ", e);
+//        }
+
+
+
         return rtn;
     }
 
@@ -136,6 +217,57 @@ public class SubstepsJMXClient implements SubstepsRunner, NotificationListener {
         return connector;
     }
 
+    public byte[] prepareExecutionConfigAsBytes(final String theConfig) {
+
+        try {
+            Object[] params = new Object[]{theConfig};
+            String[] signature = new String[]{"java.lang.String"};
+            Object rtn = mbsc.invoke(objectName, "prepareExecutionConfigAsBytes", params, signature);
+
+            log.debug("invoked");
+            return (byte[])rtn;//this.mbean.prepareExecutionConfigAsBytes(theConfig);
+        }
+        catch (Exception ex){
+            log.error("Failed to init tests: " + ex.getMessage(), ex);
+            return null;
+        }
+    }
+
+    public String getProjectSubstepsVersion(){
+
+        return projectSubstepsVersion;
+
+//        log.info("calling getProjectSubstepsVersion");
+//
+//        return this.mbean.getProjectSubstepsVersion();
+    }
+
+    public byte[] prepareRemoteExecutionConfig(String mvnConfig, String featureFile, String scenarioName) {
+
+//        try {
+//            return this.mbean.prepareRemoteExecutionConfig(mvnConfig, featureFile, scenarioName);
+//        }
+//        catch (SubstepsConfigurationException ex){
+//            log.error("Failed to init tests: " + ex.getMessage());
+//            return null;
+//        }
+
+        try {
+            final ObjectName objectName = new ObjectName(SubstepsServerMBean.SUBSTEPS_JMX_MBEAN_NAME);
+            Object  rootNode = mbsc.invoke(objectName,
+                    "prepareRemoteExecutionConfig",
+                    new Object[]{mvnConfig, featureFile, scenarioName},
+                    new String[]{String.class.getName(), String.class.getName(), String.class.getName()});
+            return (byte[])rootNode;
+
+        } catch (Exception e) {
+            log.error("Exception thrown preparing exectionConfig", e);
+        }
+        return null;
+
+    }
+
+
     public byte[] prepareExecutionConfigAsBytes(final SubstepsExecutionConfig cfg) {
 
         try {
@@ -146,6 +278,24 @@ public class SubstepsJMXClient implements SubstepsRunner, NotificationListener {
             return null;
         }
     }
+
+    @Override
+    public RootNode prepareExecutionConfig(Config theConfig) {
+
+        try {
+            final ObjectName objectName = new ObjectName(SubstepsServerMBean.SUBSTEPS_JMX_MBEAN_NAME);
+            Object  rootNode = mbsc.invoke(objectName,
+                    "prepareExecutionConfig",
+                    new Object[]{theConfig},
+                    new String[]{SubstepsExecutionConfig.class.getName()});
+            return (RootNode)rootNode;
+
+        } catch (Exception e) {
+            log.error("Exception thrown preparing exectionConfig", e);
+        }
+        return null;
+    }
+
 
     // TODO - only called in tests
     public RootNode prepareExecutionConfig(final SubstepsExecutionConfig cfg) {
@@ -266,4 +416,5 @@ public class SubstepsJMXClient implements SubstepsRunner, NotificationListener {
         }
         return rn;
     }
+
 }
