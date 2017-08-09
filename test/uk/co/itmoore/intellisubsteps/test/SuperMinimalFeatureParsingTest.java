@@ -13,7 +13,6 @@ public class SuperMinimalFeatureParsingTest extends ParsingTestCase {
         super("", "feature", new FeatureParserDefinition());
     }
 
-
     public void testParsingTestDataSuperMin() {
         doTest(true);
     }
@@ -21,7 +20,7 @@ public class SuperMinimalFeatureParsingTest extends ParsingTestCase {
     @Override
     protected String getTestDataPath() {
 
-        return "/home/ian/projects/intelliSubsteps/test/testData/features";
+        return "test/testData/features";
     }
 
     @Override

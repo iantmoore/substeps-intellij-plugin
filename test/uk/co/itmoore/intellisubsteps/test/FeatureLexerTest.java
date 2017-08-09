@@ -4,6 +4,9 @@ import com.google.common.base.Predicate;
 import com.google.common.collect.FluentIterable;
 import com.google.common.collect.TreeTraverser;
 import com.google.common.io.Files;
+import com.intellij.openapi.editor.ex.util.SegmentArrayWithData;
+import com.intellij.openapi.util.io.FileUtil;
+import com.intellij.openapi.vfs.CharsetToolkit;
 import com.intellij.psi.TokenType;
 import com.intellij.psi.tree.IElementType;
 import org.apache.log4j.LogManager;
@@ -31,7 +34,89 @@ public class FeatureLexerTest {
 
     private static final Logger log = LogManager.getLogger(FeatureLexerTest.class);
 
-    String accountFeature = "/home/ian/skybet/projects/test-automation/international-testing-parent/test-automation/src/test/resources/com/skybet/international/testing/journey/account/account.feature";
+    String accountFeature = "/home/ian/skybet/projects/test-automation/international-testing-parent/test-automation/src/main/resources/features/account/account.feature";
+
+    // TODO - create a test that's complete garbage - ensure that the lexer handles that
+
+    public static class MySegmentArrayWithData extends SegmentArrayWithData{
+        public int[] getMyEnds(){
+            return myEnds;
+        }
+    }
+
+    private void testLexer(String text){
+
+
+        MySegmentArrayWithData mySegments = new MySegmentArrayWithData();
+        FeatureLexer myLexer = new FeatureLexer();
+//        final TokenProcessor processor = createTokenProcessor(0);
+        final int textLength = text.length();
+
+        final int myInitialState = 0; //  ?
+
+        myLexer.start(text, 0, textLength, myInitialState);
+        mySegments.removeAll();
+        int i = 0;
+        while (true) {
+            final IElementType tokenType = myLexer.getTokenType();
+            if (tokenType == null) {
+                System.out.println("token type is null, breaking");
+                break;
+            }
+
+            int data = packData(tokenType, myLexer.getState(), myInitialState);
+//            processor.addToken(i, myLexer.getTokenStart(), myLexer.getTokenEnd(), data, tokenType);
+
+            mySegments.setElementAt(i, myLexer.getTokenStart(), myLexer.getTokenEnd(), data);
+            i++;
+            myLexer.advance();
+        }
+
+
+        if (textLength > 0 && (mySegments.getSegmentCount() == 0 || mySegments.getMyEnds()[mySegments.getSegmentCount() - 1] != textLength)) {
+
+            System.out.println("TEXT that's causing an issue:\n\n" + text + "\nmySegments.getSegmentCount() : " + mySegments.getSegmentCount() + "\nmySegments.getMyEnds()[mySegments.getSegmentCount() - 1] = " + mySegments.getMyEnds()[mySegments.getSegmentCount() - 1] + "\ntextLength: " + textLength);
+
+            throw new IllegalStateException("Unexpected termination offset for lexer " + myLexer);
+        }
+
+
+        // TODO - when parsing the table header - gets to the end, resets the position back one so not moving forwards.  current token is nullified, last token end is not the end..
+        // have a look at the
+
+
+//        public void addToken(final int i, final int startOffset, final int endOffset, final int data, final IElementType tokenType) {
+//            mySegments.setElementAt(i, startOffset, endOffset, data);
+//        }
+
+    }
+
+    @Test
+    public void testLexerInVariousTextStates() {
+
+        String completeFeatureFile = null;
+        File feature = new File("test/testData/features/ParsingTestDataSuperMin.feature");
+
+        try {
+            completeFeatureFile = FileUtil.loadFile(feature, CharsetToolkit.UTF8, true).trim();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        for (int i = 0; i < completeFeatureFile.length(); i++) {
+
+            System.out.println("going aroind the loop: " + i);
+
+            String partialFeatureFile = completeFeatureFile.substring(0, i);
+
+            testLexer(partialFeatureFile);
+        }
+    }
+
+    private int packData(IElementType tokenType, int state, final int myInitialState) {
+        final short idx = tokenType.getIndex();
+        return state == myInitialState ? idx : -idx;
+    }
 
     @Test
     public void testLexingIncompleteFeature(){
@@ -102,11 +187,11 @@ public class FeatureLexerTest {
 
     }
 
-
+    // fail
     @Test
     public void testMinimalFeatureLexer() throws IOException {
 
-        String file = "/home/ian/projects/intelliSubsteps/test/testData/features/ParsingTestDataMin.feature";
+        String file = "test/testData/features/ParsingTestDataMin.feature";
 
         LexingResults expected = new LexingResults();
 
@@ -137,6 +222,9 @@ public class FeatureLexerTest {
         expected.states.add(STATE_IN_SCENARIO_STEPS);
         expected.states.add(STATE_IN_SCENARIO_STEPS);
         expected.states.add(STATE_IN_SCENARIO_STEPS);
+        expected.states.add(STATE_IN_SCENARIO_STEPS);
+        expected.states.add(STATE_IN_SCENARIO_STEPS);
+
         expected.states.add(STATE_IN_SCENARIO_STEPS);
         expected.states.add(STATE_DEFAULT);
         expected.states.add(STATE_AFTER_TAGS_KEYWORD);
@@ -224,6 +312,7 @@ public class FeatureLexerTest {
         expected.tokens.add(SCENARIO_NAME_ELEMENT_TYPE);
         expected.tokens.add(STEP_ELEMENT_TYPE);
         expected.tokens.add(COMMENT_TOKEN);
+        expected.tokens.add(STEP_ELEMENT_TYPE);
         expected.tokens.add(STEP_ELEMENT_TYPE);
         expected.tokens.add(TAGS_KEYWORD_TOKEN);
         expected.tokens.add(COLON_TOKEN);
@@ -398,5 +487,9 @@ public class FeatureLexerTest {
         " token start: " +  lexer.getTokenStart()+
         " token end: " +  lexer.getTokenEnd()+
         " buf end: " +  lexer.getBufferEnd();
+    }
+
+    public void testGitHubIssue13() {
+            // see
     }
 }
