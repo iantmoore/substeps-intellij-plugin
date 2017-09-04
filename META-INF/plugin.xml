@@ -17,7 +17,7 @@
 <idea-plugin>
   <id>uk.co.itmoore.intellisubsteps</id>
   <name>Substeps IntelliJ Plugin</name>
-  <version>1.0.8</version>
+  <version>1.0.9</version>
   <vendor email="ian@itmoore.co.uk" url="http://substeps.github.io">Substeps</vendor>
 
   <description><![CDATA[
@@ -30,6 +30,10 @@
 
 
   <change-notes><![CDATA[
+   <h3>1.0.9</h3>
+   <ul><li>Fix for issue #15 detected in Android Studio and a NPE.</li>
+   </ul>
+
    <h3>1.0.8</h3>
    <ul><li>Restricted the substeps plugin to Java modules</li>
     <li>Fixes to the Feature Lexer to resolve https://github.com/iantmoore/substeps-intellij-plugin/issues/13</li></ul>
