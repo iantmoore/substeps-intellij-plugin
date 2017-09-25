@@ -182,36 +182,38 @@ public class StepValidatorAnnotator implements Annotator {
             log.trace("validate text: [" + text +"]");
 
             Module module = ModuleUtil.findModuleForPsiElement(element);
-            final List<StepImplementationsDescriptor> stepImplsInScope = new ArrayList<>();
-            final List<String> substepDefinitions = new ArrayList<>();
 
-            buildSuggestionsFromProjectSource(module, stepImplsInScope, substepDefinitions);
+            if (module != null) {
+                final List<StepImplementationsDescriptor> stepImplsInScope = new ArrayList<>();
+                final List<String> substepDefinitions = new ArrayList<>();
 
-//            log.trace("validate against " + stepImplsInScope.size() + " stepimpls in scope from project src");
+                buildSuggestionsFromProjectSource(module, stepImplsInScope, substepDefinitions);
 
-            List<StepImplementationsDescriptor> descriptorsForProjectFromLibraries = SubstepLibraryManager.INSTANCE.getDescriptorsForProjectFromLibraries(module);
+                //            log.trace("validate against " + stepImplsInScope.size() + " stepimpls in scope from project src");
 
-//            log.debug("got " + descriptorsForProjectFromLibraries.size() + " stepimpl descriptors from project libs");
+                List<StepImplementationsDescriptor> descriptorsForProjectFromLibraries = SubstepLibraryManager.INSTANCE.getDescriptorsForProjectFromLibraries(module);
 
-            stepImplsInScope.addAll(descriptorsForProjectFromLibraries);
+                //            log.debug("got " + descriptorsForProjectFromLibraries.size() + " stepimpl descriptors from project libs");
 
-            // we should now have loaded all the step impls in scope
+                stepImplsInScope.addAll(descriptorsForProjectFromLibraries);
 
-            ErrorAnnotation errorAnnotation;
-                    try {
-                        errorAnnotation = validate(text, substepDefinitions, stepImplsInScope);
+                // we should now have loaded all the step impls in scope
+
+                ErrorAnnotation errorAnnotation;
+                try {
+                    errorAnnotation = validate(text, substepDefinitions, stepImplsInScope);
+                } catch (Exception e) {
+                    log.error("Exception performing validation", e);
+                    errorAnnotation = new ErrorAnnotation(null, "Unknown error");
+                }
+                if (errorAnnotation != null) {
+                    TextRange range = new TextRange(element.getTextRange().getStartOffset(),
+                            element.getTextRange().getEndOffset());
+
+                    Annotation eAnnotation = holder.createErrorAnnotation(range, errorAnnotation.msg);
+                    if (errorAnnotation.intentionAction != null) {
+                        eAnnotation.registerFix(errorAnnotation.intentionAction);
                     }
-                    catch (Exception e){
-                        log.error("Exception performing validation", e);
-                        errorAnnotation = new ErrorAnnotation(null, "Unknown error");
-                    }
-            if (errorAnnotation != null){
-                TextRange range = new TextRange(element.getTextRange().getStartOffset() ,
-                        element.getTextRange().getEndOffset());
-
-                Annotation eAnnotation = holder.createErrorAnnotation(range, errorAnnotation.msg);
-                if (errorAnnotation.intentionAction != null) {
-                    eAnnotation.registerFix(errorAnnotation.intentionAction);
                 }
             }
         }

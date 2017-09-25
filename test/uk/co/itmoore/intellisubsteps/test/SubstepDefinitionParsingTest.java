@@ -13,14 +13,14 @@ public class SubstepDefinitionParsingTest extends ParsingTestCase {
         super("", "substeps", new SubstepDefinitionParserDefinition());
     }
 
-
+    // fail
     public void testParsingTestData() {
         doTest(true);
     }
 
     @Override
     protected String getTestDataPath() {
-        return "/home/ian/projects/intelliSubsteps/test/testData/substeps/psi";
+        return "test/testData/substeps/psi";
     }
 
     @Override
