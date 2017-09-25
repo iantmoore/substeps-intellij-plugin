@@ -13,7 +13,6 @@ public class MinimalFeatureParsingTest extends ParsingTestCase {
         super("", "feature", new FeatureParserDefinition());
     }
 
-
     public void testParsingTestDataMin() {
         doTest(true);
     }
@@ -21,7 +20,7 @@ public class MinimalFeatureParsingTest extends ParsingTestCase {
     @Override
     protected String getTestDataPath() {
 
-        return "/home/ian/projects/intelliSubsteps/test/testData/features";
+        return "test/testData/features";
     }
 
     @Override

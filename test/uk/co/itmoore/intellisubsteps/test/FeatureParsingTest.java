@@ -28,7 +28,7 @@ public class FeatureParsingTest extends ParsingTestCase {
     @Override
     protected String getTestDataPath() {
 
-        return "/home/ian/projects/intelliSubsteps/test/testData/features/psi";
+        return "test/testData/features/psi";
     }
 
     @Override

@@ -216,6 +216,10 @@ public class FeatureLexer extends AbstractSubstepsLexer {
                 } else {
                     log.error("advance fell through");
                 }
+                if (myCurrentToken == null){
+                    // if this is null and we can't tell what the token is, just assign to text.  as the text of the feature evolves, hopefully a token will become apparent
+                    myCurrentToken = FeatureTokenTypes.TEXT_TOKEN;
+                }
                 advanceToEOL();
             }
         }
@@ -275,6 +279,8 @@ public class FeatureLexer extends AbstractSubstepsLexer {
 
     private void advanceToTableCellBoundary(){
 
+        log.trace("advanceToTableCellBoundary");
+
         if (myPosition < myBuffer.length()-1) {
 
             myPosition++;
@@ -293,6 +299,9 @@ public class FeatureLexer extends AbstractSubstepsLexer {
                 }
             }
             returnWhitespace(mark);
+        }
+        else {
+            myPosition++;
         }
     }
 
