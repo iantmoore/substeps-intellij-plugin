@@ -18,8 +18,6 @@ public class FeatureCompletionContributor extends SubstepsCompletionContributor 
 
     public FeatureCompletionContributor() {
 
-        logger.debug("FeatureCompletionContributor ctor");
-
         extend(CompletionType.BASIC,
                 PlatformPatterns.psiElement(FeatureElementTypes.STEP_ELEMENT_TYPE).withLanguage(FeatureLanguage.INSTANCE),
                 new CompletionProvider<CompletionParameters>() {

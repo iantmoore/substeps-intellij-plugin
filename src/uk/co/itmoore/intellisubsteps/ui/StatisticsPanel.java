@@ -2,20 +2,14 @@
 package uk.co.itmoore.intellisubsteps.ui;
 
 import com.intellij.execution.testframework.TestsUIUtil;
-import com.intellij.openapi.actionSystem.ActionPlaces;
 import com.intellij.openapi.actionSystem.DataProvider;
-import com.intellij.openapi.actionSystem.IdeActions;
 import com.intellij.openapi.ui.VerticalFlowLayout;
-import com.intellij.ui.*;
-import com.intellij.ui.table.BaseTableView;
-import com.intellij.ui.table.TableView;
-import com.intellij.util.EditSourceOnDoubleClickHandler;
+import com.intellij.ui.SimpleColoredComponent;
+import com.intellij.ui.SimpleTextAttributes;
 import com.intellij.util.config.Storage;
-import com.intellij.util.ui.ListTableModel;
 import uk.co.itmoore.intellisubsteps.ui.events.TestEvent;
 
 import javax.swing.*;
-import javax.swing.table.TableCellRenderer;
 import java.awt.*;
 
 class StatisticsPanel extends JPanel implements DataProvider{

@@ -2,11 +2,8 @@
 package uk.co.itmoore.intellisubsteps.ui;
 
 import com.intellij.execution.Executor;
-//import com.intellij.execution.junit.JUnitConfiguration;
 import com.intellij.execution.testframework.JavaAwareTestConsoleProperties;
-import com.intellij.ide.util.PropertiesComponent;
 import com.intellij.psi.search.GlobalSearchScope;
-import com.intellij.util.config.Storage;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import uk.co.itmoore.intellisubsteps.execution.SubstepsRunConfiguration;

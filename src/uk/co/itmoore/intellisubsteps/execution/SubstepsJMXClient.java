@@ -170,6 +170,7 @@ public class SubstepsJMXClient implements SubstepsRunner, NotificationListener {
             try {
                 tries++;
                 mbsc.addNotificationListener(objectName, this, null, null);
+                log.debug("addNotificationListener succesful");
                 added = true;
             } catch (InstanceNotFoundException e) {
                 log.debug("adding notification InstanceNotFoundException");
@@ -244,6 +245,7 @@ public class SubstepsJMXClient implements SubstepsRunner, NotificationListener {
 
     public byte[] prepareRemoteExecutionConfig(String mvnConfig, String featureFile, String scenarioName) {
 
+        log.debug("prepareRemoteExecutionConfig: mvnConfig, featureFile, scenarioName [" + mvnConfig + "] [" + featureFile + "] [" +scenarioName + "]" );
 //        try {
 //            return this.mbean.prepareRemoteExecutionConfig(mvnConfig, featureFile, scenarioName);
 //        }
@@ -271,6 +273,8 @@ public class SubstepsJMXClient implements SubstepsRunner, NotificationListener {
     public byte[] prepareExecutionConfigAsBytes(final SubstepsExecutionConfig cfg) {
 
         try {
+
+            log.debug("old skool prepareExecutionConfigAsBytes");
             return this.mbean.prepareExecutionConfigAsBytes(cfg);
         }
         catch (SubstepsConfigurationException ex){

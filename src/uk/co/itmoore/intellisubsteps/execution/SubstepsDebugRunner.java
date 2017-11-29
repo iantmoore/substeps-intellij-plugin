@@ -1,16 +1,14 @@
 package uk.co.itmoore.intellisubsteps.execution;
 
-import com.intellij.debugger.DebugEnvironment;
-import com.intellij.debugger.DebuggerManager;
-import com.intellij.debugger.DefaultDebugEnvironment;
-import com.intellij.debugger.engine.DebugProcess;
-import com.intellij.debugger.engine.DebugProcessImpl;
 import com.intellij.debugger.engine.DebuggerUtils;
 import com.intellij.debugger.impl.DebuggerManagerImpl;
 import com.intellij.debugger.impl.GenericDebuggerRunner;
 import com.intellij.debugger.impl.GenericDebuggerRunnerSettings;
 import com.intellij.debugger.settings.DebuggerSettings;
-import com.intellij.execution.*;
+import com.intellij.execution.ExecutionException;
+import com.intellij.execution.ExecutionManager;
+import com.intellij.execution.RunProfileStarter;
+import com.intellij.execution.RunnerAndConfigurationSettings;
 import com.intellij.execution.configurations.JavaParameters;
 import com.intellij.execution.configurations.RemoteConnection;
 import com.intellij.execution.configurations.RunProfile;
@@ -23,13 +21,6 @@ import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import javax.swing.*;
-import java.io.DataInputStream;
-import java.io.EOFException;
-import java.io.IOException;
-import java.net.ServerSocket;
-import java.net.Socket;
 
 /**
  * Created by ian on 12/11/15.
@@ -68,6 +59,8 @@ public class SubstepsDebugRunner extends GenericDebuggerRunner {
         log.debug("execute");
 
         ExecutionManager.getInstance(environment.getProject()).startRunProfile(new RunProfileStarter() {
+
+            // TODO use com.intellij.execution.runners.GenericProgramRunner instead
             @Override
             public RunContentDescriptor execute(@NotNull RunProfileState state, @NotNull ExecutionEnvironment environment) throws ExecutionException {
 
@@ -137,8 +130,8 @@ super.createContentDescriptor(state, environment); -> gets the java params...
         }
 
 
-
-        final RemoteConnection remoteConnection = DebuggerManagerImpl.createDebugParameters(javaParameters, false,
+        // final JavaParameters parameters, final boolean debuggerInServerMode, int transport, final String debugPort, boolean checkValidity
+        final RemoteConnection remoteConnection = DebuggerManagerImpl.createDebugParameters(javaParameters, true,
                 debuggerRunnerSettings.getTransport(), debuggerRunnerSettings.getDebugPort(), false);
 
                 //.createDebugParameters(javaParameters, debuggerRunnerSettings, false);

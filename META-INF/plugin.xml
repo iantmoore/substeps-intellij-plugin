@@ -17,7 +17,7 @@
 <idea-plugin>
   <id>uk.co.itmoore.intellisubsteps</id>
   <name>Substeps IntelliJ Plugin</name>
-  <version>1.1.0</version>
+  <version>1.1.1</version>
   <vendor email="ian@itmoore.co.uk" url="http://substeps.github.io">Substeps</vendor>
 
   <description><![CDATA[
@@ -161,7 +161,7 @@
   </change-notes>
 
   <!-- please see http://confluence.jetbrains.com/display/IDEADEV/Build+Number+Ranges for description -->
-  <idea-version since-build="171"/>
+  <idea-version since-build="172"/>
 
   <!-- please see http://confluence.jetbrains.com/display/IDEADEV/Plugin+Compatibility+with+IntelliJ+Platform+Products
        on how to target different products -->
@@ -247,6 +247,10 @@
     <annotator language="SubstepsFeature" implementationClass="uk.co.itmoore.intellisubsteps.StepValidatorAnnotator"/>
 
     <annotator language="SubstepStepDefinition" implementationClass="uk.co.itmoore.intellisubsteps.StepValidatorAnnotator"/>
+
+    <debugger.javaDebugAware implementation="uk.co.itmoore.intellisubsteps.debugger.JavaDebugAware"/>
+
+    <debugger.positionManagerFactory implementation="uk.co.itmoore.intellisubsteps.debugger.SubstepsPositionManagerFactory"/>
 
   </extensions>
 

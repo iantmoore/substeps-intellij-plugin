@@ -34,7 +34,7 @@ public class FeatureParser implements PsiParser {
 
         fileMarker.done(FeatureElementTypes.FEATURE_FILE);
 
-        log.debug("parsing done!");
+        log.trace("parsing done!");
 
         return psiBuilder.getTreeBuilt();
     }
