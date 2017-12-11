@@ -30,6 +30,12 @@
 
 
   <change-notes><![CDATA[
+  <h3>1.1.1</h3>
+    <ul>
+      <li>Fixed a bug (#16) where breakpoints in java code for step implementations weren't being triggered</li>
+    </ul>
+
+
  <h3>1.1.0</h3>
     <ul>
       <li>1.1.0 Substeps upgrade</li>
@@ -161,7 +167,7 @@
   </change-notes>
 
   <!-- please see http://confluence.jetbrains.com/display/IDEADEV/Build+Number+Ranges for description -->
-  <idea-version since-build="172"/>
+  <idea-version since-build="173"/>
 
   <!-- please see http://confluence.jetbrains.com/display/IDEADEV/Plugin+Compatibility+with+IntelliJ+Platform+Products
        on how to target different products -->
@@ -247,10 +253,6 @@
     <annotator language="SubstepsFeature" implementationClass="uk.co.itmoore.intellisubsteps.StepValidatorAnnotator"/>
 
     <annotator language="SubstepStepDefinition" implementationClass="uk.co.itmoore.intellisubsteps.StepValidatorAnnotator"/>
-
-    <debugger.javaDebugAware implementation="uk.co.itmoore.intellisubsteps.debugger.JavaDebugAware"/>
-
-    <debugger.positionManagerFactory implementation="uk.co.itmoore.intellisubsteps.debugger.SubstepsPositionManagerFactory"/>
 
   </extensions>
 

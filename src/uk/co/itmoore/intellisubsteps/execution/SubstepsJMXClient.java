@@ -24,7 +24,6 @@ import java.io.ObjectInputStream;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * Created by ian on 26/08/15.
@@ -33,7 +32,7 @@ public class SubstepsJMXClient implements SubstepsRunner, NotificationListener {
 
     private static final Logger log = LogManager.getLogger(SubstepsJMXClient.class);
 
-    private static final int JMX_CLIENT_TIMEOUT_SECS = 10;
+    private static final int JMX_CLIENT_TIMEOUT_SECS = 30;
 
     private SubstepsServerMBean mbean;
 
@@ -58,7 +57,7 @@ public class SubstepsJMXClient implements SubstepsRunner, NotificationListener {
 
     private ExecutionNodeResultNotificationHandler notificiationHandler = null;
 
-    public boolean init(final int portNumber) { //throws MojoExecutionException {
+    public boolean init(final int portNumber) {
 
         final String url = "service:jmx:rmi:///jndi/rmi://:" + portNumber + "/jmxrmi";
 
@@ -75,48 +74,7 @@ public class SubstepsJMXClient implements SubstepsRunner, NotificationListener {
                 // Obtain a "stub" for the remote MBeanServer
                 mbsc = this.cntor.getMBeanServerConnection();
 
-//                this.mbean = MBeanServerInvocationHandler.newProxyInstance(mbsc, objectName, SubstepsServerMBean.class,
-//                        false);
-                log.debug("canonical objectName: " + objectName.getCanonicalName());
-
-
                 this.mbean = JMX.newMBeanProxy(mbsc, objectName, SubstepsServerMBean.class);
-
-                try {
-                    Set<ObjectName> objectNames = mbsc.queryNames(null, null);
-
-                    for (ObjectName objName : objectNames){
-
-                        log.debug("canonical objname: " + objName.getCanonicalName());
-
-                        MBeanOperationInfo[] operations = mbsc.getMBeanInfo(objName).getOperations();
-                        for (MBeanOperationInfo info : operations){
-                            log.debug("operation info: " +
-                                    info.getName() + " : desc: " +
-                                    info.getDescription());
-
-                        }
-                    }
-
-
-                    MBeanOperationInfo[] operations = mbsc.getMBeanInfo(objectName).getOperations();
-                    for (MBeanOperationInfo info : operations){
-                        log.debug("** operation info: " +
-                        info.getName() + " : desc: " +
-                        info.getDescription());
-
-                        MBeanParameterInfo[] signature = info.getSignature();
-                        for (MBeanParameterInfo sig : signature){
-                            log.debug("signature: " + sig.getType());
-                        }
-
-
-                    }
-
-                }
-                catch (Exception e){
-                    log.debug("exception thrown getting mbean info", e);
-                }
 
                 try {
                     projectSubstepsVersion = String.valueOf(mbsc.getAttribute(objectName, "ProjectSubstepsVersion"));
@@ -143,19 +101,6 @@ public class SubstepsJMXClient implements SubstepsRunner, NotificationListener {
             log.error("IOException", e);
 
         }
-//        catch (final MalformedObjectNameException e) {
-//            log.error("MalformedObjectNameException", e);
-//        }
-//        catch (ReflectionException e) {
-//            log.error("ReflectionException: ", e);
-//
-//        } catch (IntrospectionException e) {
-//            log.error("IntrospectionException: ", e);
-//        } catch (InstanceNotFoundException e) {
-//            log.error("InstanceNotFoundException: ", e);
-//        }
-
-
 
         return rtn;
     }
@@ -178,7 +123,7 @@ public class SubstepsJMXClient implements SubstepsRunner, NotificationListener {
         }
     }
 
-    protected JMXConnector getConnector(JMXServiceURL serviceURL, Map<String, ?> environment) throws IOException {
+    protected JMXConnector getConnector(JMXServiceURL serviceURL, Map<String, ?> environment)  {
         // Create the JMXCconnectorServer
 
         JMXConnector connector = null;
@@ -204,7 +149,7 @@ public class SubstepsJMXClient implements SubstepsRunner, NotificationListener {
 
                 log.debug("ConnectException sleeping..");
                 try {
-                    Thread.sleep(500);
+                    Thread.sleep(1000);
                 } catch (InterruptedException e1) {
                     log.debug("InterruptedException:",  e1);
                 }
@@ -218,41 +163,30 @@ public class SubstepsJMXClient implements SubstepsRunner, NotificationListener {
         return connector;
     }
 
-    public byte[] prepareExecutionConfigAsBytes(final String theConfig) {
-
-        try {
-            Object[] params = new Object[]{theConfig};
-            String[] signature = new String[]{"java.lang.String"};
-            Object rtn = mbsc.invoke(objectName, "prepareExecutionConfigAsBytes", params, signature);
-
-            log.debug("invoked");
-            return (byte[])rtn;//this.mbean.prepareExecutionConfigAsBytes(theConfig);
-        }
-        catch (Exception ex){
-            log.error("Failed to init tests: " + ex.getMessage(), ex);
-            return null;
-        }
-    }
+//    public byte[] prepareExecutionConfigAsBytes(final String theConfig) {
+//
+//        try {
+//            Object[] params = new Object[]{theConfig};
+//            String[] signature = new String[]{"java.lang.String"};
+//            Object rtn = mbsc.invoke(objectName, "prepareExecutionConfigAsBytes", params, signature);
+//
+//            log.debug("invoked");
+//            return (byte[])rtn;//this.mbean.prepareExecutionConfigAsBytes(theConfig);
+//        }
+//        catch (Exception ex){
+//            log.error("Failed to init tests: " + ex.getMessage(), ex);
+//            return null;
+//        }
+//    }
 
     public String getProjectSubstepsVersion(){
 
         return projectSubstepsVersion;
-
-//        log.info("calling getProjectSubstepsVersion");
-//
-//        return this.mbean.getProjectSubstepsVersion();
     }
 
     public byte[] prepareRemoteExecutionConfig(String mvnConfig, String featureFile, String scenarioName) {
 
         log.debug("prepareRemoteExecutionConfig: mvnConfig, featureFile, scenarioName [" + mvnConfig + "] [" + featureFile + "] [" +scenarioName + "]" );
-//        try {
-//            return this.mbean.prepareRemoteExecutionConfig(mvnConfig, featureFile, scenarioName);
-//        }
-//        catch (SubstepsConfigurationException ex){
-//            log.error("Failed to init tests: " + ex.getMessage());
-//            return null;
-//        }
 
         try {
             final ObjectName objectName = new ObjectName(SubstepsServerMBean.SUBSTEPS_JMX_MBEAN_NAME);
@@ -333,7 +267,7 @@ public class SubstepsJMXClient implements SubstepsRunner, NotificationListener {
         }
 
 
-        return null;//        this.mbean.prepareExecutionConfig(cfg);
+        return null;
 
     }
 

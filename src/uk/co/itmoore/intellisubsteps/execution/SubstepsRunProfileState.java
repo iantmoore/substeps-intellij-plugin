@@ -40,7 +40,6 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
-import org.substeps.config.SubstepsConfigLoader;
 import uk.co.itmoore.intellisubsteps.SubstepLibraryManager;
 import uk.co.itmoore.intellisubsteps.psi.SubstepsCompletionContributor;
 import uk.co.itmoore.intellisubsteps.psi.stepdefinition.psi.SubstepsDefinitionFile;
@@ -66,6 +65,7 @@ public class SubstepsRunProfileState  extends CommandLineState{
     int jmxPort = 45133;
     private  OSProcessHandler processHandler = null;
 
+    private JavaParameters myParams;
 
     class InputStreamConsumer implements Runnable {
 
@@ -272,8 +272,6 @@ public class SubstepsRunProfileState  extends CommandLineState{
             params.getClassPath().add(model.getClassPathString());
         }
 
-        params.getProgramParametersList().add("prog-args-env", "prg-localhost");
-
         ParametersList vmParametersList = params.getVMParametersList();
 
         vmParametersList.addParametersString("-Dfile.encoding=UTF-8");
@@ -309,12 +307,35 @@ public class SubstepsRunProfileState  extends CommandLineState{
 
         OSProcessHandler processHandler = startProcess();
 
+        processHandler.addProcessListener(new ProcessListener() {
+            @Override
+            public void startNotified(@NotNull ProcessEvent processEvent) {
+                log.debug("startNotified");
+
+            }
+
+            @Override
+            public void processTerminated(@NotNull ProcessEvent processEvent) {
+                log.debug("processTerminated: " + processEvent.getExitCode());
+            }
+
+            @Override
+            public void processWillTerminate(@NotNull ProcessEvent processEvent, boolean b) {
+                log.debug("processWillTerminate");
+            }
+
+            @Override
+            public void onTextAvailable(@NotNull ProcessEvent processEvent, @NotNull Key key) {
+                log.debug("onTextAvailable: " + processEvent.getText());
+
+            }
+        });
 
         ConsoleView consoleView = TextConsoleBuilderFactory.getInstance().createBuilder(this.getEnvironment().getProject()).getConsole();
 
         consoleView.print("Starting substeps test...", ConsoleViewContentType.NORMAL_OUTPUT);
 
-        boolean substepsServerLogsToConsole = true;
+        boolean substepsServerLogsToConsole = false;
         if (substepsServerLogsToConsole){
             consoleView.attachToProcess(processHandler);
         }
@@ -352,7 +373,7 @@ public class SubstepsRunProfileState  extends CommandLineState{
 
             substepsExecutionConfig.setFeatureFile(model.getPathToFeature());
 
-            String[] stepImplsArray = model.getStepImplentationClassNames();//.toArray(new String[model.getStepImplentationClassNames().size()]);
+            String[] stepImplsArray = model.getStepImplentationClassNames();
 
             log.debug("found step impls class names");
 
@@ -526,7 +547,15 @@ public class SubstepsRunProfileState  extends CommandLineState{
         @Override
         public void run() {
             try {
-                log.debug("run!");
+//                log.debug("about to pause");
+//
+//                try {
+//                    Thread.currentThread().sleep(5000L);
+//                } catch (InterruptedException e) {
+//                    e.printStackTrace();
+//                }
+
+                log.debug("running tests");
 
                 this.root.setState(SubstepTestState.RUNNING);
                 eventsConsumer.onEvent(new StateChangedEvent(this.root));
@@ -694,25 +723,16 @@ public class SubstepsRunProfileState  extends CommandLineState{
 
     protected GeneralCommandLine createCommandLine() throws ExecutionException {
 
-        return createFromJavaParameters(createJavaParameters(),
+        if (this.myParams == null){
+            log.debug("JavaParameters not set.. creating");
+            this.myParams = createJavaParameters();
+        }
+
+        return createFromJavaParameters(this.myParams,
                 CommonDataKeys.PROJECT.getData(DataManager.getInstance().getDataContext()),
                 true);
 
-        // DataContext dataContext = DataManager.getInstance().getDataContextFromFocus().getResult();
-        // this.project = DataKeys.PROJECT.getData(dataContext);
     }
-
-    private JavaParameters myParams;
-
-
-//    public JavaParameters getJavaParameters() throws ExecutionException {
-//        if (myParams == null) {
-//            myParams = createJavaParameters();
-//        }
-//
-//        return myParams;
-//    }
-
 
 
 
