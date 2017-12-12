@@ -10,7 +10,10 @@ import com.intellij.debugger.impl.DebuggerManagerImpl;
 import com.intellij.debugger.impl.GenericDebuggerRunner;
 import com.intellij.debugger.impl.GenericDebuggerRunnerSettings;
 import com.intellij.debugger.settings.DebuggerSettings;
-import com.intellij.execution.*;
+import com.intellij.execution.ExecutionException;
+import com.intellij.execution.ExecutionManager;
+import com.intellij.execution.RunProfileStarter;
+import com.intellij.execution.RunnerAndConfigurationSettings;
 import com.intellij.execution.configurations.JavaParameters;
 import com.intellij.execution.configurations.RemoteConnection;
 import com.intellij.execution.configurations.RunProfile;
@@ -28,6 +31,7 @@ import javax.swing.*;
 import java.io.DataInputStream;
 import java.io.EOFException;
 import java.io.IOException;
+import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 
@@ -68,6 +72,8 @@ public class SubstepsDebugRunner extends GenericDebuggerRunner {
         log.debug("execute");
 
         ExecutionManager.getInstance(environment.getProject()).startRunProfile(new RunProfileStarter() {
+
+            // TODO use com.intellij.execution.runners.GenericProgramRunner instead
             @Override
             public RunContentDescriptor execute(@NotNull RunProfileState state, @NotNull ExecutionEnvironment environment) throws ExecutionException {
 
@@ -103,114 +109,79 @@ public class SubstepsDebugRunner extends GenericDebuggerRunner {
             throws ExecutionException {
 
         log.debug("createContentDescriptor");
-        /*
-
-        think I need to do something more like this
-
-            if (state instanceof RemoteState) {
-      final RemoteConnection connection = createRemoteDebugConnection((RemoteState)state, environment.getRunnerSettings());
-      return attachVirtualMachine(state, environment, connection, false);
-    }
-
-
-// also need to do something differnetly around the createJavaParameters of the start process
-
-super.createContentDescriptor(state, environment); -> gets the java params...
-
-         */
-
-
-        /////////////////////// v2 ////////////////////////////////
-
-        // TODO follow this path - doPath appends the appropriate JVM debug args - we need the launched server process to do the same
-        // //final RemoteConnection connection = doPatch(new JavaParameters(), environment.getRunnerSettings());
 
         final SubstepsRunProfileState runProfileState = (SubstepsRunProfileState)state;
 
-
         GenericDebuggerRunnerSettings debuggerRunnerSettings = (GenericDebuggerRunnerSettings)environment.getRunnerSettings();
 
+        debuggerRunnerSettings.setLocal(false);
         JavaParameters javaParameters = runProfileState.createJavaParameters();
 
         if (StringUtil.isEmpty(debuggerRunnerSettings.getDebugPort())) {
-            debuggerRunnerSettings.setDebugPort(DebuggerUtils.getInstance().findAvailableDebugAddress(debuggerRunnerSettings.getTransport() == DebuggerSettings.SOCKET_TRANSPORT));
+            debuggerRunnerSettings.setDebugPort(DebuggerUtils.getInstance().
+                    findAvailableDebugAddress(debuggerRunnerSettings.getTransport() == DebuggerSettings.SOCKET_TRANSPORT));
         }
 
-
-
-        final RemoteConnection remoteConnection = DebuggerManagerImpl.createDebugParameters(javaParameters, false,
-                debuggerRunnerSettings.getTransport(), debuggerRunnerSettings.getDebugPort(), false);
-
-                //.createDebugParameters(javaParameters, debuggerRunnerSettings, false);
+        final RemoteConnection remoteConnection = DebuggerManagerImpl.createDebugParameters(javaParameters, false, debuggerRunnerSettings.getTransport(),
+                debuggerRunnerSettings.getDebugPort(), true);
 
         log.debug("java vm params list : " + javaParameters.getVMParametersList().getParametersString());
 
-//        runProfileState.execute()
+        final RunContentDescriptor res = attachVirtualMachine(state, environment, remoteConnection, true);
 
-        return attachVirtualMachine(state, environment, remoteConnection, true);
+        try {
+        final ServerSocket socket = new ServerSocket(Integer.parseInt(debuggerRunnerSettings.getDebugPort()), 0, InetAddress.getByName("127.0.0.1"));
 
+        if (socket != null) {
+            Thread thread = new Thread(getThreadName() + " debugger runner") {
+                @Override
+                public void run() {
+                    try {
+                        final Socket accept = socket.accept();
+                        try {
+                            DataInputStream stream = new DataInputStream(accept.getInputStream());
+                            try {
+                                int read = stream.readInt();
+                                while (read != -1) {
+                                    final DebugProcess process =
+                                            DebuggerManager.getInstance(environment.getProject()).getDebugProcess(res.getProcessHandler());
+                                    if (process == null) break;
+                                    final RemoteConnection connection = new RemoteConnection(true, "127.0.0.1", String.valueOf(read), false);
+                                    final DebugEnvironment env = new DefaultDebugEnvironment(environment, state, connection, true);
+                                    SwingUtilities.invokeLater(() -> {
+                                        try {
+                                            ((DebugProcessImpl)process).reattach(env);
+                                            accept.getOutputStream().write(0);
+                                        }
+                                        catch (Exception e) {
+                                            e.printStackTrace();
+                                        }
+                                    });
+                                    read = stream.readInt();
+                                }
+                            } finally {
+                                stream.close();
+                            }
+                        } finally {
+                            accept.close();
+                        }
+                    }
+                    catch (EOFException ignored) {}
+                    catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            };
+            thread.setDaemon(true);
+            thread.start();
+        }
 
-//        if (debuggerRunnerSettings != null) {
-//            remoteConnection.setUseSockets(debuggerRunnerSettings.getTransport() == DebuggerSettings.SOCKET_TRANSPORT);
-//            remoteConnection.setAddress(debuggerRunnerSettings.getDebugPort());
-//        }
-//
-//        return attachVirtualMachine(state, environment, remoteConnection, false);
-        //return remoteConnection;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
+        return res;
 
-        ////////////////////////////////////////////////////////////
-
-
-//        final RunContentDescriptor res = super.createContentDescriptor(state, environment);
-//        final ServerSocket socket = runProfileState.getDebugSocket();
-//        if (socket != null) {
-//            Thread thread = new Thread(getThreadName() + " debugger runner") {
-//                @Override
-//                public void run() {
-//                    try {
-//                        final Socket accept = socket.accept();
-//                        try {
-//                            DataInputStream stream = new DataInputStream(accept.getInputStream());
-//                            try {
-//                                int read = stream.readInt();
-//                                while (read != -1) {
-//                                    final DebugProcess process =
-//                                            DebuggerManager.getInstance(environment.getProject()).getDebugProcess(runProfileState.getProcess());
-//                                    if (process == null) break;
-//                                    final RemoteConnection connection = new RemoteConnection(true, "127.0.0.1", String.valueOf(read), true);
-//                                    final DebugEnvironment env = new DefaultDebugEnvironment(environment, state, connection, true);
-//                                    SwingUtilities.invokeLater(new Runnable() {
-//                                        @Override
-//                                        public void run() {
-//                                            try {
-//                                                ((DebugProcessImpl)process).reattach(env);
-//                                                accept.getOutputStream().write(0);
-//                                            }
-//                                            catch (Exception e) {
-//                                                e.printStackTrace();
-//                                            }
-//                                        }
-//                                    });
-//                                    read = stream.readInt();
-//                                }
-//                            } finally {
-//                                stream.close();
-//                            }
-//                        } finally {
-//                            accept.close();
-//                        }
-//                    }
-//                    catch (EOFException ignored) {}
-//                    catch (IOException e) {
-//                        e.printStackTrace();
-//                    }
-//                }
-//            };
-//            thread.setDaemon(true);
-//            thread.start();
-//        }
-//        return res;
     }
 
 }

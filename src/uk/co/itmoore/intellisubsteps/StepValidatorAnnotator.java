@@ -95,7 +95,7 @@ public class StepValidatorAnnotator implements Annotator {
             return new ErrorAnnotation(new CreateSubstepDefinitionQuickFix(text), "Unimplemented substep definition");
         }
         else {
-            log.debug("multiple potential matches");
+//            log.debug("multiple potential matches");
 
             List<String> dupes = new ArrayList<>();
             HashSet<String> uniques = new HashSet<>();

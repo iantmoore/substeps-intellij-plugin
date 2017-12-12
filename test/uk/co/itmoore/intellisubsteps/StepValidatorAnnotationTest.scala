@@ -1,13 +1,9 @@
 package uk.co.itmoore.intellisubsteps
 
 import java.util
-import java.util.regex.Pattern
 
 import com.technophobia.substeps.glossary.{StepDescriptor, StepImplementationsDescriptor}
-import org.apache.commons.lang3.StringEscapeUtils
-import org.scalatest.{FlatSpec, Matchers}
-
-import scala.collection.JavaConverters._
+import org.scalatest._
 
 /**
   * Created by ian on 23/01/17.
@@ -16,7 +12,7 @@ class StepValidatorAnnotationTest extends FlatSpec with Matchers{
 
   val stepValidator = new StepValidatorAnnotator
 
-  "StepValidatorAnnotator" should "return not implemented" in {
+  "StepValidatorAnnotator" must "return not implemented" in {
 
     val substepDefinitions = new util.ArrayList[String]
 

@@ -1,6 +1,5 @@
 package uk.co.itmoore.intellisubsteps;
 
-import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.util.indexing.*;
 import com.intellij.util.io.DataExternalizer;
 import com.intellij.util.io.EnumeratorStringDescriptor;

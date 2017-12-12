@@ -3,16 +3,12 @@ package uk.co.itmoore.intellisubsteps.execution;
 import com.intellij.execution.ExecutionException;
 import com.intellij.execution.Executor;
 import com.intellij.execution.JavaRunConfigurationExtensionManager;
-import com.intellij.execution.configuration.ConfigurationFactoryEx;
 import com.intellij.execution.configurations.*;
 import com.intellij.execution.runners.ExecutionEnvironment;
-import com.intellij.execution.runners.ProgramRunner;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.options.SettingsEditor;
 import com.intellij.openapi.options.SettingsEditorGroup;
-import com.intellij.openapi.project.Project;
-import com.intellij.openapi.util.DefaultJDOMExternalizer;
 import com.intellij.openapi.util.InvalidDataException;
 import com.intellij.openapi.util.WriteExternalException;
 import com.intellij.util.xmlb.XmlSerializer;
@@ -22,13 +18,8 @@ import org.jdom.Element;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import javax.swing.*;
-import java.io.IOException;
-import java.net.InetAddress;
-import java.net.ServerSocket;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.LinkedHashSet;
 
 /**
  * Created by ian on 29/07/15.
@@ -44,7 +35,6 @@ public class SubstepsRunConfiguration extends ModuleBasedConfiguration {
 
     public void setModel(SubstepsRunnerConfigurationModel model) {
 
-        log.debug("setting model");
         this.model = model;
     }
 
@@ -92,7 +82,7 @@ public class SubstepsRunConfiguration extends ModuleBasedConfiguration {
     @Override
     public void readExternal(final Element element) throws InvalidDataException {
 
-        log.debug("readExternal");
+//        log.debug("readExternal");
         //      PathMacroManager.getInstance(getProject()).expandPaths(element);
         super.readExternal(element);
         JavaRunConfigurationExtensionManager.getInstance().readExternal(this, element);
@@ -142,7 +132,7 @@ public class SubstepsRunConfiguration extends ModuleBasedConfiguration {
     @Override
     public void writeExternal(final Element element) throws WriteExternalException {
 
-        log.debug("write external");
+//        log.debug("write external");
 
         super.writeExternal(element);
         JavaRunConfigurationExtensionManager.getInstance().writeExternal(this, element);
