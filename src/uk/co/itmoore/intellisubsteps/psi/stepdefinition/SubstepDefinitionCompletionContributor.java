@@ -120,7 +120,6 @@ public class SubstepDefinitionCompletionContributor extends SubstepsCompletionCo
     public SubstepDefinitionCompletionContributor() {
 
 
-        logger.debug("SubstepDefinitionCompletionContributor ctor");
 
 
 

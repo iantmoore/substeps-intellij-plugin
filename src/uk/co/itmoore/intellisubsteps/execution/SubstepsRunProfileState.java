@@ -1,14 +1,11 @@
 package uk.co.itmoore.intellisubsteps.execution;
 
-import com.google.common.base.Strings;
 import com.intellij.analysis.AnalysisScope;
 import com.intellij.execution.*;
-import com.intellij.execution.ExecutionResult;
 import com.intellij.execution.configurations.*;
 import com.intellij.execution.filters.TextConsoleBuilderFactory;
 import com.intellij.execution.process.OSProcessHandler;
 import com.intellij.execution.process.ProcessEvent;
-import com.intellij.execution.process.ProcessHandler;
 import com.intellij.execution.process.ProcessListener;
 import com.intellij.execution.runners.ExecutionEnvironment;
 import com.intellij.execution.runners.ProgramRunner;
@@ -20,7 +17,6 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.project.ProjectBundle;
 import com.intellij.openapi.projectRoots.JavaSdkType;
 import com.intellij.openapi.projectRoots.JdkUtil;
 import com.intellij.openapi.projectRoots.Sdk;
@@ -29,23 +25,17 @@ import com.intellij.openapi.projectRoots.impl.JavaSdkImpl;
 import com.intellij.openapi.util.Computable;
 import com.intellij.openapi.util.Disposer;
 import com.intellij.openapi.util.Key;
-import com.intellij.openapi.util.io.FileUtil;
-import com.intellij.openapi.util.text.StringUtilRt;
 import com.intellij.openapi.vfs.encoding.EncodingManager;
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiJavaFile;
 import com.intellij.psi.PsiRecursiveElementVisitor;
-import com.intellij.rt.execution.testFrameworks.ForkedDebuggerHelper;
-import com.intellij.util.PathUtil;
-import com.intellij.util.SystemProperties;
-import com.intellij.util.lang.UrlClassLoader;
-import com.technophobia.substeps.execution.*;
-import com.technophobia.substeps.execution.node.IExecutionNode;
+import com.technophobia.substeps.execution.ExecutionNodeResult;
 import com.technophobia.substeps.execution.node.RootNode;
-import com.technophobia.substeps.runner.IExecutionListener;
 import com.technophobia.substeps.runner.SubstepsExecutionConfig;
-import gnu.trove.THashMap;
+import com.typesafe.config.Config;
+import com.typesafe.config.ConfigFactory;
+import com.typesafe.config.ConfigValueFactory;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
@@ -58,17 +48,12 @@ import uk.co.itmoore.intellisubsteps.ui.actions.RunningTestTracker;
 import uk.co.itmoore.intellisubsteps.ui.events.StateChangedEvent;
 
 import java.io.*;
-import java.net.InetAddress;
-import java.net.ServerSocket;
 import java.nio.charset.Charset;
 import java.nio.charset.IllegalCharsetNameException;
 import java.nio.charset.UnsupportedCharsetException;
-import java.rmi.RMISecurityManager;
 import java.util.*;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Semaphore;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Created by ian on 04/08/15.
@@ -80,6 +65,7 @@ public class SubstepsRunProfileState  extends CommandLineState{
     int jmxPort = 45133;
     private  OSProcessHandler processHandler = null;
 
+    private JavaParameters myParams;
 
     class InputStreamConsumer implements Runnable {
 
@@ -286,8 +272,6 @@ public class SubstepsRunProfileState  extends CommandLineState{
             params.getClassPath().add(model.getClassPathString());
         }
 
-        params.getProgramParametersList().add("prog-args-env", "prg-localhost");
-
         ParametersList vmParametersList = params.getVMParametersList();
 
         vmParametersList.addParametersString("-Dfile.encoding=UTF-8");
@@ -300,6 +284,8 @@ public class SubstepsRunProfileState  extends CommandLineState{
 
         log.debug("launching substeps runner with classpath: " +
                 params.getClassPath().getPathsString() + "\njvm info: " + model.getHomePath() + " version: " + model.getVersionString());
+
+        myParams = params;
 
         return params;
     }
@@ -321,11 +307,35 @@ public class SubstepsRunProfileState  extends CommandLineState{
 
         OSProcessHandler processHandler = startProcess();
 
+        processHandler.addProcessListener(new ProcessListener() {
+            @Override
+            public void startNotified(@NotNull ProcessEvent processEvent) {
+                log.debug("startNotified");
+
+            }
+
+            @Override
+            public void processTerminated(@NotNull ProcessEvent processEvent) {
+                log.debug("processTerminated: " + processEvent.getExitCode());
+            }
+
+            @Override
+            public void processWillTerminate(@NotNull ProcessEvent processEvent, boolean b) {
+                log.debug("processWillTerminate");
+            }
+
+            @Override
+            public void onTextAvailable(@NotNull ProcessEvent processEvent, @NotNull Key key) {
+                log.debug("onTextAvailable: " + processEvent.getText());
+
+            }
+        });
+
         ConsoleView consoleView = TextConsoleBuilderFactory.getInstance().createBuilder(this.getEnvironment().getProject()).getConsole();
 
         consoleView.print("Starting substeps test...", ConsoleViewContentType.NORMAL_OUTPUT);
 
-        boolean substepsServerLogsToConsole = true;
+        boolean substepsServerLogsToConsole = false;
         if (substepsServerLogsToConsole){
             consoleView.attachToProcess(processHandler);
         }
@@ -363,10 +373,15 @@ public class SubstepsRunProfileState  extends CommandLineState{
 
             substepsExecutionConfig.setFeatureFile(model.getPathToFeature());
 
-            String[] stepImplsArray = model.getStepImplentationClassNames();//.toArray(new String[model.getStepImplentationClassNames().size()]);
+            String[] stepImplsArray = model.getStepImplentationClassNames();
+
+            log.debug("found step impls class names");
+
+            for (String s : stepImplsArray){
+                log.debug("step impl: " + s);
+            }
 
             substepsExecutionConfig.setDescription("Substeps Tests");
-
             substepsExecutionConfig.setStepImplementationClassNames(stepImplsArray);
 
             substepsExecutionConfig.setSubStepsFileName(model.getSubStepDefinitionDirectory());
@@ -380,15 +395,25 @@ public class SubstepsRunProfileState  extends CommandLineState{
                 log.debug("step impl classname: " + s);
             }
 
-            log.debug("preparing config");
+            byte[] bytes;
+            String projectSubstepsVersion = jmxClient.getProjectSubstepsVersion();
+            log.debug("project has api version: " + projectSubstepsVersion);
 
-            byte[] bytes = jmxClient.prepareExecutionConfigAsBytes(substepsExecutionConfig);
+            if ("SUBSTEPS_1.1".equals(projectSubstepsVersion) ){
+
+                Config mavenConfigSettings = buildMavenFallbackConfig(model);
+                log.debug("preparing RemoteExecutionConfig");
+                bytes = jmxClient.prepareRemoteExecutionConfig(mavenConfigSettings.root().render(), model.getPathToFeature(), model.getScenarioName());
+            }
+            else   {
+                log.warn("Project is using older version of substeps, please upgrade ASAP");
+                bytes = jmxClient.prepareExecutionConfigAsBytes(substepsExecutionConfig);
+            }
+
 
             RootNode rn = getRootNodeFromBytes(bytes);
 
-
             log.debug("got root node description: " + rn.getDescription());
-
 
             final SubstepsTestProxy unboundOutputRoot = new SubstepsTestProxy(rn);
 
@@ -447,6 +472,10 @@ public class SubstepsRunProfileState  extends CommandLineState{
 
             return execResult;
         }
+        catch (Throwable t){
+            log.error("Exception thrown firing up Substeps JMX Server", t);
+            throw t;
+        }
         finally{
             if (!actualRunnerStarted && jmxClient != null){
 
@@ -458,6 +487,41 @@ public class SubstepsRunProfileState  extends CommandLineState{
     }
 
 
+    private Config buildMavenFallbackConfig(SubstepsRunnerConfigurationModel model){
+
+        // might be able to use myParams to get hold of these...
+        String[] classpathElems = model.getClassPathString().split((File.pathSeparator));
+        String buildDir = null;
+        String testOutputDir = null;
+        String workingDir = model.getWorkingDir();
+
+        for (String e : classpathElems){
+            if(e.startsWith(workingDir)){
+                if (e.contains("test-classes")){
+                    testOutputDir = e;
+                }
+                else if (e.contains("classes")){
+                    buildDir = e;
+                }
+            }
+            if (testOutputDir != null && buildDir != null){
+                break;
+            }
+        }
+        Config cfg = buildMavenFallbackConfig(buildDir,
+                workingDir,
+                testOutputDir);
+        return cfg;
+    }
+
+    private Config buildMavenFallbackConfig(String projectBuildDir, String baseDir, String testOutputDir) {
+
+        return ConfigFactory.empty().withValue("project.build.directory", ConfigValueFactory.fromAnyRef(projectBuildDir))
+                .withValue("basedir", ConfigValueFactory.fromAnyRef(baseDir))
+                .withValue("project.build.testOutputDirectory", ConfigValueFactory.fromAnyRef(testOutputDir))
+                .withValue("project.build.outputDirectory", ConfigValueFactory.fromAnyRef(projectBuildDir));
+    }
+
     private static class ActualRunner implements Runnable, Serializable, ExecutionNodeResultNotificationHandler {
 
         private transient SubstepsJMXClient jmxClient;
@@ -468,7 +532,8 @@ public class SubstepsRunProfileState  extends CommandLineState{
 
         private final CountDownLatch countDownLatch = new CountDownLatch(1);
 
-        public ActualRunner(SubstepsJMXClient jmxClient, Logger log, SubstepsListenersNotifier eventsConsumer,  Map<Long, SubstepsTestProxy> proxyMap, SubstepsTestProxy root ){
+        public ActualRunner(SubstepsJMXClient jmxClient, Logger log, SubstepsListenersNotifier eventsConsumer,
+                            Map<Long, SubstepsTestProxy> proxyMap, SubstepsTestProxy root ){
             this.jmxClient = jmxClient;
             this.jmxClient.setNotificiationHandler(this);
             this.log = log;
@@ -482,7 +547,15 @@ public class SubstepsRunProfileState  extends CommandLineState{
         @Override
         public void run() {
             try {
-                log.debug("run!");
+//                log.debug("about to pause");
+//
+//                try {
+//                    Thread.currentThread().sleep(5000L);
+//                } catch (InterruptedException e) {
+//                    e.printStackTrace();
+//                }
+
+                log.debug("running tests");
 
                 this.root.setState(SubstepTestState.RUNNING);
                 eventsConsumer.onEvent(new StateChangedEvent(this.root));
@@ -650,24 +723,20 @@ public class SubstepsRunProfileState  extends CommandLineState{
 
     protected GeneralCommandLine createCommandLine() throws ExecutionException {
 
-        return createFromJavaParameters(createJavaParameters(), CommonDataKeys.PROJECT
-                .getData(DataManager.getInstance().getDataContext()), true);
-    }
-
-    private JavaParameters myParams;
-
-
-    public JavaParameters getJavaParameters() throws ExecutionException {
-        if (myParams == null) {
-            myParams = createJavaParameters();
+        if (this.myParams == null){
+            log.debug("JavaParameters not set.. creating");
+            this.myParams = createJavaParameters();
         }
-        return myParams;
+
+        return createFromJavaParameters(this.myParams,
+                CommonDataKeys.PROJECT.getData(DataManager.getInstance().getDataContext()),
+                true);
+
     }
 
 
 
-
-    public GeneralCommandLine createFromJavaParameters(final SimpleJavaParameters javaParameters,
+    private GeneralCommandLine createFromJavaParameters(final SimpleJavaParameters javaParameters,
                                                               final Project project,
                                                               final boolean dynamicClasspath) throws CantRunException {
         return createFromJavaParameters(javaParameters, dynamicClasspath && JdkUtil.useDynamicClasspath(project));

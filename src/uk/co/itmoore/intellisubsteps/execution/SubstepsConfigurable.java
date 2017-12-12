@@ -1,19 +1,8 @@
 package uk.co.itmoore.intellisubsteps.execution;
 
 
-import com.intellij.openapi.options.ConfigurationException;
-import com.intellij.openapi.options.SettingsEditor;
-import com.intellij.ui.PanelWithAnchor;
-import org.jetbrains.annotations.NotNull;
-
-import javax.swing.*;
-
 import com.intellij.execution.ExecutionBundle;
-//import com.intellij.execution.MethodBrowser;
 import com.intellij.execution.configuration.BrowseModuleValueActionListener;
-//import com.intellij.execution.junit.SubstepsRunConfiguration;
-//import com.intellij.execution.junit.FeatureRunnerConfigurationType;
-//import com.intellij.execution.junit.TestClassFilter;
 import com.intellij.execution.ui.AlternativeJREPanel;
 import com.intellij.execution.ui.CommonJavaParametersPanel;
 import com.intellij.ide.util.PackageChooserDialog;
@@ -21,19 +10,36 @@ import com.intellij.openapi.fileChooser.FileChooserDescriptor;
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory;
 import com.intellij.openapi.fileChooser.FileChooserFactory;
 import com.intellij.openapi.fileTypes.PlainTextLanguage;
+import com.intellij.openapi.options.ConfigurationException;
+import com.intellij.openapi.options.SettingsEditor;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.ui.*;
-import com.intellij.psi.*;
-//import com.intellij.rt.execution.junit.RepeatCount;
-import com.intellij.ui.*;
+import com.intellij.openapi.ui.ComponentWithBrowseButton;
+import com.intellij.openapi.ui.LabeledComponent;
+import com.intellij.openapi.ui.TextFieldWithBrowseButton;
+import com.intellij.psi.JavaCodeFragment;
+import com.intellij.psi.PsiClass;
+import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiPackage;
+import com.intellij.ui.EditorTextField;
+import com.intellij.ui.EditorTextFieldWithBrowseButton;
+import com.intellij.ui.InsertPathAction;
+import com.intellij.ui.PanelWithAnchor;
 import com.intellij.ui.components.JBLabel;
 import gnu.trove.TIntArrayList;
+import org.jetbrains.annotations.NotNull;
 
+import javax.swing.*;
 import javax.swing.event.ChangeListener;
 import javax.swing.text.Document;
 import javax.swing.text.PlainDocument;
 import java.util.Arrays;
 import java.util.List;
+
+//import com.intellij.execution.MethodBrowser;
+//import com.intellij.execution.junit.SubstepsRunConfiguration;
+//import com.intellij.execution.junit.FeatureRunnerConfigurationType;
+//import com.intellij.execution.junit.TestClassFilter;
+//import com.intellij.rt.execution.junit.RepeatCount;
 
 
 /**
@@ -63,12 +69,12 @@ public class SubstepsConfigurable <T extends SubstepsRunConfiguration> extends S
 
 
     @Override
-    protected void resetEditorFrom(SubstepsRunConfiguration runConfig) {
+    protected void resetEditorFrom(@NotNull SubstepsRunConfiguration runConfig) {
 
     }
 
     @Override
-    protected void applyEditorTo(SubstepsRunConfiguration config) throws ConfigurationException {
+    protected void applyEditorTo(@NotNull SubstepsRunConfiguration config) throws ConfigurationException {
 
     }
 

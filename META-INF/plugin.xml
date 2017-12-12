@@ -17,7 +17,7 @@
 <idea-plugin>
   <id>uk.co.itmoore.intellisubsteps</id>
   <name>Substeps IntelliJ Plugin</name>
-  <version>1.0.9</version>
+  <version>1.1.1</version>
   <vendor email="ian@itmoore.co.uk" url="http://substeps.github.io">Substeps</vendor>
 
   <description><![CDATA[
@@ -30,6 +30,18 @@
 
 
   <change-notes><![CDATA[
+  <h3>1.1.1</h3>
+    <ul>
+      <li>Fixed a bug (#16) where breakpoints in java code for step implementations weren't being triggered</li>
+    </ul>
+
+
+ <h3>1.1.0</h3>
+    <ul>
+      <li>1.1.0 Substeps upgrade</li>
+    </ul>
+
+
    <h3>1.0.9</h3>
    <ul><li>Fix for issue #15 detected in Android Studio and a NPE.</li>
    </ul>
@@ -155,7 +167,7 @@
   </change-notes>
 
   <!-- please see http://confluence.jetbrains.com/display/IDEADEV/Build+Number+Ranges for description -->
-  <idea-version since-build="171"/>
+  <idea-version since-build="173"/>
 
   <!-- please see http://confluence.jetbrains.com/display/IDEADEV/Plugin+Compatibility+with+IntelliJ+Platform+Products
        on how to target different products -->

@@ -14,7 +14,6 @@ import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Test;
 import uk.co.itmoore.intellisubsteps.psi.feature.FeatureLexer;
-import uk.co.itmoore.intellisubsteps.psi.feature.FeatureTokenTypes;
 
 import java.io.File;
 import java.io.IOException;
